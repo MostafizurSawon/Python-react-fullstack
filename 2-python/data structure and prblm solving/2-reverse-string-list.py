@@ -11,6 +11,7 @@ def reverse_string(list):
   li2= [l[::-1] for l in list]
   return li2
   
+  # slice = s[start:stop:step]
   
     
 print(reverse_string(li))
