@@ -2,10 +2,15 @@ import os
 from time import sleep
 
 books = []
+lents = []
 
 def create_book():
   authors = ""
   title = input('Book Title: ')
+  isbn = input('Book ISBN: ')
+  year = input('Book Publishing Year: ')
+  price = input('Book Price: ')
+  quantity = input('Book Quantity: ')
   while True:
     author = input('Book Author: ')
     if author == "e":
@@ -21,15 +26,14 @@ def create_book():
         authors += author
       print('Author added successfully!')
     print('\n Press "e" if there is no more authors. \n')
-    
-  isbn = input('Book ISBN: ')
-  year = input('Book Publishing Year: ')
   
   new_book = {
     "title": title,
-    "authors": authors,
     "isbn": isbn,
     "year": year,
+    "price": price,
+    "quantity": quantity,
+    "authors": authors,
   }
   
   books.append(new_book)
@@ -39,12 +43,12 @@ def create_book():
   
   with open("books_backup.csv", "wt") as fp:
     for book in books:
-      line = f"{book['title']}, {book['authors']}, {book['isbn']}, {book['year']}\n"
+      line = f"{book['title']}, {book['isbn']}, {book['year']}, {book['price']}, {book['quantity']}, {book['authors']}\n"
       fp.write(line)
   
   
 def view_books():
-  print(f"Title \t\t\t Authors \t\t\t ISBN \t\t\t Published Year")
+  print(f"Title \t\t ISBN \t\t\t Published Year \t Price \t\t Quantity \t Authors")
   # print(books)
   for book in books:
     # print(book)
@@ -56,8 +60,126 @@ def view_books():
       else:
         auth+= l
       
-    line = f"{book['title']} \t\t {auth} \t\t {book['isbn']} \t\t {book['year']}"
+    line = f"{book['title']} \t{book['isbn']} \t  {book['year']} \t\t{book['price']} \t\t   {book['quantity']} \t\t{auth}"
     print(line)
+    
+def search_books():
+  search_term = input("Book search: ")
+  q = 0
+  print('')
+  for book in books:
+    if search_term.lower() in book["title"].lower() or search_term in book["isbn"] or search_term.lower() in book["authors"].lower():
+      q+=1
+      for t in books:
+        if t['title'] == book["title"]:
+          auth = ""
+          line_splitted = book['authors'].strip().split("#")
+          for l in line_splitted:
+            if len(auth):
+              auth+= ', '+l
+            else:
+              auth+= l
+      
+      line = f"Result: {q} -> Title: {book['title']}  ISBN:{book['isbn']} Published Year:{book['year']}  Price:{book['price']}  Quantity:{book['quantity']} Author: {auth}"
+      print(line)
+  print('\nTotal Found Books:', q)
+  
+def remove_book():
+    search_term = input("Enter text to search to remove: ")
+    
+    for index, book in enumerate(books):
+      if search_term.lower() in book["title"].lower():
+        for t in books:
+          if t['title'] == book["title"]:
+            auth = ""
+            line_splitted = book['authors'].strip().split("#")
+            for l in line_splitted:
+              if len(auth):
+                auth+= ', '+l
+              else:
+                auth+= l
+      
+            line = f"{index+1} -> Title: {book['title']}  ISBN:{book['isbn']} Published Year:{book['year']}  Price:{book['price']}  Quantity:{book['quantity']} Author: {auth}"
+            print(line)
+            
+    selected_index = input("Enter an number to remove: ")
+    selected_index = int(selected_index)
+
+    books.pop(selected_index - 1)
+
+    print("Book removing... Please wait...")
+    sleep(1)
+    backup_books()
+    print("Book removed successfully!")
+    
+def lent_book():
+  name = input("Your Name: ")
+  for items in lents:
+    if name.lower() in items['user'].lower():
+      print("\nPlease return your book First!\n")
+      print("Exiting...")
+      sleep(1)
+      return
+  book_name = input("Book Name you want to lent: ")
+  
+  flag = False
+  verify = []
+  
+  for index, book in enumerate(books):
+    
+    if book_name.lower() in book['title'].lower():
+      flag = True
+      for t in books:
+        if t['title'] == book["title"]:
+          auth = ""
+          line_splitted = book['authors'].strip().split("#")
+          for l in line_splitted:
+            if len(auth):
+              auth+= ', '+l
+            else:
+              auth+= l
+          verify.append(index)
+          line = f"{index+1} -> Title: {book['title']}  ISBN:{book['isbn']} Published Year:{book['year']}  Price:{book['price']}  Quantity:{book['quantity']} Author: {auth}"
+          print(line)
+      
+  if flag:
+    selected_index = input("Enter an number to lent: ")
+    selected_index = int(selected_index)
+    
+    if selected_index in verify:
+      quantity = int(books[selected_index-1]['quantity'])
+      if quantity:
+        books[selected_index-1]['quantity'] = quantity - 1
+        lent_book = {
+          "title" : books[selected_index-1]['title'],
+          "user" : name,
+        }
+        lents.append(lent_book)
+        
+        with open("lent_books_backup.csv", "wt") as fp:
+          for lent in lents:
+            line = f"{lent['title']}, {lent['user']}\n"
+            fp.write(line)
+        
+        backup_books()
+        print(lents)
+      else:
+        print("\nSorry currently this book is not available!\n")
+    else:
+      print("\nSelect correct number.\n")
+      
+  else:
+    print("\nNothing Found!\n")
+  
+  
+  
+    
+    
+def backup_books():
+  with open("books_backup.csv", "wt") as fp:
+    for book in books:
+      line = f"{book['title']}, {book['isbn']}, {book['year']}, {book['price']}, {book['quantity']}, {book['authors']}\n"
+      fp.write(line)
     
 def restore_books():
   with open("books_backup.csv", "r") as fp:
@@ -65,17 +187,33 @@ def restore_books():
         line_splitted = line.strip().split(",")
         book = {
             "title": line_splitted[0],
-            "authors": line_splitted[1],
-            "isbn": line_splitted[2],
-            "year": line_splitted[3],
+            "isbn": line_splitted[1],
+            "year": line_splitted[2],
+            "price": line_splitted[3],
+            "quantity": line_splitted[4],
+            "authors": line_splitted[5],
         }
         books.append(book)
 
   print("Books Restored!")
   
+def restore_lents():
+  with open("lent_books_backup.csv", "r") as fp:
+    for line in fp.readlines():
+        line_splitted = line.strip().split(",")
+        lent_list = {
+            "title": line_splitted[0],
+            "user": line_splitted[1],
+        }
+        lents.append(lent_list)
+
+  print("Lents Restored!", lents)
+  
 def check_and_restore_books():
     if os.path.exists("books_backup.csv") and os.path.getsize("books_backup.csv") > 0:
         restore_books()
+    if os.path.exists("lent_books_backup.csv") and os.path.getsize("lent_books_backup.csv") > 0:
+        restore_lents()
 
 check_and_restore_books()
 
@@ -85,7 +223,10 @@ menu = """
 
 1. Add a new book.
 2. View all books.
-3. Restore backup books.
+3. Search books by Title or ISBN or Author's name.
+4. Remove a book
+5. Lent a book
+6. Restore backup books.
 
 0. Exit
 
@@ -101,6 +242,12 @@ while True:
   elif(user == "2"):
     view_books()
   elif(user == "3"):
+    search_books()
+  elif(user == "4"):
+    remove_book()
+  elif(user == "5"):
+    lent_book()
+  elif(user == "8"):
     restore_books()
   elif(user == "0"):
     print("Exiting Now... Please wait........")
