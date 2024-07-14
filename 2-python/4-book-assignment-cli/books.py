@@ -60,7 +60,7 @@ def view_books():
       else:
         auth+= l
       
-    line = f"{book['title']} \t{book['isbn']} \t  {book['year']} \t\t{book['price']} \t\t   {book['quantity']} \t\t{auth}"
+    line = f"{book['title']} \t{book['isbn']} \t  {book['year']} \t\t\t{book['price']} \t\t   {book['quantity']} \t\t{auth}"
     print(line)
     
 def search_books(cat):
@@ -126,7 +126,7 @@ def lent_book():
   name = input("Your Name: ")
   for items in lents:
     if name.lower() in items['user'].lower():
-      print("\nHello Mr. {name} You can lent only 1 book at a time.\n\nPlease return your book First!\n")
+      print(f"\nHello Mr. {name} You can lent only 1 book at a time.\n\nPlease return your book First!\n")
       print("Exiting...")
       sleep(1)
       return
@@ -148,7 +148,7 @@ def lent_book():
               auth+= ', '+l
             else:
               auth+= l
-          verify.append(index)
+          verify.append(index+1)
           line = f"{index+1} -> Title: {book['title']}  ISBN:{book['isbn']} Published Year:{book['year']}  Price:{book['price']}  Quantity:{book['quantity']} Author: {auth}"
           print(line)
       
@@ -236,10 +236,6 @@ def return_book():
             
     
     
-          
-  
-    
-    
 def backup_books():
   with open("books_backup.csv", "wt") as fp:
     for book in books:
@@ -274,6 +270,29 @@ def restore_lents():
 
   print("Lents Restored!", lents)
   
+  
+def all_lent_books():
+  index = 1
+  for book in books:
+    # user =''
+    for lent in lents:
+      if lent['title'] in book['title']:
+        # user = lent['user']
+        # print(lent)
+        auth = ""
+        line_splitted = book['authors'].strip().split("#")
+        for l in line_splitted:
+          if len(auth):
+            auth+= ', '+l
+          else:
+            auth+= l
+          
+        line = f"{index}. User: {lent['user']}  Book: {book['title']} ISBN: {book['isbn']}  Published Year: {book['year']} Price: {book['price']}  Quantity: {book['quantity']} Authors: {auth}"
+        print(line) 
+        index+=1 
+
+
+  
 def check_and_restore_books():
     if os.path.exists("books_backup.csv") and os.path.getsize("books_backup.csv") > 0:
         restore_books()
@@ -293,7 +312,7 @@ menu = """
 5. Remove a book
 6. Lent a book
 7. Return a book
-8. Restore backup books.
+8. View all Lent books.
 
 0. Exit
 
@@ -307,6 +326,8 @@ while True:
   if(user == "1"):
     create_book()
   elif(user == "2"):
+    print("\nLoading...\n")
+    sleep(1)
     view_books()
   elif(user == "3"):
     search_books('title')
@@ -315,15 +336,21 @@ while True:
   elif(user == "5"):
     remove_book()
   elif(user == "6"):
+    view_books()
     lent_book()
   elif(user == "7"):
     return_book()
   elif(user == "8"):
-    restore_books()
+    print("\nLoading...\n")
+    sleep(1)
+    all_lent_books()
   elif(user == "0"):
     print("Exiting Now... Please wait........")
     sleep(2)
     print("Please Come again.")
     sleep(1)
     break
+  else:
+    print("\nInvalid Choice.")
+    sleep(1)
   
