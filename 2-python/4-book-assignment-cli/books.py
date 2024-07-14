@@ -63,12 +63,20 @@ def view_books():
     line = f"{book['title']} \t{book['isbn']} \t  {book['year']} \t\t{book['price']} \t\t   {book['quantity']} \t\t{auth}"
     print(line)
     
-def search_books():
-  search_term = input("Book search: ")
+def search_books(cat):
+  if cat == 'auth':
+    search_term = input("Book search by Author name: ")
+    
+  else:
+    search_term = input("Book search: ")
   q = 0
   print('')
   for book in books:
-    if search_term.lower() in book["title"].lower() or search_term in book["isbn"] or search_term.lower() in book["authors"].lower():
+    if cat == 'auth':
+      condition = search_term.lower() in book["authors"].lower()
+    else:
+      condition = search_term.lower() in book["title"].lower() or search_term in book["isbn"]
+    if condition:
       q+=1
       for t in books:
         if t['title'] == book["title"]:
@@ -112,18 +120,20 @@ def remove_book():
     backup_books()
     print("Book removed successfully!")
     
+    
+    
 def lent_book():
   name = input("Your Name: ")
   for items in lents:
     if name.lower() in items['user'].lower():
-      print("\nPlease return your book First!\n")
+      print("\nHello Mr. {name} You can lent only 1 book at a time.\n\nPlease return your book First!\n")
       print("Exiting...")
       sleep(1)
       return
   book_name = input("Book Name you want to lent: ")
   
   flag = False
-  verify = []
+  verify = [] # Ensures user selecting correct index
   
   for index, book in enumerate(books):
     
@@ -172,6 +182,61 @@ def lent_book():
     print("\nNothing Found!\n")
   
   
+def return_book():
+  name = input("Your Name: ")
+  book_lent = ''
+  flag = False
+  for lent in lents:
+    if name.lower() in lent['user'].lower():
+      # print(name, lent)
+      # print(f"\nHello Mr. {name} You can lent only 1 book at a time.\n\nPlease return your book First!\n")
+      # print("Exiting...")
+      # sleep(1)
+      # return
+      book_lent = lent['title']
+      flag = True
+  
+  if flag:
+    for book in books:
+      
+      if book_lent == book['title']:
+        for t in books:
+          if t['title'] == book["title"]:
+            auth = ""
+            line_splitted = book['authors'].strip().split("#")
+            for l in line_splitted:
+              if len(auth):
+                auth+= ', '+l
+              else:
+                auth+= l
+            line = f"Your Lent Book -> Title: {book['title']}  ISBN:{book['isbn']} Published Year:{book['year']}  Price:{book['price']}  Quantity:{book['quantity']} Author: {auth}"
+            print(line,'\n')
+            
+            print(f"Returning {book['title']}... Please wait......")
+            sleep(1)
+            
+
+            book['quantity'] = int(book['quantity'])+1
+
+            print('\nReturned Successfully!\n')
+            
+            print("Updating Books Server...Please wait......\n")
+            sleep(1)
+            backup_books()
+            print('Books server is now updated!\n')
+            
+  
+      for lent in lents:
+        if lent['user'].lower() == name:
+          lents.pop(lent)
+  else:
+    print("You have not lent any books.\n")
+    print('Exiting...')
+    sleep(1)
+            
+    
+    
+          
   
     
     
@@ -223,10 +288,12 @@ menu = """
 
 1. Add a new book.
 2. View all books.
-3. Search books by Title or ISBN or Author's name.
-4. Remove a book
-5. Lent a book
-6. Restore backup books.
+3. Search books by Title or ISBN.
+4. Search books by Author's name.
+5. Remove a book
+6. Lent a book
+7. Return a book
+8. Restore backup books.
 
 0. Exit
 
@@ -242,11 +309,15 @@ while True:
   elif(user == "2"):
     view_books()
   elif(user == "3"):
-    search_books()
+    search_books('title')
   elif(user == "4"):
-    remove_book()
+    search_books('auth')
   elif(user == "5"):
+    remove_book()
+  elif(user == "6"):
     lent_book()
+  elif(user == "7"):
+    return_book()
   elif(user == "8"):
     restore_books()
   elif(user == "0"):
