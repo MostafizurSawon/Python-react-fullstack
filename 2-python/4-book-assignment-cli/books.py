@@ -8,9 +8,25 @@ def create_book():
   authors = ""
   title = input('Book Title: ')
   isbn = input('Book ISBN: ')
-  year = input('Book Publishing Year: ')
-  price = input('Book Price: ')
-  quantity = input('Book Quantity: ')
+  
+  while True:
+    try:
+        year = int(input('Book Publishing Year: '))
+        break
+    except ValueError:
+        print("Invalid input. Please enter a valid year.")
+  while True:
+    try:
+        quantity = int(input('Book Quantity: '))
+        break
+    except ValueError:
+        print("Invalid input. Please enter a valid number for the book quantity.")
+  while True:
+    try:
+        price = float(input('Book Price: '))
+        break
+    except ValueError:
+        print("Invalid input. Please enter a valid number for the book price.")
   while True:
     author = input('Book Author: ')
     if author == "e":
@@ -43,11 +59,12 @@ def create_book():
   
   with open("books_backup.csv", "wt") as fp:
     for book in books:
-      line = f"{book['title']}, {book['isbn']}, {book['year']}, {book['price']}, {book['quantity']}, {book['authors']}\n"
+      line = f"{book['title']},{book['isbn']},{book['year']},{book['price']},{book['quantity']},{book['authors']}\n"
       fp.write(line)
   
   
 def view_books():
+  print(" ############################################################## All Books List ############################################################\n")
   print(f"Title \t\t ISBN \t\t\t Published Year \t Price \t\t Quantity \t Authors")
   # print(books)
   for book in books:
@@ -62,6 +79,8 @@ def view_books():
       
     line = f"{book['title']} \t{book['isbn']} \t  {book['year']} \t\t\t{book['price']} \t\t   {book['quantity']} \t\t{auth}"
     print(line)
+  
+  print("\n ############################################################## Books List Ends ############################################################\n")
     
 def search_books(cat):
   if cat == 'auth':
@@ -94,7 +113,7 @@ def search_books(cat):
   
 def remove_book():
     search_term = input("Enter text to search to remove: ")
-    
+    verify = []
     for index, book in enumerate(books):
       if search_term.lower() in book["title"].lower():
         for t in books:
@@ -106,14 +125,17 @@ def remove_book():
                 auth+= ', '+l
               else:
                 auth+= l
-      
+            verify.append(index)
             line = f"{index+1} -> Title: {book['title']}  ISBN:{book['isbn']} Published Year:{book['year']}  Price:{book['price']}  Quantity:{book['quantity']} Author: {auth}"
             print(line)
             
-    selected_index = input("Enter an number to remove: ")
-    selected_index = int(selected_index)
+    selected_index = input("Enter a number to remove: ")
+    selected_index = int(selected_index)-1
 
-    books.pop(selected_index - 1)
+    if selected_index in verify:
+      books.pop(selected_index)
+    else:
+      print("\nThis book is not available to remove!\n")
 
     print("Book removing... Please wait...")
     sleep(1)
@@ -125,7 +147,7 @@ def remove_book():
 def lent_book():
   name = input("Your Name: ")
   for items in lents:
-    if name.lower() in items['user'].lower():
+    if name.lower() == items['user'].lower():
       print(f"\nHello Mr. {name} You can lent only 1 book at a time.\n\nPlease return your book First!\n")
       print("Exiting...")
       sleep(1)
@@ -153,28 +175,35 @@ def lent_book():
           print(line)
       
   if flag:
-    selected_index = input("Enter an number to lent: ")
+    selected_index = input("Enter a number to lent: ")
     selected_index = int(selected_index)
     
     if selected_index in verify:
       quantity = int(books[selected_index-1]['quantity'])
       if quantity:
+        if quantity==1:
+          print(f"\nSorry {books[selected_index-1]['title']} has only one copy available. Last copy can not be lent!\n")
+          return
         books[selected_index-1]['quantity'] = quantity - 1
         lent_book = {
-          "title" : books[selected_index-1]['title'],
-          "user" : name,
+          "title":books[selected_index-1]['title'],
+          "user":name,
         }
         lents.append(lent_book)
         
+        print("\nProcessing...Please wait...")
+        sleep(1)
+        print(f"\n{book['title']} lent to {name}\n")
+        
         with open("lent_books_backup.csv", "wt") as fp:
           for lent in lents:
-            line = f"{lent['title']}, {lent['user']}\n"
+            line = f"{lent['title']},{lent['user']}\n"
             fp.write(line)
         
         backup_books()
-        print(lents)
+        # print(lents)
       else:
-        print("\nSorry currently this book is not available!\n")
+        print("\nNot enough books available to lend!\n")
     else:
       print("\nSelect correct number.\n")
       
@@ -188,11 +217,6 @@ def return_book():
   flag = False
   for lent in lents:
     if name.lower() in lent['user'].lower():
-      # print(name, lent)
-      # print(f"\nHello Mr. {name} You can lent only 1 book at a time.\n\nPlease return your book First!\n")
-      # print("Exiting...")
-      # sleep(1)
-      # return
       book_lent = lent['title']
       flag = True
   
@@ -218,17 +242,21 @@ def return_book():
 
             book['quantity'] = int(book['quantity'])+1
 
-            print('\nReturned Successfully!\n')
             
-            print("Updating Books Server...Please wait......\n")
-            sleep(1)
-            backup_books()
-            print('Books server is now updated!\n')
             
   
-      for lent in lents:
-        if lent['user'].lower() == name:
-          lents.pop(lent)
+    for index,lent in enumerate(lents):
+      if lent['user'].lower() == name:
+        # print(lent,name)
+        lents.pop(index)
+        restore_lents()
+        print('\nReturned Successfully!\n')
+            
+        print("Updating Books Server...Please wait......\n")
+        sleep(1)
+        backup_books()
+        print('Books server is now updated!\n')
+        return
   else:
     print("You have not lent any books.\n")
     print('Exiting...')
@@ -239,7 +267,7 @@ def return_book():
 def backup_books():
   with open("books_backup.csv", "wt") as fp:
     for book in books:
-      line = f"{book['title']}, {book['isbn']}, {book['year']}, {book['price']}, {book['quantity']}, {book['authors']}\n"
+      line = f"{book['title']},{book['isbn']},{book['year']},{book['price']},{book['quantity']},{book['authors']}\n"
       fp.write(line)
     
 def restore_books():
@@ -247,38 +275,36 @@ def restore_books():
     for line in fp.readlines():
         line_splitted = line.strip().split(",")
         book = {
-            "title": line_splitted[0],
-            "isbn": line_splitted[1],
-            "year": line_splitted[2],
-            "price": line_splitted[3],
-            "quantity": line_splitted[4],
-            "authors": line_splitted[5],
+            "title":line_splitted[0],
+            "isbn":line_splitted[1],
+            "year":line_splitted[2],
+            "price":line_splitted[3],
+            "quantity":line_splitted[4],
+            "authors":line_splitted[5],
         }
         books.append(book)
 
-  print("Books Restored!")
+  # print("Books Restored!")
   
 def restore_lents():
   with open("lent_books_backup.csv", "r") as fp:
     for line in fp.readlines():
         line_splitted = line.strip().split(",")
         lent_list = {
-            "title": line_splitted[0],
-            "user": line_splitted[1],
+            "title":line_splitted[0],
+            "user":line_splitted[1],
         }
         lents.append(lent_list)
 
-  print("Lents Restored!", lents)
+  # print("Lents Restored!", lents)
   
   
 def all_lent_books():
+  print("\n ############################################################## All Lents Books ############################################################\n")
   index = 1
   for book in books:
-    # user =''
     for lent in lents:
       if lent['title'] in book['title']:
-        # user = lent['user']
-        # print(lent)
         auth = ""
         line_splitted = book['authors'].strip().split("#")
         for l in line_splitted:
@@ -290,6 +316,7 @@ def all_lent_books():
         line = f"{index}. User: {lent['user']}  Book: {book['title']} ISBN: {book['isbn']}  Published Year: {book['year']} Price: {book['price']}  Quantity: {book['quantity']} Authors: {auth}"
         print(line) 
         index+=1 
+  print("\n ############################################################ Lents Books List Ends ##########################################################\n")
 
 
   
@@ -334,6 +361,8 @@ while True:
   elif(user == "4"):
     search_books('auth')
   elif(user == "5"):
+    view_books()
+    print()
     remove_book()
   elif(user == "6"):
     view_books()
