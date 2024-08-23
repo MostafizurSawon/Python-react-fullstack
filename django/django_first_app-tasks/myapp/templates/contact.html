@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h2>Contact Us</h2>
+    <h3>Our email address is {{ emailaddress }}</h3>
+    {% load static %}
+    <p>
+        <img width="400" src="{% static 'images/img3.jpeg' %}" alt="">
+    </p>
+
+    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eos doloribus nesciunt animi vitae excepturi provident asperiores ducimus quidem dolorum iusto?</p>
+    <p>
+      <ul>
+        {% for profile in socialprofiles %}
+        <li>{{ profile | lower}}</li> 
+        <!-- template fileter -->
+        {% endfor %}
+      </ul>
+    </p>
+    <p>
+      Our headquarter is in 
+      {% if hq == "d" %}
+      <strong>Dhaka</strong>
+      {% elif hq == "k" %}
+      <strong>Khulna</strong>
+      {% elif hq == "r" %}
+      <strong>Rajshahi</strong>
+      {% else %}
+      <strong>Area 51</strong>
+      {% endif %}
+    </p>
+{% endblock %}
+
+{% block title %}
+    Contact Us
+{% endblock %}
