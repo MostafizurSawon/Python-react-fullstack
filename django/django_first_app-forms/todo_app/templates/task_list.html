@@ -3,17 +3,24 @@
 {% block content %}
 
 <h1>All Tasks</h1>
-<ol>
+<ul>
     {% for task in tasks %}
     <li>
-        ID: {{ task.id }} <a href="{% url 'task_details' task.pk %}">{{ task.title }}</a> - {{ task.description }} - {{ task.completed }} | <a href="{% url 'delete_task' task.id %}">Delete</a>
+        {{ forloop.counter }}.
+        <!-- {{ task.id }} - -->
+        <a href="{% url 'task_details' task.pk %}">
+            {{ task.title }}
+        </a> - {{ task.description }} -
+        {{ task.completed }}
+        | <a href="{% url 'update_form' task.id %}">Update</a>
+        | <a href="{% url 'delete_task' task.id %}">Delete</a>
     </li>
     {% endfor %}
-</ol>
+</ul>
 
 <a href="/tasks/?completed=1">Completed Tasks</a>
 <br>
-<a href="/tasks/?<completed=0>">Pending Tasks</a>
+<a href="/tasks/?completed=0">Pending Tasks</a>
 <br>
 <a href="/tasks/">All Tasks</a>
 <br>
