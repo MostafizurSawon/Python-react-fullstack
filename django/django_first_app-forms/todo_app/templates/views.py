@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Task, Book, Author
 from django.http import HttpResponse, JsonResponse
-from .forms import TaskForm, TaskUpdateForm, BookForm, AuthorForm
+from .forms import TaskForm, TaskUpdateForm, BookForm
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 
@@ -132,19 +132,6 @@ def task_by_user_id(request, user_id):
 
 # --books and authors one to many relationship ----
 
-def add_author(request):
-    if request.method == "POST":
-        form = AuthorForm(request.POST)
-        if form.is_valid():
-            print(form.cleaned_data)
-            form.save()
-            return redirect("all_books")
-        else:
-            return render(request, "add_author.html", {"form": form})
-    else:
-        form = AuthorForm()
-        return render(request, "add_author.html", {"form": form})
-
 
 def all_books(request):
     books = Book.objects.all()
@@ -178,15 +165,13 @@ def add_book(request):
     if request.method == "POST":
         form = BookForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
             form.save()
             return redirect("all_books")
         else:
             return render(request, "add_book.html", {"form": form})
     else:
-        form = BookForm()
+        form = TaskForm()
         return render(request, "add_book.html", {"form": form})
-
 
 
 def author(request, author_id):
