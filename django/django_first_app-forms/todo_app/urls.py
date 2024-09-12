@@ -15,10 +15,11 @@ urlpatterns = [
     
     path('books/', views.all_books, name="all_books"),
     path('books/add-book/', views.add_book, name="add_book"),
-    path('books/add-author/', views.add_author, name="add_author"),
-    
-    
     path('books/<int:book_id>', views.book, name="book"),
+    path('books/update/<int:pk>', views.update_book_form, name="update_book"),
+    
+    
+    path('books/add-author/', views.add_author, name="add_author"),
     path('author/<int:author_id>', views.author, name="author")
 ]
 

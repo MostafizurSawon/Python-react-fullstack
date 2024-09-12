@@ -2,6 +2,33 @@
 
 {% block content %}
 
+<div class="{{custom}}">
+    <div class="popup-message" id="popupMessage">
+        Welcome to the site.
+    </div>
+</div>
+
+{% if messages %}
+<div class="">
+    {% for message in messages %}
+        <div class="popup-message" id="popupMessage">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% comment %} 
+{% if messages %}
+<div class="container mt-3 popup-message" id="popupMessage"">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+{% endif %} {% endcomment %}
+
 <h1>All Tasks</h1>
 <ul>
     {% for task in tasks %}
@@ -25,5 +52,15 @@
 <a href="/tasks/">All Tasks</a>
 <br>
 <a href="/tasks/form">Add Task</a>
+<br>
+<a href="/tasks/books/">All Books</a>
+<br>
+<a href="/tasks/books/add-book">Add new Book</a>
+<br>
+<a href="/tasks/books/add-book">Add new Book</a>
+<br>
+{% comment %} <a href="{% url 'update_form' task.id %}">Update Book</a>
+<br>
+<a href="{% url 'delete_task' task.id %}">Delete Book</a> {% endcomment %}
 
 {% endblock %}
