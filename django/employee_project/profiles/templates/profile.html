@@ -1,0 +1,86 @@
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% block content %}
+
+
+<center>
+  <div class="m-2 bg-light rounded shadow">
+    <h1 class="p-3">{{user}}'s Personal Information</h1>
+    <div class="card-header">
+      <center class="">
+        <p>Username: {{user.username}} </p>
+        <p>First Name: {{user.first_name}} </p>
+        <p>Last Name: {{user.last_name}} </p>
+        <p>Email: {{user.email}} </p>
+        <p>Last logged in: {{user.last_login}} </p>
+        <p>Joining date: {{user.date_joined}} </p>
+      </center>
+    </div>
+  </div>
+
+  <div class="mx-5">
+    <div class=" pt-5">
+      {% if data|length %}
+        <h1 class="p-3">{{user}}'s Company Profile</h1>
+      {% endif %}
+      {% for post in data %}
+      <div class="">
+        <div class="card shadow m-2">
+          <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <p>Username: {{post.name.username}} </p>
+              <p>Email: {{post.name.email}} </p>
+            </div>
+          </div>
+          <center class="card-body mx-4">
+            {% comment %} <h5 class="card-title"><a href="{% url 'detail_post' post.id %}" class="text-decoration-none text-dark">{{post.title}}</a></h5> {% endcomment %}
+            <h5 class="card-title">Employee Name: {{post.name.first_name}} {{post.name.last_name}}</h5>
+            <p class="card-text">Salary : {{post.salary}} ৳</p>
+            <p class="card-text">Address : {{post.address}}</p>
+            <p class="card-text">Mobile No : {{post.phone}}</p>
+            <p class="card-text">Gender : {{post.gender}}</p>
+            <p class="card-text">Designation : {{post.designation}}</p>
+            <p class="card-text">Description : {{post.description}}</p>
+            <div class="d-flex justify-content-between mb-2">
+              <a href="{% url 'update_data_form' post.id %}">
+                <button type="button" class="btn btn-outline-success px-5">Edit</button></a>
+              
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-outline-danger px-5" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                  Delete
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        Are you Sure you want to delete all your datas?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-success px-3" data-bs-dismiss="modal">No</button>
+                        <a href="{% url 'delete_data' post.id %}">
+                        <button type="button" class="btn btn-outline-danger">Delete</button>
+                      </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              
+            </div>
+            
+          </center>
+          <div class="card-footer text-muted">
+            <center>Company Profile Created on: {{post.created_on}}</center>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</center>
+
+
+{% endblock %}
