@@ -5,8 +5,14 @@ from .forms import DataForm, DataUpdateForm
 
 # Create your views here.
 def home(request):
-  data = Cdata.objects.all()
-  return render(request, 'home.html', {'data': data})
+    query = request.GET.get('q')  # Capture the search query if it exists
+    if query:
+        data = Cdata.objects.filter(first_name__icontains=query)  # Filter by name
+    else:
+        data = Cdata.objects.all()  # Show all data if no query
+
+    return render(request, 'home.html', {'data': data, 'query': query})
+
 
 def contact_details(request, pk):
     try:
