@@ -1,0 +1,32 @@
+{% extends 'base.html' %} 
+{% comment %} {% load static %} {% endcomment %}
+{% block content %}
+
+
+
+
+<div class="p-4">
+  <div id="e-data" class="">
+    <center><h4 class="text-success"> Result found: {{data | length}}</h4></center>
+    <div class="row pt-5 gy-4">
+      {% for post in data %}
+      <div class="col-md-6 ">
+        <div class="card shadow m-2">
+          <div class="card-body mx-4">
+            Employee Name: <a href="{% url 'contact_details' post.pk %}">
+               {{post.first_name}}
+          </a>
+            <p>Email: <a href="mailto:{{post.email}}">{{post.email}}</a> </p>
+            <p class="card-text">Mobile No : <a href="tel:5{{post.phone}}p000">{{post.phone}}</a></p>
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'update_data_form' post.id %}"><button class="btn btn-success">Edit</button></a>
+              <a href="{% url 'delete_data' post.id %}"><button class="btn btn-danger">Delete</button></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
