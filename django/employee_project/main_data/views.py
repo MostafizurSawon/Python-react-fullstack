@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
-from .forms import DataForm, DataUpdateForm
+from .forms import DataForm, DataUpdateForm, DataUpdateFormAdmin
 from django.contrib.auth.decorators import login_required
 from .models import E_data
 
@@ -48,6 +48,35 @@ def update_data_form(request, pk):
                 return render(request, "add_data.html", context=context)
 
         data_form = DataUpdateForm(instance=data)
+        context = {
+            "form": data_form,
+            "type": "Update"
+        }
+        return render(request, "add_data.html", context=context)
+    except E_data.DoesNotExist:
+        return HttpResponse("Employee Data does not exist")
+    
+    
+@login_required
+def update_data_form_admin(request, pk):
+    try:
+        data = E_data.objects.get(pk=pk)
+
+        if request.method == "POST":
+            data_form = DataUpdateFormAdmin(request.POST, instance=data)
+
+            if data_form.is_valid():
+                data_form.save()
+                messages.success(request, "Employee data updated successfully!")
+                return redirect("profile")
+            else:
+                context = {
+                    "form": data_form,
+                    "type": "Update"
+                }
+                return render(request, "add_data.html", context=context)
+
+        data_form = DataUpdateFormAdmin(instance=data)
         context = {
             "form": data_form,
             "type": "Update"

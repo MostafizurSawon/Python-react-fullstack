@@ -35,3 +35,13 @@ class DataUpdateForm(forms.ModelForm):
             'designation': forms.TextInput(attrs={'readonly': 'true'}),
             'salary': forms.TextInput(attrs={'readonly': 'true'}),
         }
+        
+class DataUpdateFormAdmin(forms.ModelForm):
+    phone = forms.CharField(
+        max_length=14,
+        validators=[RegexValidator(r'^\d+$', message="Phone number must contain only digits.")],
+        widget=forms.TextInput(attrs={'placeholder': 'Phone Number'})
+    )
+    class Meta:
+        model = E_data
+        fields = '__all__'

@@ -14,7 +14,7 @@
     <title>Employee's Data!</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
       <div class="container-fluid">
         <a class="navbar-brand" href="{% url 'homepage' %}">Employee Data</a>
         <button
@@ -75,6 +75,8 @@
             {% endif %}
 
             {% if request.user.is_authenticated %}
+            {% if not request.user.is_superuser %}
+
             <li class="nav-item ms-3">
               <a
                 class="nav-link text-danger"
@@ -82,6 +84,8 @@
                 >Delete {{user}}'s account</a
               >
             </li>
+
+            {% endif %}
             {% endif %}
             
           </ul>
