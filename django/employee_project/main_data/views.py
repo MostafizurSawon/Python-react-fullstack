@@ -64,3 +64,13 @@ def delete_data(request, pk):
         return redirect("profile")
     except E_data.DoesNotExist:
         return HttpResponse("Data does not exist")
+    
+    
+@login_required
+def delete_user_data(request):
+    user = request.user
+    if request.method == 'POST':
+        user.delete()
+        return redirect('homepage') 
+
+    return render(request, 'confirm.html')

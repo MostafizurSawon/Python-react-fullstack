@@ -44,9 +44,22 @@ def user_login(request):
 @login_required
 def profile(request):
     data = E_data.objects.filter(name = request.user)
-    print('data:', request.user.username)
+    # print('data:', request.user.username)
     return render(request, 'profile.html', {'data': data, 'user': request.user})
+
+@login_required
+def profile_nav(request):
+    data = E_data.objects.filter(name = request.user)
+    # post_id = -1
+    # for post in data:
+    #     post_id = post.id
+    #     break
+        
+    # print('data:', request.user.username)
+    print("post id",data[0].id, data[0].name_id)
+    return render(request, 'base.html', {'data': data[0], 'user': request.user})
 
 def user_logout(request):
     logout(request)
     return redirect('user_login')
+

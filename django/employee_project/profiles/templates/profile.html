@@ -32,7 +32,8 @@
           </div>
           <center class="card-body mx-4">
             {% comment %} <h5 class="card-title"><a href="{% url 'detail_post' post.id %}" class="text-decoration-none text-dark">{{post.title}}</a></h5> {% endcomment %}
-            <h5 class="card-title">Employee Name: {{post.name.first_name}} {{post.name.last_name}}</h5>
+            {% comment %} <h5 class="card-title">Employee Name: {{post.name.first_name}} {{post.name.last_name}}</h5> {% endcomment %}
+            <h5 class="card-title">Employee Name: {{post.employee}}</h5>
             <p class="card-text">Salary : {{post.salary}} ৳</p>
             <p class="card-text">Address : {{post.address}}</p>
             <p class="card-text">Mobile No : {{post.phone}}</p>
@@ -44,12 +45,12 @@
                 <button type="button" class="btn btn-outline-success px-5">Edit</button></a>
               
                 <!-- Button trigger modal -->
-                <button type="button" class="btn btn-outline-danger px-5" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                {% comment %} <button type="button" class="btn btn-outline-danger px-5" data-bs-toggle="modal" data-bs-target="#exampleModal">
                   Delete
-                </button>
+                </button> {% endcomment %}
 
                 <!-- Modal -->
-                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                {% comment %} <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
                       <div class="modal-header">
@@ -67,7 +68,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> {% endcomment %}
               
             </div>
             

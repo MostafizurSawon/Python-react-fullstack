@@ -16,8 +16,10 @@ class E_data(models.Model):
       ('Male', 'Male'),
       ('Female', 'Female'),
   ]
+  # unique=True
   # name = models.CharField(max_length=40)
   name = models.OneToOneField(User, on_delete=models.CASCADE)
+  employee = models.CharField(max_length=40, blank=True, null=True)
   address = models.TextField()
   phone = models.CharField(max_length=14)
   salary = models.DecimalField(max_digits=10, decimal_places=2)

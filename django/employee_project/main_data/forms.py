@@ -12,6 +12,7 @@ class DataForm(forms.ModelForm):
     class Meta:
         model = E_data
         fields = [
+            "employee",
             "address",
             "phone",
             "salary",

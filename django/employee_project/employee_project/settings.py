@@ -70,6 +70,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'profiles.context_processors.user_data',
+                # 'profiles.context_processors.add_user_data',
             ],
         },
     },

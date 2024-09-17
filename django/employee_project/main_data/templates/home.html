@@ -38,7 +38,8 @@
             </div>
           </div>
           <div class="card-body mx-4">
-            <h5 class="card-title">Employee Name: {{post.name.first_name}} {{post.name.last_name}}</h5>
+            {% comment %} <h5 class="card-title">Employee Name: {{post.name.first_name}} {{post.name.last_name}}</h5> {% endcomment %}
+            <h5 class="card-title">Employee Name: {{post.employee}}</h5>
             <p class="card-text">Salary : {{post.salary}} ৳</p>
             <p class="card-text">Address : {{post.address}}</p>
             <p class="card-text">Mobile No : <a href="tel:5{{post.phone}}p000">{{post.phone}}</a></p>
