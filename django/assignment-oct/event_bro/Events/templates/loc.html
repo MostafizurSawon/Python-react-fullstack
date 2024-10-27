@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{%  load crispy_forms_tags %}
+{% block title %}
+<title>User Profile | Event Bro</title>
+{% endblock %} 
+
+
+
+{% block content %} 
+
+
+
+<section class="bg-light py-3 py-md-5 py-xl-8">
+  <div class="container">
+    <div class="row justify-content-md-center">
+      <div class="col-12 col-md-10 col-lg-8 col-xl-7 col-xxl-6">
+        <h2 class="mb-4 display-5 text-center">{{data.user.username}}'s Profile</h2>
+
+        <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+  Add Location
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Location</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form class="mx-auto w-100" method="post">
+          {% csrf_token %}
+          {{ form_l | crispy }}
+        
+          <button class="btn btn-success" data-bs-dismiss="modal" type="submit">Add Data</button>
+        
+        </form>
+      </div>
+      {% comment %} <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div> {% endcomment %}
+    </div>
+  </div>
+</div>
+
+        
+      </div>
+    </div>
+  </div>
+
+</section>
+
+
+{% comment %} user own jokes {% endcomment %}
+
+
+
+
+
+{% endblock %}
+
+
+

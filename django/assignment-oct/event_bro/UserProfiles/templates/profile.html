@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{%  load crispy_forms_tags %}
+{% block title %}
+<title>User Profile | Event Bro</title>
+{% endblock %} 
+
+
+
+{% block content %} 
+
+
+
+<section class="bg-light py-3 py-md-5 py-xl-8">
+  <div class="container">
+    <div class="row justify-content-md-center">
+      <div class="col-12 col-md-10 col-lg-8 col-xl-7 col-xxl-6">
+        <h2 class="mb-4 display-5 text-center">{{data.user.username}}'s Profile</h2>
+
+        <p class="text-secondary text-center lead fs-4 mb-5">This Profile page is your digital hub, where you can find all your profile informations.</p>
+        
+        <hr class="w-50 mx-auto mb-5 mb-xl-9 border-dark-subtle">
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row gy-4 gy-lg-0">
+      <div class="col-12 col-lg-4 col-xl-3">
+        <div class="row gy-4">
+          <div class="col-12">
+            <div class="card widget-card border-light shadow-sm">
+              <div class="card-header text-bg-primary">Welcome, {{data.user.username}}</div>
+              <div class="card-body">
+                <div class="text-center mb-3">
+                  <img src="{{data.image}}" class="img-fluid rounded-circle"  alt="{{data.user.username}}" />
+                </div>
+                <h5 class="text-center mb-1">{{data.user.first_name}} {{data.user.last_name}}</h5>
+                <p class="text-center text-secondary mb-4">{{data.position}}</p>
+                <p class="text-center text-secondary mb-4">Total Points: {{data.points}}</p>
+                
+                <ul class="list-group list-group-flush mb-4">
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <h6 class="m-0">Total Posts</h6>
+                    <span>{{all}}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <h6 class="m-0">Pending tasks</h6>
+                    <span>{{pending}}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <h6 class="m-0">Completed Tasks</h6>
+                    <span>{{complete}}</span>
+                  </li>
+                </ul>
+                {% comment %} <div class="d-grid m-0">
+                  <button class="btn btn-outline-primary" type="button">Follow</button>
+                </div> {% endcomment %}
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="card widget-card border-light shadow-sm">
+              <div class="card-header text-bg-primary">Social Accounts</div>
+              <div class="card-body">
+                
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="card widget-card border-light shadow-sm">
+              <div class="card-header text-bg-primary">About Me</div>
+              <div class="card-body">
+                <ul class="list-group list-group-flush mb-0">
+                  <li class="list-group-item">
+                    <h6 class="mb-1">
+                      <span class="bii bi-mortarboard-fill me-2"></span>
+                      Education
+                    </h6>
+                  </li>
+                  <li class="list-group-item">
+                    <h6 class="mb-1">
+                      <span class="bii bi-geo-alt-fill me-2"></span>
+                      {{data.country}}
+                    </h6>
+                    <span>{{data.address}}</span>
+                  </li>
+                  <li class="list-group-item">
+                    <h6 class="mb-1">
+                      <span class="bii bi-building-fill-gear me-2"></span>
+                      Company
+                    </h6>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="card widget-card border-light shadow-sm">
+              <div class="card-header text-bg-primary">Skills</div>
+              <div class="card-body">
+                Coming soon
+                <img class="img-fluid" src="https://giffiles.alphacoders.com/221/221781.gif" alt="">
+                {% comment %} <span class="badge text-bg-primary">HTML</span>
+                <span class="badge text-bg-primary">SCSS</span>
+                <span class="badge text-bg-primary">Javascript</span>
+                <span class="badge text-bg-primary">React</span>
+                <span class="badge text-bg-primary">Vue</span>
+                <span class="badge text-bg-primary">Angular</span>
+                <span class="badge text-bg-primary">UI</span>
+                <span class="badge text-bg-primary">UX</span> {% endcomment %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-8 col-xl-9">
+        <div class="card widget-card border-light shadow-sm">
+          <div class="card-body p-4">
+            <ul class="nav nav-tabs" id="profileTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-tab-pane" type="button" role="tab" aria-controls="overview-tab-pane" aria-selected="true">Overview</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="about-tab" data-bs-toggle="tab" data-bs-target="#about-tab-pane" type="button" role="tab" aria-controls="about-tab-pane" aria-selected="false">About</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Profile</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email-tab-pane" type="button" role="tab" aria-controls="email-tab-pane" aria-selected="false">Emails</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password-tab-pane" type="button" role="tab" aria-controls="password-tab-pane" aria-selected="false">Password</button>
+              </li>
+            </ul>
+            <div class="tab-content pt-4" id="profileTabContent">
+              <div class="tab-pane fade show active" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
+                {% comment %} <a class="dropdown-item" href="{% url 'profile_info' %}">Update data</a> {% endcomment %}
+
+                <h5 class="mb-3">Your all Tasks</h5>
+                
+                
+
+
+                
+
+                
+              </div>
+              <div class="tab-pane fade" id="about-tab-pane" role="tabpanel" aria-labelledby="about-tab" tabindex="0">
+                
+                
+                <p class="lead mb-3">{{data.description}}</p>
+
+                <h5 class="mb-3">Profile</h5>
+                <div class="row g-0">
+                  <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                    <div class="p-2">First Name</div>
+                  </div>
+                  <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                    <div class="p-2">{{data.user.first_name}}</div>
+                  </div>
+                  <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                    <div class="p-2">Last Name</div>
+                  </div>
+                  <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                    <div class="p-2">{{data.user.last_name}}</div>
+                  </div>
+
+                  <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                    <div class="p-2"><div class="d-flex align-items-center mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock-history text-muted me-2" viewBox="0 0 16 16">
+                        <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022zm2.004.45a7 7 0 0 0-.985-.299l.219-.976q.576.129 1.126.342zm1.37.71a7 7 0 0 0-.439-.27l.493-.87a8 8 0 0 1 .979.654l-.615.789a7 7 0 0 0-.418-.302zm1.834 1.79a7 7 0 0 0-.653-.796l.724-.69q.406.429.747.91zm.744 1.352a7 7 0 0 0-.214-.468l.893-.45a8 8 0 0 1 .45 1.088l-.95.313a7 7 0 0 0-.179-.483m.53 2.507a7 7 0 0 0-.1-1.025l.985-.17q.1.58.116 1.17zm-.131 1.538q.05-.254.081-.51l.993.123a8 8 0 0 1-.23 1.155l-.964-.267q.069-.247.12-.501m-.952 2.379q.276-.436.486-.908l.914.405q-.24.54-.555 1.038zm-.964 1.205q.183-.183.35-.378l.758.653a8 8 0 0 1-.401.432z"/>
+                        <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0z"/>
+                        <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5"/>
+                      </svg>
+                      Last Login
+                    </div></div>
+                  </div>
+
+                  
+                  
+                  <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                    <div class="p-2">{{ user.last_login }}</div>
+                  </div>
+                  <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                    <div class="p-2"><div class="d-flex align-items-center mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar text-muted me-2" viewBox="0 0 16 16">
+                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
+                      </svg>
+                      Member since
+                    </div></div>
+                  </div>
+
+                  
+                  <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                    <div class="p-2">{{ user.date_joined }}</div>
+                  </div>
+
+                  
+              
+                  
+                  
+
+                  <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                    <div class="p-2">Address</div>
+                  </div>
+                  <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                    <div class="p-2">{{data.address}}</div>
+                  </div>
+                  <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                    <div class="p-2">Country</div>
+                  </div>
+                  <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                    <div class="p-2">{{data.country}}</div>
+                  </div>
+                  <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                    <div class="p-2">Phone</div>
+                  </div>
+                  <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                    <div class="p-2">{{data.mobile}}</div>
+                  </div>
+                  <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                    <div class="p-2">Email</div>
+                  </div>
+                  <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                    <div class="p-2">{{data.user.email}}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                <form action="#!" class="row gy-3 gy-xxl-4">
+                  <div class="col-12">
+                    <div class="row gy-2">
+                      <label class="col-12 form-label m-0">Profile Image</label>
+                      <div class="col-12">
+                        <img src="{{data.image}}" class="img-fluid" alt="{{data.user.username}}" height="600px" width="400px">
+                      </div>
+                      <div class="col-12">
+                        <a href="#!" class="d-inline-block bg-primary link-light lh-1 p-2 rounded">
+                          <i class="bi bi-upload"></i>
+                        </a>
+                        <a href="#!" class="d-inline-block bg-danger link-light lh-1 p-2 rounded">
+                          <i class="bi bi-trash"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="inputFirstName" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="inputFirstName" value="{{data.user.first_name}}">
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="inputLastName" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="inputLastName" value="{{data.user.last_name}}">
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="inputSkills" class="form-label">Skills</label>
+                    <input type="text" class="form-control" id="inputSkills" value="HTML, SCSS, Javascript, React, Vue, Angular, UI, UX">
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="inputPhone" class="form-label">Phone</label>
+                    <input type="tel" class="form-control" id="inputPhone" value="{{data.mobile}}">
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="inputEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="inputEmail" value="{{data.user.email}}">
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="inputAddress" class="form-label">Address</label>
+                    <input type="text" class="form-control" id="inputAddress" value="{{data.address}}">
+                  </div>
+                  <div class="col-12">
+                    <label for="inputAbout" class="form-label">About</label>
+                    <textarea class="form-control" id="inputAbout">{{data.description}}</textarea>
+                  </div>
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                  </div>
+                </form>
+              </div>
+              <div class="tab-pane fade" id="email-tab-pane" role="tabpanel" aria-labelledby="email-tab" tabindex="0">
+                <form action="#!">
+                  <fieldset class="row gy-3 gy-md-0">
+                    <legend class="col-form-label col-12 col-md-3 col-xl-2">Email Alerts</legend>
+                    <div class="col-12 col-md-9 col-xl-10">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="emailChange">
+                        <label class="form-check-label" for="emailChange">
+                          Email Changed
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="passwordChange">
+                        <label class="form-check-label" for="passwordChange">
+                          Password Changed
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="weeklyNewsletter">
+                        <label class="form-check-label" for="weeklyNewsletter">
+                          Weekly Newsletter
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="productPromotions">
+                        <label class="form-check-label" for="productPromotions">
+                          Product Promotions
+                        </label>
+                      </div>
+                    </div>
+                  </fieldset>
+                  <div class="row">
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-primary mt-4">Save Changes</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="tab-pane fade" id="password-tab-pane" role="tabpanel" aria-labelledby="password-tab" tabindex="0">
+                <form action="#!">
+                  <div class="row gy-3 gy-xxl-4">
+                    <div class="col-12">
+                      <label for="currentPassword" class="form-label">Current Password</label>
+                      <input type="password" class="form-control" id="currentPassword">
+                    </div>
+                    <div class="col-12">
+                      <label for="newPassword" class="form-label">New Password</label>
+                      <input type="password" class="form-control" id="newPassword">
+                    </div>
+                    <div class="col-12">
+                      <label for="confirmPassword" class="form-label">Confirm Password</label>
+                      <input type="password" class="form-control" id="confirmPassword">
+                    </div>
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-primary">Change Password</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+
+{% comment %} user own jokes {% endcomment %}
+
+
+
+
+
+{% endblock %}
+
+
+
