@@ -1,10 +1,12 @@
 from django.http import HttpResponse
 from django.views.generic import FormView
 from .forms import UserRegistrationForm, UserProfileForm
-from django.contrib.auth import login, logout
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect, get_object_or_404
+
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm
 
 from .models import UserAccount
 # from Events.models import Events
@@ -65,6 +67,28 @@ class UserLoginView(LoginView):
     def get_success_url(self):
         # print("logged")
         return reverse_lazy('profile')
+    
+def UserLogin(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                # Redirect to profile page on successful login
+                return redirect(reverse_lazy('profile'))
+            else:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Invalid login details. Please try again.")
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'user_login.html', {'form': form})
 
 @login_required
 def user_logout(request):
@@ -114,7 +138,7 @@ def update_profile_info_form(request):
 
             if data_form.is_valid():
                 data_form.save()
-                messages.success(request, "Your Data updated successfully!")
+                messages.success(request, "Your Profile Data updated successfully!")
                 return redirect("profile")
             else:
                 context = {

@@ -2,13 +2,13 @@
 {% load static %}
 
 {% block content %}
-<!-- Hero 3 - Bootstrap Brain Component -->
-<section class="py-3 py-lg-5 py-xl-8">
+<!-- Hero Component -->
+{% comment %} <section class="py-3 py-lg-5 py-xl-8">
   <div class="container overflow-hidden">
     <div class="row gy-5 gy-lg-0 align-items-lg-center justify-content-lg-between">
       <div class="col-12 col-lg-6 order-1 order-lg-0">
         <h2 class="display-3 fw-bold mb-3">Gojo sensei is watching you!</h2>
-        <p class="fs-4 mb-5">Timely task management enhances productivity, reduces stress, and leads to a sense of accomplishment, driving success in both personal and professional life.</p>
+        <p class="fs-4 mb-5">Timely event management enhances productivity, reduces stress, and leads to a sense of accomplishment, driving success in both personal and professional life.</p>
         <div class="d-grid gap-2 d-sm-flex">
           <button type="button" class="btn btn-secondary bsb-btn-2xl rounded-pill">Explore Now</button>
           <button type="button" class="btn btn-outline-dark bsb-btn-2xl rounded-pill">Free Trial</button>
@@ -20,88 +20,114 @@
           <div class="bsb-circle bg-secondary position-absolute top-50 start-50 translate-middle" style="--bsb-cs: 460px;"></div>
           <div class="bsb-circle border border-4 border-danger position-absolute top-10 end-0 z-1" style="--bsb-cs: 100px;"></div>
           <img class="img-fluid position-relative z-2" loading="lazy" src="{% static 'images/gojo.png' %}" alt="sawons website hero section">
-          {% comment %} <img class="img-fluid position-relative z-2" loading="lazy" src="https://img.freepik.com/free-vector/young-superhero-action-pose_1308-172152.jpg" alt="A Digital Agency Specialized in AI and Web 3.0"> {% endcomment %}
+          <img class="img-fluid position-relative z-2" loading="lazy" src="https://img.freepik.com/free-vector/young-superhero-action-pose_1308-172152.jpg" alt="A Digital Agency Specialized in AI and Web 3.0">
         </div>
       </div>
     </div>
   </div>
-</section>
-<div>
-    {% comment %} {% include 'show_books.html' with books=books %} {% endcomment %}
+</section> {% endcomment %}
+
+{% comment %} {% load messages %} {% endcomment %}
+
+  
+
+<section class="main-home container-fluid my-4 pt-5">
+  <!-- Messages -->
+{% if messages %}
+<div class="container my-5">
+    {% for message in messages %}
+        <div class="alert 
+            {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} 
+            alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
 </div>
+<!-- Auto-dismiss messages after 5 seconds -->
+<script>
+    setTimeout(() => {
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000); // 5000ms = 5 seconds
+</script>
+{% endif %}
 
 
 
-<section class="main-home container-fluid mb-4">
   <div class="my-5 text-success">
-    <h2>User's Activities</h2>
+    <h2>All Events</h2>
     <hr>
   </div>
-  <div class="row d-flex justify-content-center gy-4">
+  <div class="row d-flex justify-content-center g-2">
 
-    {% for task in taskHome %}
-    <div class="col-md-12">
+    {% for event in ev %}
+    <div class="col-md-4">
       <div class="card">
         <div class="card-header d-flex align-items-center">
           {% comment %} <span class="avatar text-bg-primary avatar-lg fs-5">R</span> {% endcomment %}
           <div class="text-center d-flex align-items-center">
-           {% comment %} asd {{ac.gender}} {% endcomment %}
-            <img src="{{task.user.account.image}}" class="img-fluid rounded-circle" height="50" width="50" alt="{{data.user.username}}" />
+            <img src="{{event.owner.account.image}}" class="img-fluid rounded-circle" height="50" width="50" alt="{{data.user.username}}" />
           </div>
           <div class="ms-3">
-            <h6 class="mb-0 fs-sm text-success">{{task.user.first_name}} {{task.user.last_name}} ({{task.user.username}})</h6>
+            <h6 class="mb-0 fs-sm text-success">{{event.owner.first_name}} {{event.owner.last_name}} ({{event.owner.username}})</h6>
             
-            <span class="text-muted fs-sm">{{task.created_at}}</span>
+            <span class="text-muted fs-sm">{{event.created_at}}</span>
           </div>
           <div class="dropstart ms-auto">
-            <p class="text-success fs-sm">User Point: {{task.user.account.points}}</p>
+            {% comment %} <p class="text-success fs-sm">User Point: {{event.owner.account.points}}</p> {% endcomment %}
             <button class="btn text-muted" type="btn" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="fas fa-ellipsis-v"></i> 
             </button>
             <ul class="dropdown-menu">
               <li>
-                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="{% url 'update_event' event.id %}">Edit</a>
               </li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item" href="{% url 'delete_event' event.id %}">Delete</a></li>
             </ul>
           </div>
         </div>
         {% comment %} <img src="/images/cards/2.jpg" class="card-img-top" alt="green iguana" /> {% endcomment %}
         <div class="card-body">
+          <h5 class="card-title">
+            Name: {{event.name}}
+          </h5>
           <p class="card-text">
-          
-            <div class="card-body">
-              {% if task.complete %}
-                <h5 class="card-title">Status: <span class="text-success">Completed</span></h5>
-              {% else %}
-                <h5 class="card-title">Status: <span class="text-danger">Pending</span></h5>
-              {% endif %}
-              <p class="card-text">
-                Topics: {{task.topics}}
-              </p>
-              <h4 class="card-text">            
-                Skills: 
-                {% if task.skill_category.all %}
-                  
-                    {% for skill in task.skill_category.all %}
-                      <button type="button" class="btn btn-primary btn-sm" disabled>{{ skill.skill }}</button> 
-                    {% endfor %}
-                  
-                {% else %}
-                  No skills assigned.
-                {% endif %}</h4>
-              </div>
-            
+            Location: {{event.location}}
+          </p>
+          <p class="card-text">
+            Type: {{event.cat}}
+          </p>
+          <p class="card-text">
+            Event date: {{event.date}}
+          </p>
+          <p class="card-text">
+            Seat available: {{event.limit}}
+          </p>
+          <p class="card-text">
+            Description: {{event.description}}
           </p>
         </div>
-        {% comment %} <div class="card-footer d-flex">
-          <button class="btn btn-link p-0 me-auto fw-bold" href="#">Action</button>
-          <button class="btn btn-subtle" type="button"><i class="fas fa-heart fa-lg"></i></button>
-          <button class="btn btn-subtle" type="button"><i class="fas fa-share fa-lg"></i></button>
-        </div> {% endcomment %}
+        <div class="card-footer d-flex">
+          <button class="btn p-0 me-auto fw-bold text-muted">Posted: {{ event.created_date }}</button>
+          {% if event.id in booked_events %}
+              <button class="btn btn-success" style="background-color: #28a745; border: none;">
+                  <i class="fas fa-check-circle me-2"></i> <!-- Font Awesome check icon -->
+                  Event Booked
+              </button>
+          {% else %}
+              <button class="btn btn-link p-0 me-auto fw-bold" onclick="location.href='{% url 'book_event' event.id %}'">Book Now</button>
+          {% endif %}
+
+        </div>
+          {% comment %} <button class="btn btn-subtle" type="button"><i class="fas fa-heart fa-lg"></i></button>
+          <button class="btn btn-subtle" type="button"><i class="fas fa-share fa-lg"></i></button> {% endcomment %}
+        
       </div>
     </div>
-    <hr>
     {% endfor %}
     
   </div>

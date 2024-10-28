@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{{ request.user.username }}'s Booked Events | Event Bro
+{% endblock %} 
+
+{% block content %}
+<section class="main-home container-fluid my-4 pt-5">
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container my-5">
+        {% for message in messages %}
+            <div class="alert 
+                {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} 
+                alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(() => {
+            let alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                let bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000); // 5000ms = 5 seconds
+    </script>
+    {% endif %}
+
+    <div class="my-5 text-success">
+        <h2>{{ request.user.username }}'s booked Events</h2>
+        <hr>
+    </div>
+
+    <div class="row d-flex justify-content-center g-2">
+        {% if booked %}
+            {% for booking in booked %}
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="text-center d-flex align-items-center">
+                            <img src="{{ booking.ev.owner.account.image }}" class="img-fluid rounded-circle" height="50" width="50" alt="{{ booking.ev.owner.username }}'s profile picture" />
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0 fs-sm text-success">{{ booking.ev.owner.first_name }} {{ booking.ev.owner.last_name }} ({{ booking.ev.owner.username }})</h6>
+                            <span class="text-muted fs-sm">{{ booking.created|date:"D d M Y H:i:s" }}</span>
+                        </div>
+                        <div class="dropstart ms-auto">
+                            <button class="btn text-muted" type="btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v"></i> 
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'update_event' booking.ev.id %}">Edit</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'delete_event' booking.ev.id %}">Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Name: {{ booking.ev.name }}</h5>
+                        <p class="card-text">Location: {{ booking.ev.location }}</p>
+                        <p class="card-text">Type: {{ booking.ev.cat }}</p>
+                        <p class="card-text">Event date: {{ booking.ev.date }}</p>
+                        <p class="card-text">Seats available: {{ booking.ev.limit }}</p>
+                        <p class="card-text">Description: {{ booking.ev.description }}</p>
+                    </div>
+                    <div class="card-footer d-flex">
+                        <button class="btn p-0 me-auto fw-bold text-muted">Booked On: {{ booking.created|date:"D d M Y H:i:s" }}</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-md-12">
+                <p>You have not booked any events yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock content %}

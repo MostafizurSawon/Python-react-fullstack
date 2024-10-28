@@ -11,6 +11,28 @@
 
 
 <section class="bg-light py-3 py-md-5 py-xl-8">
+  {% if messages %}
+<div class="container my-5">
+    {% for message in messages %}
+        <div class="alert 
+            {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} 
+            alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+</div>
+<!-- Auto-dismiss messages after 5 seconds -->
+<script>
+    setTimeout(() => {
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000); // 5000ms = 5 seconds
+</script>
+{% endif %}
   <div class="container">
     <div class="row justify-content-md-center">
       <div class="col-12 col-md-10 col-lg-8 col-xl-7 col-xxl-6">

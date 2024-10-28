@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import random
+from Events.models import Events
 
 class UserAccount(models.Model):
     GENDER_CHOICES = [
@@ -11,7 +12,7 @@ class UserAccount(models.Model):
     images = [
       'https://img.freepik.com/free-photo/androgynous-avatar-non-binary-queer-person_23-2151100207.jpg',
       'https://img.freepik.com/free-photo/cartoon-character-with-handbag-sunglasses_71767-99.jpg',
-      'https://img.freepik.com/free-photo/anime-style-character-space_23-2151134190.jpg', 
+      'https://img.freepik.com/free-photo/androgynous-avatar-non-binary-queer-person_23-2151100211.jpg', 
       'https://img.freepik.com/premium-photo/poster-anime-character-with-fiery-background_943629-32000.jpg',
       'https://img.freepik.com/free-photo/androgynous-avatar-non-binary-queer-person_23-2151100183.jpg'
       ]
@@ -32,3 +33,10 @@ class UserAccount(models.Model):
     def __str__(self):
         return self.user.first_name
     
+class UserBooked(models.Model):
+  user = models.ForeignKey(User, related_name='booked_account', on_delete=models.CASCADE)
+  ev = models.ForeignKey(Events, related_name='booked_event', on_delete=models.CASCADE)
+  created = models.DateTimeField(auto_now_add=True)
+  
+  def __str__(self):
+    return f"{self.user.username}'s {self.ev.name}"
