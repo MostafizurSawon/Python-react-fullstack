@@ -52,85 +52,107 @@
             let bsAlert = new bootstrap.Alert(alert);
             bsAlert.close();
         });
-    }, 5000); // 5000ms = 5 seconds
+    }, 3000); 
 </script>
 {% endif %}
 
 
-
-  <div class="my-5 text-success">
-    <h2>All Events</h2>
-    <hr>
-  </div>
-  <div class="row d-flex justify-content-center g-2">
-
-    {% for event in ev %}
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-header d-flex align-items-center">
-          {% comment %} <span class="avatar text-bg-primary avatar-lg fs-5">R</span> {% endcomment %}
-          <div class="text-center d-flex align-items-center">
-            <img src="{{event.owner.account.image}}" class="img-fluid rounded-circle" height="50" width="50" alt="{{data.user.username}}" />
-          </div>
-          <div class="ms-3">
-            <h6 class="mb-0 fs-sm text-success">{{event.owner.first_name}} {{event.owner.last_name}} ({{event.owner.username}})</h6>
-            
-            <span class="text-muted fs-sm">{{event.created_at}}</span>
-          </div>
-          <div class="dropstart ms-auto">
-            {% comment %} <p class="text-success fs-sm">User Point: {{event.owner.account.points}}</p> {% endcomment %}
-            <button class="btn text-muted" type="btn" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="fas fa-ellipsis-v"></i> 
-            </button>
-            <ul class="dropdown-menu">
-              <li>
-                <a class="dropdown-item" href="{% url 'update_event' event.id %}">Edit</a>
-              </li>
-              <li><a class="dropdown-item" href="{% url 'delete_event' event.id %}">Delete</a></li>
-            </ul>
-          </div>
-        </div>
-        {% comment %} <img src="/images/cards/2.jpg" class="card-img-top" alt="green iguana" /> {% endcomment %}
-        <div class="card-body">
-          <h5 class="card-title">
-            Name: {{event.name}}
-          </h5>
-          <p class="card-text">
-            Location: {{event.location}}
-          </p>
-          <p class="card-text">
-            Type: {{event.cat}}
-          </p>
-          <p class="card-text">
-            Event date: {{event.date}}
-          </p>
-          <p class="card-text">
-            Seat available: {{event.limit}}
-          </p>
-          <p class="card-text">
-            Description: {{event.description}}
-          </p>
-        </div>
-        <div class="card-footer d-flex">
-          <button class="btn p-0 me-auto fw-bold text-muted">Posted: {{ event.created_date }}</button>
-          {% if event.id in booked_events %}
-              <button class="btn btn-success" style="background-color: #28a745; border: none;">
-                  <i class="fas fa-check-circle me-2"></i> <!-- Font Awesome check icon -->
-                  Event Booked
-              </button>
-          {% else %}
-              <button class="btn btn-link p-0 me-auto fw-bold" onclick="location.href='{% url 'book_event' event.id %}'">Book Now</button>
-          {% endif %}
-
-        </div>
-          {% comment %} <button class="btn btn-subtle" type="button"><i class="fas fa-heart fa-lg"></i></button>
-          <button class="btn btn-subtle" type="button"><i class="fas fa-share fa-lg"></i></button> {% endcomment %}
+<section class="main-home container-fluid my-4 pt-5">
+  <!-- Search and Filter Form -->
+  <div class="w-50 mx-auto">
+    <form method="GET" action="{% url 'home' %}">
+      <div class="input-group mb-3">
+        <!-- Dropdown for Category -->
+        <select name="category" class="btn btn-outline-secondary">
+          <option value="">All Categories</option>
+          {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+          {% endfor %}
+        </select>
         
+        <!-- Search Input -->
+        <input type="text" name="search" class="form-control" placeholder="Search by name" aria-label="Text input with segmented dropdown button">
+        
+        <!-- Search Button -->
+        <button type="submit" class="btn btn-info">Search</button>
       </div>
-    </div>
-    {% endfor %}
-    
+    </form>
   </div>
+
+  {% if ev %}
+    <div class="my-5 text-success">
+      <h2>All Events</h2>
+      <hr>
+    </div>
+    <div class="row d-flex justify-content-center g-2">
+      {% for event in ev %}
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header d-flex align-items-center">
+            <div class="text-center d-flex align-items-center">
+              <img src="{{ event.owner.account.image }}" class="img-fluid rounded-circle" height="50" width="50" alt="{{ event.owner.username }}" />
+            </div>
+            <div class="ms-3">
+              <h6 class="mb-0 fs-sm text-success">{{ event.owner.first_name }} {{ event.owner.last_name }} ({{ event.owner.username }})</h6>
+              <span class="text-muted fs-sm">{{ event.created_date }}</span>
+            </div>
+            <div class="dropstart ms-auto">
+              <button class="btn text-muted" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-ellipsis-v"></i> 
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'update_event' event.id %}">Edit</a></li>
+                <li><a class="dropdown-item" href="{% url 'delete_event' event.id %}">Delete</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Name: {{ event.name }}</h5>
+            <p class="card-text">Location: {{ event.location }}</p>
+            <p class="card-text">Category: {{ event.cat }}</p>
+            <p class="card-text">Event date: {{ event.date }}</p>
+            <p class="card-text">Seat available: {{ event.limit }}</p>
+            <p class="card-text">Description: {{ event.description }}</p>
+          </div>
+          <div class="card-footer d-flex">
+            <button class="btn p-0 me-auto fw-bold text-muted">Posted: {{ event.created_date }}</button>
+            {% if event.id in booked_events %}
+                <button class="btn btn-success" style="background-color: #28a745; border: none;">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Event Booked
+                </button>
+            {% else %}
+                <button class="btn btn-link p-0 me-auto fw-bold" onclick="location.href='{% url 'book_event' event.id %}'">Book Now</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- No Results Found Template -->
+    <section class="py-3 py-md-5 min-vh-100 d-flex justify-content-center align-items-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="text-center">
+              <h2 class="d-flex justify-content-center align-items-center gap-2 mb-4">
+                <span class="display-1 fw-bold">4</span>
+                <i class="bi bi-exclamation-circle-fill text-danger display-4"></i>
+                <span class="display-1 fw-bold bsb-flip-h">4</span>
+              </h2>
+              <h3 class="h2 mb-2">Oops! You're lost.</h3>
+              <p class="mb-5">No events found matching your search criteria.</p>
+              <a class="btn bsb-btn-5xl btn-dark rounded-pill px-5 fs-6 m-0" href="{% url 'home' %}" role="button">Back to Home</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+</section>
+
+
 </section>
 
 {% endblock content %}

@@ -62,17 +62,17 @@
                 
                 <ul class="list-group list-group-flush mb-4">
                   <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <h6 class="m-0">Total Posts</h6>
-                    <span>{{all}}</span>
+                    <h6 class="m-0">Total Events</h6>
+                    <span>{{ev | length}}</span>
                   </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                  {% comment %} <li class="list-group-item d-flex justify-content-between align-items-center">
                     <h6 class="m-0">Pending tasks</h6>
                     <span>{{pending}}</span>
                   </li>
                   <li class="list-group-item d-flex justify-content-between align-items-center">
                     <h6 class="m-0">Completed Tasks</h6>
                     <span>{{complete}}</span>
-                  </li>
+                  </li> {% endcomment %}
                 </ul>
                 {% comment %} <div class="d-grid m-0">
                   <button class="btn btn-outline-primary" type="button">Follow</button>
@@ -80,15 +80,15 @@
               </div>
             </div>
           </div>
-          <div class="col-12">
+          {% comment %} <div class="col-12">
             <div class="card widget-card border-light shadow-sm">
               <div class="card-header text-bg-primary">Social Accounts</div>
               <div class="card-body">
                 
               </div>
             </div>
-          </div>
-          <div class="col-12">
+          </div> {% endcomment %}
+          {% comment %} <div class="col-12">
             <div class="card widget-card border-light shadow-sm">
               <div class="card-header text-bg-primary">About Me</div>
               <div class="card-body">
@@ -115,24 +115,24 @@
                 </ul>
               </div>
             </div>
-          </div>
-          <div class="col-12">
+          </div> {% endcomment %}
+          {% comment %} <div class="col-12">
             <div class="card widget-card border-light shadow-sm">
               <div class="card-header text-bg-primary">Skills</div>
               <div class="card-body">
                 Coming soon
                 <img class="img-fluid" src="https://giffiles.alphacoders.com/221/221781.gif" alt="">
-                {% comment %} <span class="badge text-bg-primary">HTML</span>
+                <span class="badge text-bg-primary">HTML</span>
                 <span class="badge text-bg-primary">SCSS</span>
                 <span class="badge text-bg-primary">Javascript</span>
                 <span class="badge text-bg-primary">React</span>
                 <span class="badge text-bg-primary">Vue</span>
                 <span class="badge text-bg-primary">Angular</span>
                 <span class="badge text-bg-primary">UI</span>
-                <span class="badge text-bg-primary">UX</span> {% endcomment %}
+                <span class="badge text-bg-primary">UX</span>
               </div>
             </div>
-          </div>
+          </div> {% endcomment %}
         </div>
       </div>
       <div class="col-12 col-lg-8 col-xl-9">
@@ -145,21 +145,82 @@
               <li class="nav-item" role="presentation">
                 <button class="nav-link" id="about-tab" data-bs-toggle="tab" data-bs-target="#about-tab-pane" type="button" role="tab" aria-controls="about-tab-pane" aria-selected="false">About</button>
               </li>
-              <li class="nav-item" role="presentation">
+              {% comment %} <li class="nav-item" role="presentation">
                 <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Profile</button>
-              </li>
-              <li class="nav-item" role="presentation">
+              </li> {% endcomment %}
+              {% comment %} <li class="nav-item" role="presentation">
                 <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email-tab-pane" type="button" role="tab" aria-controls="email-tab-pane" aria-selected="false">Emails</button>
-              </li>
-              <li class="nav-item" role="presentation">
+              </li> {% endcomment %}
+              {% comment %} <li class="nav-item" role="presentation">
                 <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password-tab-pane" type="button" role="tab" aria-controls="password-tab-pane" aria-selected="false">Password</button>
-              </li>
+              </li> {% endcomment %}
             </ul>
             <div class="tab-content pt-4" id="profileTabContent">
               <div class="tab-pane fade show active" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
                 {% comment %} <a class="dropdown-item" href="{% url 'profile_info' %}">Update data</a> {% endcomment %}
 
-                <h5 class="mb-3">Your all Tasks</h5>
+                <h5 class="mb-3">Events</h5>
+<hr>
+                {% if ev %}
+
+    <div class="row d-flex justify-content-center g-2">
+      {% for event in ev %}
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header d-flex align-items-center">
+            <div class="text-center d-flex align-items-center">
+              <img src="{{ event.owner.account.image }}" class="img-fluid rounded-circle" height="50" width="50" alt="{{ event.owner.username }}" />
+            </div>
+            <div class="ms-3">
+              <h6 class="mb-0 fs-sm text-success">{{ event.owner.first_name }} {{ event.owner.last_name }} ({{ event.owner.username }})</h6>
+              <span class="text-muted fs-sm">{{ event.created_date }}</span>
+            </div>
+            <div class="dropstart ms-auto">
+              <button class="btn text-muted" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-ellipsis-v"></i> 
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'update_event' event.id %}">Edit</a></li>
+                <li><a class="dropdown-item" href="{% url 'delete_event' event.id %}">Delete</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Name: {{ event.name }}</h5>
+            <p class="card-text">Location: {{ event.location }}</p>
+            <p class="card-text">Category: {{ event.cat }}</p>
+            <p class="card-text">Event date: {{ event.date }}</p>
+            <p class="card-text">Seat available: {{ event.limit }}</p>
+            <p class="card-text">Description: {{ event.description }}</p>
+          </div>
+          <div class="card-footer">
+            <p class="text-center fw-bold text-muted">Posted: {{ event.created_date }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- No Results Found Template -->
+    <section class="py-3 py-md-5 min-vh-100 d-flex justify-content-center align-items-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="text-center">
+              <h2 class="d-flex justify-content-center align-items-center gap-2 mb-4">
+                <span class="display-1 fw-bold">4</span>
+                <i class="bi bi-exclamation-circle-fill text-danger display-4"></i>
+                <span class="display-1 fw-bold bsb-flip-h">4</span>
+              </h2>
+              <h3 class="h2 mb-2">Oops! You're lost.</h3>
+              <p class="mb-5">No events found matching your search criteria.</p>
+              <a class="btn bsb-btn-5xl btn-dark rounded-pill px-5 fs-6 m-0" href="{% url 'home' %}" role="button">Back to Home</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  {% endif %}
                 
                 
 
@@ -229,12 +290,12 @@
                   <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
                     <div class="p-2">{{data.address}}</div>
                   </div>
-                  <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                  {% comment %} <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
                     <div class="p-2">Country</div>
                   </div>
                   <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
                     <div class="p-2">{{data.country}}</div>
-                  </div>
+                  </div> {% endcomment %}
                   <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
                     <div class="p-2">Phone</div>
                   </div>

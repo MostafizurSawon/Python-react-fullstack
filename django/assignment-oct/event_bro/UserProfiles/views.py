@@ -1,5 +1,7 @@
 from django.http import HttpResponse
 from django.views.generic import FormView
+
+from Events.models import Events
 from .forms import UserRegistrationForm, UserProfileForm
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView
@@ -13,28 +15,8 @@ from .models import UserAccount
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import random
+from django.contrib.auth.models import User  
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.contrib.auth.models import User  # Assuming you're using the default User model
-
-# @receiver(post_save, sender=User)
-# def create_user_account(sender, instance, created, **kwargs):
-#     # When a new User is created, create the corresponding UserAccount, UserSocialAccount, userEducation
-#     if created:
-#         UserAccount.objects.create(
-#             user=instance, 
-#             image=random.choice(UserAccount.images),  # Or handle image selection appropriately
-#         )
-#         UserSocialAccount.objects.create(
-#             user=instance, 
-#         )
-#         UserEducation.objects.create(
-#             user=instance,   
-#         )
-
-
-# User Authentication starts here
 
 from django.db import IntegrityError
 
@@ -102,12 +84,13 @@ def user_logout(request):
 # Profile Section starts here
 @login_required
 def MyProfile(request):
-#   data = UserAccount.objects.all()
-    data = get_object_or_404(UserAccount, user=request.user)
-    if data:
-        return render(request, 'profile.html',  {'data': data})
-    else:
-        return render(request, 'profile.html')
+    ev = Events.objects.filter(owner=request.user)
+    
+    if request.user.is_superuser:
+        ev = Events.objects.all()
+        messages.success(request, f"Welcome Admin!")
+        
+    return render(request, 'profile.html', {'ev': ev})
 
 @login_required
 def add_profile_info_form(request):

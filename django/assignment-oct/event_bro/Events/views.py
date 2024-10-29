@@ -92,7 +92,7 @@ def updateEvent(request, event_id):
     event = get_object_or_404(Events, id=event_id)
 
     # Allow only the owner to update the event
-    if event.owner != request.user:
+    if event.owner != request.user and not request.user.is_superuser:
         messages.error(request, "You do not have permission to edit this event.")
         return redirect('home')
 
@@ -111,7 +111,7 @@ def updateEvent(request, event_id):
 def deleteEvent(request, event_id):
     event = get_object_or_404(Events, id=event_id)
 
-    if event.owner != request.user:
+    if event.owner != request.user and not request.user.is_superuser:
         messages.error(request, "You do not have permission to delete this event.")
         return redirect('home')
 
