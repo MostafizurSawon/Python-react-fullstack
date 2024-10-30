@@ -1,17 +1,19 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% block title %}
 <title>Login Page | Event Bro</title>
 {% endblock %}
 {% block content %}
-
-<section class="p-3 p-md-4 p-xl-5">
+<div class="my-5"></div>
+<section class="p-5 p-md-4 p-xl-5">
     <div class="container">
       <div class="row">
-        <div class="col-12 col-md-5">
-          <img class="img-fluid rounded mx-auto my-4 w-100 shadow" loading="lazy" src="https://mfiles.alphacoders.com/100/1009815.png" alt="login side wallpaper">
+        <div class="col-12 col-md-6">
+          <img class="img-fluid rounded mx-auto my-4 w-100 shadow" loading="lazy" src="{% static 'images/login.gif' %}" alt="login side wallpaper">
+          {% comment %} <img class="img-fluid rounded mx-auto my-4 w-100 shadow" loading="lazy" src="https://img.freepik.com/free-photo/top-view-lock-with-key-password_23-2148578124.jpg" alt="login side wallpaper"> {% endcomment %}
         </div>
-        <div class="col-12 col-md-7 bsb-tpl-bg-lotion">
+        <div class="col-12 col-md-6 bsb-tpl-bg-lotion d-flex align-items-center">
           <div class="p-3 p-md-4 p-xl-5">
 
             <h3 class="mb-5">Welcome to the Login!</h3>

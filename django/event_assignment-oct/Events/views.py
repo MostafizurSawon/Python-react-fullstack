@@ -88,6 +88,26 @@ def bookEvent(request, event_id):
     return redirect('home')
 
 @login_required
+def cancelBooking(request, event_id):
+    event = get_object_or_404(Events, id=event_id)
+    ac = UserAccount.objects.get(user=request.user)
+
+    booking = UserBooked.objects.filter(user=request.user, ev=event).first()
+    if booking:
+        booking.delete()
+        ac.points -= 10  
+        ac.save()
+
+        event.limit += 1
+        event.save()
+
+        messages.success(request, f"You have successfully canceled your booking for {event.name}.")
+    else:
+        messages.error(request, "You do not have a booking for this event.")
+
+    return redirect('booked-event')
+
+@login_required
 def updateEvent(request, event_id):
     event = get_object_or_404(Events, id=event_id)
 

@@ -39,7 +39,7 @@
       </button>
       <div class="collapse navbar-collapse" id="bsbNavbar">
         <ul class="navbar-nav bsb-dropdown-menu-responsive ms-auto align-items-center">
-          <li class="nav-item dropdown">
+          {% comment %} <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle bsb-dropdown-toggle-caret-disable" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               <span class="position-relative pt-1">
                 <i class="bi bi-search"></i>
@@ -56,7 +56,7 @@
                 </div>
               </form>
             </div>
-          </li>
+          </li> {% endcomment %}
           {% comment %} 
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle bsb-dropdown-toggle-caret-disable" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -333,7 +333,7 @@
 
 {% else %}
 
-<nav class="py-3 navbar navbar-expand-lg navbar-dark bg-dark sticky">
+<nav class="py-3 navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand text-info" href="{% url 'home' %}">EventBro</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
