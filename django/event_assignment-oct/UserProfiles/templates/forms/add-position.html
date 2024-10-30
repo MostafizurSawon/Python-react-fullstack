@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="m-5 pt-5">
+
+<!-- Display success message -->
+{% if messages %}
+  {% for message in messages %}
+      {% if message.tags == 'success' %}
+      <div class="alert alert-{{ message.tags }} d-flex align-items-center">
+        <i class="fas fa-check-circle me-2"></i>  <!-- Check icon for success -->
+      {% elif message.tags == 'error' %}
+      <div class="alert alert-danger d-flex align-items-center">
+        <i class="fas fa-times-circle me-2"></i>  <!-- Cross icon for error -->
+      {% endif %}
+      <div>
+        {{ message }}
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+
+
+  <!-- Display form errors -->
+  {% if form.errors %}
+    <div class="alert alert-danger">
+      <ul>
+        {% for field, errors in form.errors.items %}
+          <li>{{ field.label }}: {{ errors|join:", " }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <!-- Display non-field errors (if any) -->
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      <ul>
+        {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form class="mx-auto w-100 p-5 shadow" method="post">
+    <h1 class="text-center my-3">{{ type }}</h1>
+    {% csrf_token %}
+    {{ form | crispy }}
+    <button class="btn btn-success" type="submit">{{ type }}</button>
+  </form>
+
+</div>
+
+{% comment %} <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const successMessage = document.getElementById('success-message');
+    if (successMessage) {
+      setTimeout(() => {
+        successMessage.style.display = 'none';
+      }, 3000); 
+    }
+  });
+</script> {% endcomment %}
+
+{% endblock %}
