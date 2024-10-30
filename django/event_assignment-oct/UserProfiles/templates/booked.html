@@ -46,7 +46,7 @@
                         </div>
                         <div class="ms-3">
                             <h6 class="mb-0 fs-sm text-success">{{ booking.ev.owner.first_name }} {{ booking.ev.owner.last_name }} ({{ booking.ev.owner.username }})</h6>
-                            <span class="text-muted fs-sm">{{ booking.created|date:"D d M Y H:i:s" }}</span>
+                            <span class="text-muted fs-sm">{{ booking.ev.created_date }}</span>
                         </div>
                         {% comment %} <div class="dropstart ms-auto">
                             <button class="btn text-muted" type="btn" data-bs-toggle="dropdown" aria-expanded="false">
