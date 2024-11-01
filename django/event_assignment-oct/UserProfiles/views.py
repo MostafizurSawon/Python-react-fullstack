@@ -135,7 +135,7 @@ def update_profile_info_form(request):
         }
         return render(request, "add-info.html", context=context)
     except UserAccount.DoesNotExist:
-        return HttpResponse("Employee Data does not exist")
+        return HttpResponse("Data does not exist!")
     
     
    

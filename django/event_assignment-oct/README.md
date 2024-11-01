@@ -2,6 +2,7 @@
  
 - pip install -r requirements.txt
 
+# This a event management project where user can create their events with seat limit, location etc after creating a new account. Other user can book events. Users can see their booked events on the booked event in their navigation. They can also see and manage their own events on the profile section with their personal information. User can update their profile.
 
 # Features:
 - User Registration and Login

@@ -3,10 +3,13 @@ from django.db.models import Q
 from Events.models import Events, Category
 from UserProfiles.models import UserBooked
 
+from django.db.models import Q
+
 def home(request):
-    ev = Events.objects.all()
+    ev = Events.objects.all().select_related('location')
     categories = Category.objects.all()
     booked_events = []
+    
     if request.user.is_authenticated:
         booked_events = UserBooked.objects.filter(user=request.user).values_list('ev_id', flat=True)
     
@@ -28,3 +31,4 @@ def home(request):
         'booked_events': booked_events,
         'categories': categories
     })
+
