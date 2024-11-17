@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Registration</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" />
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/animate.min' %}.css" rel="stylesheet" />
+    <link href="{% static 'css/fontawesome.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/toastify.min' %}.css" rel="stylesheet" />
+    <script src="{% static 'js/toastify-js.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle' %}.js"></script>
+    <script src="{% static 'js/config.js' %}"></script>
+</head>
+
+<body>
+    <div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-10 center-screen">
+                    <div class="card animated fadeIn w-100 p-3">
+                        <div class="card-body">
+                            <h4>Sign Up</h4>
+                            <hr />
+                            <div class="container-fluid m-0 p-0">
+                                <div class="row m-0 p-0">
+                                    <div class="col-md-4 p-2">
+                                        <label>Email Address</label>
+                                        <input id="email" placeholder="User Email" class="form-control" type="email" />
+                                    </div>
+                                    <div class="col-md-4 p-2">
+                                        <label>First Name</label>
+                                        <input id="firstName" placeholder="First Name" class="form-control"
+                                            type="text" />
+                                    </div>
+                                    <div class="col-md-4 p-2">
+                                        <label>Last Name</label>
+                                        <input id="lastName" placeholder="Last Name" class="form-control" type="text" />
+                                    </div>
+                                    <div class="col-md-4 p-2">
+                                        <label>Mobile Number</label>
+                                        <input id="mobile" placeholder="Mobile" class="form-control" type="mobile" />
+                                    </div>
+                                    <div class="col-md-4 p-2">
+                                        <label>Password</label>
+                                        <input id="password" placeholder="User Password" class="form-control"
+                                            type="password" />
+                                    </div>
+                                </div>
+                                <div class="row m-0 p-0">
+                                    <div class="col-md-4 p-2">
+                                        <button onclick="window.location.href='dashboard.html'"
+                                            class="btn mt-3 w-100  bg-gradient-primary">Complete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

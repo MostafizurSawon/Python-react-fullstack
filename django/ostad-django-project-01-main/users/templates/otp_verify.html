@@ -1,0 +1,24 @@
+<!-- templates/users/otp_verify.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTP Verification</title>
+    <link rel="stylesheet" href="https://matcha.mizu.sh/matcha.css">
+</head>
+<body>
+    <h2>Enter OTP</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <p>
+            <p>Your OTP is: {{ otp }}</p>
+        </p>
+        <div>
+            {{ form.otp.label_tag }}<br>
+            {{ form.otp }}
+            {{ form.otp.errors }}
+        </div>
+        <button type="submit">Verify OTP</button>
+    </form>
+</body>
+</html>
