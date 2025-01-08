@@ -1,0 +1,21 @@
+
+.sec{
+  height: 200px;
+  background-color: rgb(212, 93, 93);
+}
+.sec2{
+  height: 200px;
+  background-color: greenyellow;
+}
+
+.sec3{
+  height: 250px;
+  background-color: rgb(178, 240, 240);
+}
+
+.like{
+  height: 550px;
+}
+.dislike{
+  height: 550px;
+}
