@@ -15,15 +15,15 @@ const DashboardIndexPage = () => {
 
     // Use Spread Operator
 
-    useEffect(() => {
-        myaxios.get("/summary")
-            .then((response) => {
-                setData(response.data);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    }, []);
+    // useEffect(() => {
+    //     myaxios.get("/summary")
+    //         .then((response) => {
+    //             setData(response.data);
+    //         })
+    //         .catch((error) => {
+    //             console.error(error);
+    //         });
+    // }, []);
 
 
     return (

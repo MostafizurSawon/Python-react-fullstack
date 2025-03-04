@@ -20,8 +20,10 @@ const RegisterPage = () => {
             data,
         ).then((response) => {
             if (response.data.status === "success") {
+                console.log("success bro!");
                 navigate("/login/");
             } else {
+                navigate("/");
                 console.error(response.data);
             }
         }).catch((error) => {

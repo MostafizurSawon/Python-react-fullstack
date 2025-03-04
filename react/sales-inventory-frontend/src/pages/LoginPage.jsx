@@ -10,7 +10,7 @@ const LoginPage = () => {
         const formdata = new FormData(e.target);
         const data = Object.fromEntries(formdata);
 
-        console.log(data);
+        console.log("login data -> ", data);
 
         myaxios.post(
             "/user-login",
