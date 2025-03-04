@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router";
 import myaxios from "../utils/myaxios";
+import { errorToast, successToast } from "../utils/toast";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -17,9 +18,11 @@ const LoginPage = () => {
             data,
         ).then((response) => {
             if (response.data.status === "success") {
+                successToast("Logged in Successfully!");
                 localStorage.setItem("token", response.data.token);
                 navigate("/dashboard/index/");
             } else {
+                errorToast("Invalid!");
                 console.error(response.data.message);
             }
         }).catch((error) => {

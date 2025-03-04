@@ -149,7 +149,7 @@ const IndexPage = () => {
                 </div>
                 <div className="mb-5"></div>
                 <div className="container">
-                    <p className="text-center">All rights reserved © Learn with Rabbil (LWR) 2023-2024</p>
+                    <p className="text-center"></p>
                 </div>
             </footer>
         </div>

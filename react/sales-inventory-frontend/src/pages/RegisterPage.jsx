@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router";
 import myaxios from "../utils/myaxios";
+import { errorToast, successToast } from "../utils/toast";
 
 const RegisterPage = () => {
 
@@ -21,9 +22,11 @@ const RegisterPage = () => {
         ).then((response) => {
             if (response.data.status === "success") {
                 console.log("success bro!");
+                successToast("Registered Successfully!");
                 navigate("/login/");
             } else {
                 navigate("/");
+                errorToast("Failed!");
                 console.error(response.data);
             }
         }).catch((error) => {
