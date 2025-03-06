@@ -1,41 +1,42 @@
 import random
-from . import serializers
 from django.contrib.auth import authenticate, get_user_model
 from django.core.mail import send_mail
-
 from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
 from rest_framework_simplejwt.tokens import RefreshToken
-
-from .serializers import (
-    UserRegistrationSerializer,
-    UserProfileSerializer,
-)
-
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from .serializers import UserRegistrationSerializer, UserProfileSerializer
 
 User = get_user_model()
 
-
 class UserRegistrationView(APIView):
-    # serializer_class = serializers.RegistrationSerializer      -    not needed
+    @swagger_auto_schema(request_body=UserRegistrationSerializer)
     def post(self, request):
-        # serializer = self.serializer_class(data=request.data)    -  not needed
         serializer = UserRegistrationSerializer(data=request.data)
-        
-        
         if serializer.is_valid():
             serializer.save()
             return Response(
                 {"status": "success", "message": "User Registration Successfully"},
                 status=status.HTTP_201_CREATED,
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        else:
+            print(serializer.errors)
+            return Response(
+                {"status": "Error", "message": "User Registration failed!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 class UserLoginView(APIView):
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'email': openapi.Schema(type=openapi.TYPE_STRING, description='Email'),
+            'password': openapi.Schema(type=openapi.TYPE_STRING, description='Password'),
+        }
+    ))
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
@@ -58,8 +59,13 @@ class UserLoginView(APIView):
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
-
 class SendOTPView(APIView):
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'email': openapi.Schema(type=openapi.TYPE_STRING, description='Email'),
+        }
+    ))
     def post(self, request):
         email = request.data.get("email")
         if not email or not User.objects.filter(email=email).exists():
@@ -85,8 +91,14 @@ class SendOTPView(APIView):
             status=status.HTTP_200_OK,
         )
 
-
 class VerifyOTPView(APIView):
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'email': openapi.Schema(type=openapi.TYPE_STRING, description='Email'),
+            'otp': openapi.Schema(type=openapi.TYPE_STRING, description='OTP'),
+        }
+    ))
     def post(self, request):
         email = request.data.get("email")
         otp = request.data.get("otp")
@@ -117,10 +129,15 @@ class VerifyOTPView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-
 class ResetPasswordView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'password': openapi.Schema(type=openapi.TYPE_STRING, description='New Password'),
+        }
+    ))
     def post(self, request):
         password = request.data.get("password")
 
@@ -138,7 +155,6 @@ class ResetPasswordView(APIView):
             status=status.HTTP_200_OK,
         )
 
-
 class UserProfileView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -154,10 +170,10 @@ class UserProfileView(APIView):
             status=status.HTTP_200_OK,
         )
 
-
 class UserProfileUpdateView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
+    @swagger_auto_schema(request_body=UserProfileSerializer)
     def post(self, request):
         user = request.user
         serializer = UserProfileSerializer(user, data=request.data, partial=True)

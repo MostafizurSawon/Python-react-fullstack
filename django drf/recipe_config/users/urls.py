@@ -13,12 +13,12 @@ from .views import (
 
 urlpatterns = [
     path(
-        "user-registration",
+        "register",
         UserRegistrationView.as_view(),
         name="user-registration",
     ),
     path(
-        "user-login",
+        "login/",
         UserLoginView.as_view(),
         name="user-login",
     ),
