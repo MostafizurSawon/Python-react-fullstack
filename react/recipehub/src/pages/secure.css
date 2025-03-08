@@ -1,0 +1,8 @@
+.form-group.error input {
+  border: 2px solid red;
+}
+
+
+.active{
+  color: red;
+}
