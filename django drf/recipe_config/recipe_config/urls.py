@@ -19,7 +19,7 @@ schema_view = get_schema_view(
 
 api_urlpatterns = [
     path("accounts/", include("users.urls")),
-    path("recipe/", include("recipe.urls")),
+    path("recipes/", include("recipe.urls")),
     path("contact/", include("contact_us.urls")),
 ]
 

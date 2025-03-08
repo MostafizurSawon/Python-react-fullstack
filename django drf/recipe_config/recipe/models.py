@@ -17,7 +17,8 @@ class Recipe(models.Model):
     ingredients = models.TextField()
     category = models.ManyToManyField(Category)
     user = models.ForeignKey(User, on_delete = models.CASCADE)
-    image = models.ImageField(upload_to="recipe/images/")
+    # image = models.ImageField(upload_to="recipe/images/")
+    img = models.URLField(null=True, blank=True)
     instructions = models.TextField()
     created_on = models.DateField(auto_now_add=True, null=True, blank=True)
     
