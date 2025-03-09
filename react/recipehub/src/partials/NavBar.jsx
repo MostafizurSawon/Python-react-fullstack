@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-
+import './sidebar.css';
 
 const Navbar = ({ navOpenHandler }) => {
     return (
@@ -12,7 +12,7 @@ const Navbar = ({ navOpenHandler }) => {
                     </span>
                     {/* <img className="nav-logo  mx-2" src="/images/logo.png" alt="logo" /> */}
                 </nav>
-                    <Link className="h4" to="/">RecipeHub</Link>
+                    <Link className="h4 text-decoration-none" to="/">RecipeHub</Link>
 
                 <div className="float-right h-auto d-flex">
                     <div className="user-dropdown">

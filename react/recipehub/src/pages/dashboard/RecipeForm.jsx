@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router";
 import myaxios from "../../utils/myaxios";
 import { errorToast, successToast } from "../../utils/toast";
@@ -40,7 +40,8 @@ const RecipeForm = () => {
         ).then((response) => {
             if (response.status === 201) { // Assuming 201 Created status for successful creation
                 successToast("Recipe created successfully!");
-                navigate("/"); // Redirect to the desired page after success
+                e.target.reset();
+                // navigate("/"); // Redirect to the desired page after success
             } else {
                 errorToast("Failed to create recipe!");
                 console.error(response.data);
