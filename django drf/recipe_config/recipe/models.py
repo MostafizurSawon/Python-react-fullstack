@@ -23,7 +23,7 @@ class Recipe(models.Model):
     created_on = models.DateField(auto_now_add=True, null=True, blank=True)
     
     def __str__(self):
-        return f"{self.title} of Mr. {self.user.first_name} {self.user.last_name}"
+        return f"{self.title} of Mr. {self.user.firstName} {self.user.lastName}"
 
 
 STAR_CHOICES = [

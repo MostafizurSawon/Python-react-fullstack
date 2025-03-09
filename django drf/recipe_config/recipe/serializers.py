@@ -1,14 +1,15 @@
 from rest_framework import serializers
 from . import models
+from users.serializers import UserProfileSerializer  # ✅ Import the correct user serializer
 
 class RecipeSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(many=False)  # Display user as string (e.g., username)
-    category = serializers.PrimaryKeyRelatedField(many=True, queryset=models.Category.objects.all())  # Allow sending category IDs
+    user = UserProfileSerializer(read_only=True)  # ✅ Use nested serializer for full user details
+    category = serializers.PrimaryKeyRelatedField(many=True, queryset=models.Category.objects.all())
 
     class Meta:
         model = models.Recipe
         fields = '__all__'
-        read_only_fields = ['user', 'created_on']  # Ensure these fields are read-only
+        read_only_fields = ['user', 'created_on'] 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
