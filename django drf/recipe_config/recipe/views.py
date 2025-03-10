@@ -3,43 +3,57 @@ from rest_framework import viewsets
 from . import models
 from . import serializers
 from rest_framework import filters, pagination
-from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet, CharFilter
+from django.db.models import Q
+import logging
+
+# Set up logging
+logger = logging.getLogger(__name__)
+
+# Custom FilterSet for Recipe
+class RecipeFilter(FilterSet):
+    categories = CharFilter(method='filter_categories')
+    search = CharFilter(method='filter_search')  # Add search filter
+
+    def filter_categories(self, queryset, name, value):
+        logger.info(f"Filtering recipes by categories: {value}")
+        if not value:
+            return queryset
+        category_names = [cat.strip() for cat in value.split(',')]
+        query = Q()
+        for cat_name in category_names:
+            query |= Q(category__name__iexact=cat_name)
+        return queryset.filter(query).distinct()
+
+    def filter_search(self, queryset, name, value):
+        logger.info(f"Searching recipes with query: {value}")
+        if not value:
+            return queryset
+        return queryset.filter(
+            Q(title__icontains=value) |  # Search in title
+            Q(category__name__icontains=value)  # Search in category name
+        ).distinct()
 
 class CategoryViewset(viewsets.ModelViewSet):
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer
-    
-
-# class AvailableTimeForSpecificDoctor(filters.BaseFilterBackend):
-#     def filter_queryset(self, request, query_set, view):
-#         doctor_id = request.query_params.get("doctor_id")
-#         if doctor_id:
-#             return query_set.filter(doctor = doctor_id)
-#         return query_set
-
-# class AvailableTimeViewset(viewsets.ModelViewSet):
-#     permission_classes = [IsAuthenticatedOrReadOnly]
-#     queryset = models.AvailableTime.objects.all()
-#     serializer_class = serializers.AvailableTimeSerializer
-#     filter_backends = [AvailableTimeForSpecificDoctor]
 
 class RecipePagination(pagination.PageNumberPagination):
-    page_size = 10 # items per page
-    page_size_query_param = page_size
+    page_size = 10  # items per page
+    page_size_query_param = 'page_size'
     max_page_size = 100
 
 class RecipeViewset(viewsets.ModelViewSet):
     queryset = models.Recipe.objects.all()
     serializer_class = serializers.RecipeSerializer
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend]
     pagination_class = RecipePagination
-    search_fields = ['user__first_name', 'user__email', 'category__name']
+    filterset_class = RecipeFilter  # Use custom FilterSet
 
     def perform_create(self, serializer):
-        # Assign the current user as the owner of the recipe
         serializer.save(user=self.request.user)
-    
+
 class ReviewViewset(viewsets.ModelViewSet):
     queryset = models.Review.objects.all()
     serializer_class = serializers.ReviewSerializer

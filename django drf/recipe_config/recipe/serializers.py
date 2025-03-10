@@ -4,7 +4,7 @@ from users.serializers import UserProfileSerializer  # ✅ Import the correct us
 
 class RecipeSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer(read_only=True)  # ✅ Use nested serializer for full user details
-    category = serializers.PrimaryKeyRelatedField(many=True, queryset=models.Category.objects.all())
+    category = serializers.StringRelatedField(many=True)  # ✅ Return category names as a list
 
     class Meta:
         model = models.Recipe
@@ -20,3 +20,5 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Review
         fields = '__all__'
+        
+# pip install django-filter
