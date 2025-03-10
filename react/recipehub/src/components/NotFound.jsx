@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 
 
-function NotFound() {
+function NotFound({message}) {
   return (
 <section className="py-3 py-md-5 min-vh-100 d-flex justify-content-center align-items-center">
   <div className="container">
@@ -13,9 +13,30 @@ function NotFound() {
             <i className="bi bi-exclamation-circle-fill text-danger display-4"></i>
             <span className="display-1 fw-bold bsb-flip-h">4</span>
           </h2>
-          <h3 className="h2 mb-2">Oops! You're lost.</h3>
-          <p className="mb-5">The page you are looking for was not found.</p>
-          <Link className="btn bsb-btn-5xl btn-dark rounded-pill px-5 fs-6 m-0" to="/" role="button">Back to Home</Link>
+          
+
+          {message ? (
+            <div>
+            <h3 className="h2 mb-2">Oops!</h3>
+            <p className="mb-5">No recipe found!</p>
+            </div>
+          
+        
+          
+        ) : (
+          <div>
+            <h3 className="h2 mb-2">Oops! You're lost.</h3>
+            <p className="mb-5">The page you are looking for was not found.</p>
+            
+          <Link
+            className="btn bsb-btn-5xl btn-dark rounded-pill px-5 fs-6 m-0"
+            to="/"
+            role="button"
+          >
+            Back to Home
+          </Link>
+          </div>
+        )}
         </div>
       </div>
     </div>

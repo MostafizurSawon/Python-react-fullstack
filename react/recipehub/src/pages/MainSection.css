@@ -1,3 +1,21 @@
+/* Reset default styles */
+* {
+  box-sizing: border-box;
+}
+
+/* Navbar assumption (adjust height based on your design) */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px; /* Adjust this based on your navbar height */
+  background-color: #fff;
+  z-index: 2000; /* Higher than filter panel */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Main container styles */
 .custom-card {
   border: 1px solid #e0e0e0 !important;
   background-color: #fff;
@@ -14,7 +32,7 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.4));
-  pointer-events: none; /* Allows clicks to pass through the overlay */
+  pointer-events: none;
 }
 
 .custom-card:hover {
@@ -22,7 +40,7 @@
 }
 
 .custom-pagination .page-item .page-link {
-  color: #e74c3c;
+  color: #e74c12;
   background-color: #fff;
   border-color: #e0e0e0;
   font-weight: 600;
@@ -33,8 +51,8 @@
 }
 
 .custom-pagination .page-item.active .page-link {
-  background-color: #e74c3c;
-  border-color: #e74c3c;
+  background-color: #e74c12;
+  border-color: #e74c12;
   color: #fff;
 }
 
@@ -45,7 +63,144 @@
 }
 
 .custom-pagination .page-link:hover {
-  background-color: #e74c3c;
+  background-color: #e74c12;
   color: #fff;
-  border-color: #e74c3c;
+  border-color: #e74c12;
+}
+
+.recipe-info {
+  padding-top: 8px;
+  border-top: 1px solid #e0e0e0;
+  color: #34495e;
+}
+
+.recipe-by,
+.shared-date {
+  display: flex;
+  align-items: center;
+}
+
+.recipe-by span:last-child,
+.shared-date span:last-child {
+  margin-left: 8px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* Wrapper for MainSection content */
+.main-section-wrapper {
+  position: relative;
+  min-height: calc(100vh - 60px); /* Adjust for navbar height */
+  padding-top: 80px; /* Space above filter panel to account for navbar and heading */
+  padding-bottom: 60px; /* Add padding to prevent content from being cut off */
+}
+
+/* Add padding to the filter panel container to prevent cutoff */
+.filter-panel-container {
+  padding-top: 20px; /* Space within the section, adjusted for heading */
+}
+
+/* Styles for the filter panel */
+.filter-panel {
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.filter-panel h5 {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.filter-panel .form-check {
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.filter-panel .form-check-label {
+  color: #34495e;
+  padding-left: 8px;
+}
+
+/* Ensure checkbox tick marks are visible */
+.filter-panel .custom-checkbox .form-check-input {
+  margin-right: 8px;
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.filter-panel .custom-checkbox .form-check-input:checked {
+  background-color: #e74c12;
+  border-color: #e74c12;
+}
+
+.filter-panel .custom-checkbox .form-check-input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(231, 76, 18, 0.25);
+}
+
+/* Sticky filter panel within MainSection area */
+.sticky-center {
+  position: sticky;
+  top: 80px; /* Align with the top of the MainSection content, below navbar */
+  max-height: calc(100vh - 140px); /* Adjust for navbar (60px), padding-top (80px), and bottom margin */
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.filter-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.filter-panel::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+
+.filter-panel::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+/* Search bar styles */
+.mb-4 .form-control {
+  border-color: #e0e0e0;
+  transition: border-color 0.3s ease;
+}
+
+.mb-4 .form-control:focus {
+  border-color: #e74c12;
+  box-shadow: 0 0 0 0.2rem rgba(231, 76, 18, 0.25);
+}
+
+.mb-4 .btn-outline-secondary {
+  color: #34495e;
+  border-color: #e0e0e0;
+}
+
+.mb-4 .btn-outline-secondary:hover {
+  background-color: #e74c12;
+  color: #fff;
+  border-color: #e74c12;
+}
+
+.mb-4 .btn-outline-secondary:disabled {
+  background-color: #f8f9fa;
+  color: #b0b0b0;
+  border-color: #e0e0e0;
+}
+
+
+/* recipe card */
+
+.ingredient-item {
+  white-space: pre-line; /* Preserves newlines and spaces */
+  line-height: 1.5;
+  padding: 5px 0;
+}
+
+/* Style for the instructions section */
+.instruction-text {
+  white-space: pre-wrap; /* Preserves newlines and wraps text */
+  line-height: 1.6;
 }
