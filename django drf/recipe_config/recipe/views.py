@@ -49,10 +49,12 @@ class RecipeViewset(viewsets.ModelViewSet):
     serializer_class = serializers.RecipeSerializer
     filter_backends = [DjangoFilterBackend]
     pagination_class = RecipePagination
-    filterset_class = RecipeFilter  # Use custom FilterSet
+    filterset_class = RecipeFilter
+    permission_classes = [IsAuthenticatedOrReadOnly]  # Ensure authentication
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
 
 class ReviewViewset(viewsets.ModelViewSet):
     queryset = models.Review.objects.all()
