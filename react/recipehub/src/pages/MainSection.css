@@ -195,12 +195,53 @@
 
 .ingredient-item {
   white-space: pre-line; /* Preserves newlines and spaces */
-  line-height: 1.5;
-  padding: 5px 0;
+  line-height: 2;
+  padding: 10px 0;
+  
 }
 
 /* Style for the instructions section */
 .instruction-text {
   white-space: pre-wrap; /* Preserves newlines and wraps text */
   line-height: 1.6;
+}
+
+/* details */
+
+/* Existing styles remain unchanged, appending new styles */
+
+/* Ingredient item styling */
+.ingredient-item {
+  font-size: 0.95rem;
+  border: none;
+  color: #7f8c8d;
+  padding: 8px 0;
+}
+
+/* Instruction text styling */
+.instruction-text {
+  font-size: 0.95rem;
+  color: #7f8c8d;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* Recipe info styling (already present, ensuring consistency) */
+.recipe-info {
+  padding-top: 8px;
+  border-top: 1px solid #e0e0e0;
+  color: #34495e;
+}
+
+.recipe-by,
+.shared-date {
+  display: flex;
+  align-items: center;
+}
+
+.recipe-by span:last-child,
+.shared-date span:last-child {
+  margin-left: 8px;
+  font-weight: 500;
+  font-size: 0.9rem;
 }

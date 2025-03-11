@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Card, ListGroup, Button, Pagination, Form, InputGroup, FormControl } from 'react-bootstrap';
+import { Card, Button, Pagination, Form, InputGroup, FormControl } from 'react-bootstrap';
 import myaxios from '../utils/myaxios';
 import Loading from './../components/Loading';
 import NotFound from './../components/NotFound';
@@ -72,14 +72,6 @@ function MainSection() {
       });
   };
 
-  const splitIngredients = (ingredients) => {
-    const regex = /\s*(?=\u09E6-\u09EF+\))/;
-    return ingredients
-      .split(regex)
-      .map((item) => item.trim())
-      .filter((item) => item !== '');
-  };
-
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
@@ -98,7 +90,7 @@ function MainSection() {
   const handleCategoryChange = (categoryName) => {
     let updatedCategories;
     if (selectedCategories.includes(categoryName)) {
-      updatedCategories = selectedCategories.filter(cat => cat !== categoryName);
+      updatedCategories = selectedCategories.filter((cat) => cat !== categoryName);
     } else {
       updatedCategories = [...selectedCategories, categoryName];
     }
@@ -175,25 +167,19 @@ function MainSection() {
           </div>
           {/* Right Side: Recipes with Search */}
           <div className="col-md-9">
-            <InputGroup className="mb-4 search-bar">
-              <InputGroup.Text style={{ background: 'none', border: 'none' }}>
+            <InputGroup className="my-3 ">
+              <InputGroup.Text style={{ background: 'none', border: 'none', padding: '10px 16px' }}>
                 <i className="bi bi-search" style={{ color: '#34495e' }}></i>
               </InputGroup.Text>
-              <FormControl
+              <FormControl 
                 placeholder="Search recipes..."
                 value={searchQuery}
                 onChange={handleSearchChange}
                 aria-label="Search recipes"
-                style={{
-                  borderRadius: '20px',
-                  padding: '8px 16px',
-                  borderColor: '#e0e0e0',
-                  background: 'linear-gradient(90deg, #ffffff 0%, #f0f2f5 100%)',
-                  boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.05)',
-                }}
+                style={{ border: 'none', padding: '10px 16px' }}
               />
               <Button
-                variant="outline-secondary"
+                variant="success"
                 onClick={() => {
                   setSearchQuery('');
                   const params = { page: 1 };
@@ -202,7 +188,7 @@ function MainSection() {
                   }
                   setSearchParams(params);
                 }}
-                style={{ borderRadius: '0 20px 20px 0', padding: '8px 16px', borderColor: '#e0e0e0' }}
+                style={{ border: 'none', padding: '10px 16px', margin: '6px' }}
                 disabled={!searchQuery}
               >
                 Clear
@@ -219,6 +205,7 @@ function MainSection() {
                         border: '1px solid #e0e0e0',
                         overflow: 'hidden',
                         transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                        height: '400px', // Fixed height for uniformity
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-10px)';
@@ -264,35 +251,11 @@ function MainSection() {
                             {recipe.title}
                           </span>
                         </Card.Title>
-                        <Card.Text className="text-muted mb-2">
+                        <Card.Text className="text-muted mb-3">
                           <span style={{ fontSize: '1.1rem', color: '#3498db' }}>📋</span>
                           <span style={{ fontSize: '1rem', marginLeft: '8px', fontWeight: '500', color: '#34495e' }}>
-                            Category: {recipe.category && recipe.category.length > 0
-                              ? recipe.category.join(', ')
-                              : 'Uncategorized'}
+                            Category: {recipe.category && recipe.category.length > 0 ? recipe.category.join(', ') : 'Uncategorized'}
                           </span>
-                        </Card.Text>
-                        <Card.Subtitle className="d-flex align-items-center text-muted mb-3">
-                          <span style={{ fontSize: '1.2rem', color: '#3498db' }}>📋</span>
-                          <span style={{ fontSize: '1rem', marginLeft: '8px', fontWeight: '600' }}>Ingredients</span>
-                        </Card.Subtitle>
-                        <ListGroup variant="flush" className="mb-3">
-                          {splitIngredients(recipe.ingredients).map((item, index) => (
-                            <ListGroup.Item
-                              key={index}
-                              className="py-2 ingredient-item"
-                              style={{ fontSize: '0.95rem', border: 'none', color: '#7f8c8d' }}
-                            >
-                              {item}
-                            </ListGroup.Item>
-                          ))}
-                        </ListGroup>
-                        <Card.Subtitle className="d-flex align-items-center text-muted mb-3">
-                          <span style={{ fontSize: '1.2rem', color: '#27ae60' }}>ℹ️</span>
-                          <span style={{ fontSize: '1rem', marginLeft: '8px', fontWeight: '600' }}>Instructions</span>
-                        </Card.Subtitle>
-                        <Card.Text className="mb-4 instruction-text" style={{ fontSize: '0.95rem', color: '#7f8c8d', lineHeight: '1.5' }}>
-                          {recipe.instructions || 'No instructions provided.'}
                         </Card.Text>
                         <div className="recipe-info mt-auto d-flex justify-content-between align-items-center">
                           <div className="recipe-by">

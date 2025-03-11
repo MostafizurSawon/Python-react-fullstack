@@ -19,7 +19,7 @@ const LoginPage = () => {
         console.log("login data -> ", data);
 
         myaxios.post(
-            "/accounts/login",
+            "/accounts/login/",
             data,
         ).then((response) => {
             if (response.data.status === "success") {

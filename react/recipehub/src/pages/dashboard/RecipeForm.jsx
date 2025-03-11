@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import myaxios from "../../utils/myaxios";
 import { errorToast, successToast } from "../../utils/toast";
 
@@ -8,7 +8,6 @@ const RecipeForm = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch categories to populate the category dropdown
         myaxios.get('recipes/categories')
             .then(response => {
                 setCategories(response.data);
@@ -25,23 +24,30 @@ const RecipeForm = () => {
         const data = Object.fromEntries(formdata);
         const userEmail = localStorage.getItem('user');
 
-        // Add user email to the data
+        // Add user email to the data (temporary; see note below)
         data.user = userEmail;
 
-        // Handle category selection
+        // Handle category selection - use IDs
         const categorySelect = document.getElementById('category');
         data.category = Array.from(categorySelect.selectedOptions).map(option => option.value);
 
-        // console.log('-->', data);
+        console.log('Submitting data:', {
+            title: data.title,
+            img: data.img,
+            ingredients: data.ingredients,
+            category: data.category,
+            instructions: data.instructions,
+            user: data.user,
+        });
 
         myaxios.post(
             "recipes/lists/",
             data,
         ).then((response) => {
-            if (response.status === 201) { // Assuming 201 Created status for successful creation
+            if (response.status === 201) {
                 successToast("Recipe created successfully!");
                 e.target.reset();
-                // navigate("/"); // Redirect to the desired page after success
+                navigate("/"); // Redirect to home or recipe list
             } else {
                 errorToast("Failed to create recipe!");
                 console.error(response.data);
@@ -69,6 +75,7 @@ const RecipeForm = () => {
                         id="title"
                         name="title"
                         placeholder="Recipe Title"
+                        required
                     />
                 </div>
                 <div className="form-group">
@@ -88,6 +95,7 @@ const RecipeForm = () => {
                         id="ingredients"
                         name="ingredients"
                         placeholder="Recipe Ingredients"
+                        required
                     ></textarea>
                 </div>
                 <div className="form-group">
@@ -97,9 +105,12 @@ const RecipeForm = () => {
                         id="category"
                         name="category"
                         multiple
+                        required
                     >
                         {categories.map(category => (
-                            <option key={category.id} value={category.id}>{category.name}</option>
+                            <option key={category.id} value={category.id}>
+                                {category.name}
+                            </option>
                         ))}
                     </select>
                 </div>
@@ -110,6 +121,7 @@ const RecipeForm = () => {
                         id="instructions"
                         name="instructions"
                         placeholder="Recipe Instructions"
+                        required
                     ></textarea>
                 </div>
                 <button type="submit" className="btn btn-primary">Submit</button>
