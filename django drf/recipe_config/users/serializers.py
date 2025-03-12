@@ -1,103 +1,69 @@
 from rest_framework import serializers
+from .models import User, UserProfile
 
-# from django.contrib.auth import get_user_model
-# User = get_user_model()
-
-from .models import User
-
-
-# class UserRegistrationSerializer(serializers.ModelSerializer):
-#     password = serializers.CharField(required=True)
-
+# class UserProfileSerializer(serializers.ModelSerializer):
 #     class Meta:
-#         model = User
-#         fields = [
-#             "email",
-#             "firstName",
-#             "lastName",
-#             "password",
-#             "mobile",
-#         ]
-
-#     def to_representation(self, instance):
-#         representation = super().to_representation(instance)
-#         representation.setdefault('email', '')
-#         representation.setdefault('firstName', '')
-#         representation.setdefault('lastName', '')
-#         representation.setdefault('password', '')
-#         representation.setdefault('mobile', '')
-#         return representation
-
-#     def create(self, validated_data):
-#         password = validated_data.pop("password")
-#         user = User(**validated_data)
-#         user.set_password(password)
-#         user.save()
-#         return user
-
-
-class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(required = True)
-    class Meta:
-        model = User
-        fields = [
-            "email",
-            "firstName",
-            "lastName",
-            "password",
-            "mobile",
-        ]
-        # extra_kwargs = {
-        #     'email': {'default': ''},
-        #     'firstName': {'default': ''},
-        #     'lastName': {'default': ''},
-        #     'password': {'default': ''},
-        #     'mobile': {'default': ''}
-        # }
-
-    def create(self, validated_data):
-        # Path 1
-        # user = User(
-        #     firstName=validated_data["firstName"],
-        #     lastName=validated_data["lastName"],
-        #     email=validated_data["email"],
-        #     mobile=validated_data["mobile"],
-        # )
-        # user.set_password(validated_data["password"])
-        # user.save()
-
-        # Path 2
-        password = validated_data.pop("password")
-        user = User(**validated_data)
-        user.set_password(password)
-        user.save()
-
-        # Path 3
-        # user = User.objects.create_user(
-        #     firstName=validated_data["firstName"],
-        #     lastName=validated_data["lastName"],
-        #     email=validated_data["email"],
-        #     mobile=validated_data["mobile"],
-        #     password=validated_data["password"],
-        # )
-
-        # Path 4
-        # user = User.objects.create_user(**validated_data)
-
-        return user
-
+#         model = UserProfile
+#         fields = ["image", "age", "portfolio", "sex", "bio", "facebook"]
+#         extra_kwargs = {
+#             "image": {"required": False},
+#             "portfolio": {"required": False},
+#             "facebook": {"required": False},
+#         }
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = [
-            "email",
-            "firstName",
-            "lastName",
-            "mobile",
-            # "password",
-        ]
+        fields = ["email", "firstName", "lastName", "mobile"]
+        # extra_kwargs = {"email": {"read_only": True}}
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True, min_length=8)
+
+    class Meta:
+        model = User
+        fields = ["email", "firstName", "lastName", "password", "mobile"]
+        extra_kwargs = {
+            "email": {"required": True, "validators": [serializers.EmailField().validators[0]]},
+            "firstName": {"required": True},
+            "lastName": {"required": True},
+            "mobile": {"required": False},
+        }
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value.lower()).exists():
+            raise serializers.ValidationError("This email is already registered.")
+        return value.lower()
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        UserProfile.objects.create(user=user)  # Default profile
+        return user
+
+class UserFullSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer()
+
+    class Meta:
+        model = User
+        fields = ["email", "firstName", "lastName", "mobile", "profile"]
         extra_kwargs = {
             "email": {"read_only": True},
-            # "password": {"write_only": True},
         }
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop("profile", {})
+        profile = instance.profile
+
+        instance.firstName = validated_data.get("firstName", instance.firstName)
+        instance.lastName = validated_data.get("lastName", instance.lastName)
+        instance.mobile = validated_data.get("mobile", instance.mobile)
+        instance.save()
+
+        for attr, value in profile_data.items():
+            setattr(profile, attr, value)
+        profile.save()
+
+        return instance
