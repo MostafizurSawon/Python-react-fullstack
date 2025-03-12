@@ -7,6 +7,8 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import NotFound from '../components/NotFound';
 import Loading from '../components/Loading';
+import { errorToast, successToast } from "../utils/toast";
+
 
 function RecipeDetail() {
   const { id } = useParams();
@@ -111,10 +113,12 @@ function RecipeDetail() {
       };
       const response = await myaxios.put(`recipes/lists/${id}/`, updatedData);
       setRecipe(response.data);
+      successToast("Recipe Updated Successfully!");
       setShowModal(false);
     } catch (error) {
       console.error('Error updating recipe:', error);
-      alert('Failed to update recipe');
+      // alert('Failed to update recipe');
+      errorToast("Failed to update recipe.");
     }
   };
 

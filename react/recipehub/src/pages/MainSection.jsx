@@ -22,7 +22,7 @@ function MainSection() {
   // Fetch categories for the filter panel
   const fetchCategories = async () => {
     try {
-      const response = await myaxios.get('/recipes/categories/');
+      const response = await myaxios.get('recipes/categories/');
       const cats = response.data.results || response.data;
       setCategories(cats); // Store full category objects
     } catch (error) {

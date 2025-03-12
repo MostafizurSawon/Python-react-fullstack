@@ -1,6 +1,8 @@
 import { Link } from "react-router";
 
-const token = localStorage.getItem("token");
+const token = !!localStorage.getItem("token"); 
+
+const user = !!localStorage.getItem("user");
 
 const Navbar = () => {
     return (
@@ -21,7 +23,7 @@ const Navbar = () => {
                             <li className="nav-item me-4"><Link className="nav-link" to="/dashboard/profile">Profile</Link></li>
                             <li className="nav-item"><Link className="nav-link" to="/dashboard/index">Dashboard</Link></li>
                         </ul>
-                        {token ? <Link className="btn mt-3 bg-gradient-danger"to="/logout/">Logout</Link> : <div>
+                        {(token && user) ? <Link className="btn mt-3 bg-gradient-danger"to="/logout/">Logout</Link> : <div>
                             <Link className="btn mt-3 bg-gradient-primary" to="/register">
                                 Register
                             </Link>
