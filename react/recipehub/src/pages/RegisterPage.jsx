@@ -17,7 +17,7 @@ const RegisterPage = () => {
         console.log(data);
 
         myaxios.post(
-            "accounts/register",
+            "accounts/register/",
             data,
         ).then((response) => {
             if (response.data.status === "success") {
@@ -31,6 +31,7 @@ const RegisterPage = () => {
             }
         }).catch(error => {
             if (error.response) {
+                errorToast("Failed, Email already exists!");
                 console.error('Error Response:', error.response.data);
                 console.error('Status Code:', error.response.status);
             } else if (error.request) {

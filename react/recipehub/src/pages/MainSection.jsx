@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react'; // Import useRef
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Pagination, Form, InputGroup, FormControl } from 'react-bootstrap';
 import myaxios from '../utils/myaxios';
@@ -18,6 +18,7 @@ function MainSection() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const sectionRef = useRef(null); // Create a ref for the MainSection container
 
   // Fetch categories for the filter panel
   const fetchCategories = async () => {
@@ -83,7 +84,8 @@ function MainSection() {
         params.search = searchQuery;
       }
       setSearchParams(params);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Scroll to the top of MainSection
+      sectionRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -103,14 +105,16 @@ function MainSection() {
       params.search = searchQuery;
     }
     setSearchParams(params);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to the top of MainSection
+    sectionRef.current.scrollIntoView({ behavior: 'smooth' });
   };
 
   const clearFilters = () => {
     setSelectedCategories([]);
     setSearchQuery('');
     setSearchParams({ page: 1 }); // Reset to page 1
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to the top of MainSection
+    sectionRef.current.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleSearchChange = (e) => {
@@ -124,6 +128,8 @@ function MainSection() {
       params.search = value;
     }
     setSearchParams(params);
+    // Scroll to the top of MainSection
+    sectionRef.current.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleViewRecipe = (id) => {
@@ -133,7 +139,7 @@ function MainSection() {
   const fallbackImage = 'https://placehold.co/300x200?text=No+Image';
 
   return (
-    <div className="container my-4">
+    <div className="container my-4" ref={sectionRef}> {/* Attach the ref to the container */}
       <h1 className="text-center mb-5" style={{ fontWeight: 'bold', color: '#2c3e50', fontSize: '2.5rem' }}>
         Our Recipes
       </h1>
@@ -167,7 +173,7 @@ function MainSection() {
           </div>
           {/* Right Side: Recipes with Search */}
           <div className="col-md-9">
-            <InputGroup className="my-3 ">
+            <InputGroup className="my-3">
               <InputGroup.Text style={{ background: 'none', border: 'none', padding: '10px 16px' }}>
                 <i className="bi bi-search" style={{ color: '#34495e' }}></i>
               </InputGroup.Text>
@@ -254,7 +260,7 @@ function MainSection() {
                         <Card.Text className="text-muted mb-3">
                           <span style={{ fontSize: '1.1rem', color: '#3498db' }}>📋</span>
                           <span style={{ fontSize: '1rem', marginLeft: '8px', fontWeight: '500', color: '#34495e' }}>
-                            Category: {recipe.category && recipe.category.length > 0 ? recipe.category.join(', ') : 'Uncategorized'}
+                            Category: {recipe.category_names && recipe.category_names.length > 0 ? recipe.category_names.join(', ') : 'Uncategorized'}
                           </span>
                         </Card.Text>
                         <div className="recipe-info mt-auto d-flex justify-content-between align-items-center">
