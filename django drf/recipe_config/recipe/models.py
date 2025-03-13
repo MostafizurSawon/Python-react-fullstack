@@ -1,3 +1,4 @@
+# models.py
 from django.db import models
 from django.core.exceptions import ValidationError
 from users.models import User
@@ -96,12 +97,12 @@ class Review(models.Model):
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='comments')  # Add related_name='comments'
     content = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Comment by {self.user.firstName} on {self.recipe.title}"
+        return f"{self.content} Comment by {self.user.firstName} on {self.recipe.title}"
 
     def get_reaction_counts(self):
         reactions = Reaction.objects.filter(comment=self)
@@ -111,3 +112,10 @@ class Comment(models.Model):
             'SAD': reactions.filter(reaction_type='SAD').count(),
             'LOVE': reactions.filter(reaction_type='LOVE').count(),
         }
+        
+    def can_delete(self, requesting_user):
+        """Check if the requesting user can delete this comment."""
+        is_owner = self.recipe.user == requesting_user
+        is_commenter = self.user == requesting_user
+        is_staff = requesting_user.is_staff or requesting_user.is_superuser
+        return (is_owner and not is_staff) or is_commenter or is_staff
