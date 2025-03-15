@@ -335,6 +335,7 @@ function RecipeDetail() {
                         )}
                       </div>
                       <p style={{ color: '#7f8c8d', marginTop: '5px' }}>{comment.content}</p>
+                      
                     </ListGroup.Item>
                   ))
                 ) : (

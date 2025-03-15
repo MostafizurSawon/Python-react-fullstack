@@ -15,7 +15,7 @@ const ProfilePage = () => {
     const [profileData, setProfileData] = useState(defaultProfileData);
 
     useEffect(() => {
-        myaxios.get("accounts/user-profile")
+        myaxios.get("accounts/profile/")
             .then((response) => {
                 let api_data = response.data?.data;
                 if (api_data) {
