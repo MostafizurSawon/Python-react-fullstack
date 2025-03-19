@@ -41,7 +41,7 @@ const ProfilePage = () => {
             delete profileData.password;
         }
 
-        myaxios.post("accounts/user-update", profileData)
+        myaxios.post("accounts/profile/update/", profileData)
             .then((response) => {
                 if (response.data.status === "success") {
                     successToast("Profile Updated Successfully!");

@@ -18,7 +18,6 @@ import Test from "./components/Test";
 import SalePage from "./pages/dashboard/SalePage";
 import NotFound from "./components/NotFound";
 import RecipeForm from "./pages/dashboard/RecipeForm";
-import MainSection from "./pages/MainSection"; // Adjusted path to root pages
 import RecipeDetail from "./pages/RecipeDetail"; // Adjusted path to root pages
 import 'bootstrap/dist/css/bootstrap.min.css';
 

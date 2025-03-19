@@ -1,203 +1,7 @@
-// import { useEffect, useState } from "react";
-// import myaxios from "../../utils/myaxios";
-
-// const DashboardIndexPage = () => {
-
-//     const [data, setData] = useState({
-//         product: 0,
-//         category: 0,
-//         customer: 0,
-//         invoice: 0,
-//         total: 0,
-//         vat: 0,
-//         payable: 0
-//     });
-
-//     // Use Spread Operator
-
-//     // useEffect(() => {
-//     //     myaxios.get("/summary")
-//     //         .then((response) => {
-//     //             setData(response.data);
-//     //         })
-//     //         .catch((error) => {
-//     //             console.error(error);
-//     //         });
-//     // }, []);
-
-
-//     return (
-//         <div className="container-fluid">
-//             {/* <div className="row">
-//                 <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 animated fadeIn p-2">
-//                     <div className="card card-plain h-100 bg-white">
-//                         <div className="p-3">
-//                             <div className="row">
-//                                 <div className="col-9 col-lg-8 col-md-8 col-sm-9">
-//                                     <div>
-//                                         <h5 className="mb-0 text-capitalize font-weight-bold">
-//                                             <span id="product">{data.product}</span>
-//                                         </h5>
-//                                         <p className="mb-0 text-sm">Product</p>
-//                                     </div>
-//                                 </div>
-//                                 <div className="col-3 col-lg-4 col-md-4 col-sm-3 text-end">
-//                                     <div className="icon icon-shape bg-gradient-primary shadow float-end border-radius-md">
-//                                         <img className="w-100 " src="/images/icon.svg" />
-//                                     </div>
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-
-//                 <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 animated fadeIn p-2">
-//                     <div className="card card-plain h-100 bg-white">
-//                         <div className="p-3">
-//                             <div className="row">
-//                                 <div className="col-9 col-lg-8 col-md-8 col-sm-9">
-//                                     <div>
-//                                         <h5 className="mb-0 text-capitalize font-weight-bold">
-//                                             <span id="category">{data.category}</span>
-//                                         </h5>
-//                                         <p className="mb-0 text-sm">Category</p>
-//                                     </div>
-//                                 </div>
-//                                 <div className="col-3 col-lg-4 col-md-4 col-sm-3 text-end">
-//                                     <div className="icon icon-shape bg-gradient-primary shadow float-end border-radius-md">
-//                                         <img className="w-100 " src="/images/icon.svg" />
-//                                     </div>
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-
-//                 <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 animated fadeIn p-2">
-//                     <div className="card card-plain h-100 bg-white">
-//                         <div className="p-3">
-//                             <div className="row">
-//                                 <div className="col-9 col-lg-8 col-md-8 col-sm-9">
-//                                     <div>
-//                                         <h5 className="mb-0 text-capitalize font-weight-bold">
-//                                             <span id="customer">{data.customer}</span>
-//                                         </h5>
-//                                         <p className="mb-0 text-sm">Customer</p>
-//                                     </div>
-//                                 </div>
-//                                 <div className="col-3 col-lg-4 col-md-4 col-sm-3 text-end">
-//                                     <div className="icon icon-shape bg-gradient-primary shadow float-end border-radius-md">
-//                                         <img className="w-100 " src="/images/icon.svg" />
-//                                     </div>
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-
-//                 <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 animated fadeIn p-2">
-//                     <div className="card card-plain h-100  bg-white">
-//                         <div className="p-3">
-//                             <div className="row">
-//                                 <div className="col-9 col-lg-8 col-md-8 col-sm-9">
-//                                     <div>
-//                                         <h5 className="mb-0 text-capitalize font-weight-bold">
-//                                             <span id="invoice">{data.invoice}</span>
-//                                         </h5>
-//                                         <p className="mb-0 text-sm">Invoice</p>
-//                                     </div>
-//                                 </div>
-//                                 <div className="col-3 col-lg-4 col-md-4 col-sm-3 text-end">
-//                                     <div className="icon icon-shape bg-gradient-primary shadow float-end border-radius-md">
-//                                         <img className="w-100 " src="/images/icon.svg" />
-//                                     </div>
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-
-
-//                 <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 animated fadeIn p-2">
-//                     <div className="card card-plain h-100 bg-white">
-//                         <div className="p-3">
-//                             <div className="row">
-//                                 <div className="col-9 col-lg-8 col-md-8 col-sm-9">
-//                                     <div>
-//                                         <h5 className="mb-0 text-capitalize font-weight-bold">
-//                                             $ <span id="total">{data.total}</span>
-//                                         </h5>
-//                                         <p className="mb-0 text-sm">Total Sale</p>
-//                                     </div>
-//                                 </div>
-//                                 <div className="col-3 col-lg-4 col-md-4 col-sm-3 text-end">
-//                                     <div className="icon icon-shape bg-gradient-primary shadow float-end border-radius-md">
-//                                         <img className="w-100 " src="/images/icon.svg" />
-//                                     </div>
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-
-
-//                 <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 animated fadeIn p-2">
-//                     <div className="card card-plain h-100  bg-white">
-//                         <div className="p-3">
-//                             <div className="row">
-//                                 <div className="col-9 col-lg-8 col-md-8 col-sm-9">
-//                                     <div>
-//                                         <h5 className="mb-0 text-capitalize font-weight-bold">
-//                                             $ <span id="vat">{data.vat}</span>
-//                                         </h5>
-//                                         <p className="mb-0 text-sm">Vat Collection</p>
-//                                     </div>
-//                                 </div>
-//                                 <div className="col-3 col-lg-4 col-md-4 col-sm-3 text-end">
-//                                     <div className="icon icon-shape bg-gradient-primary shadow float-end border-radius-md">
-//                                         <img className="w-100 " src="/images/icon.svg" />
-//                                     </div>
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-
-
-//                 <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 animated fadeIn p-2">
-//                     <div className="card card-plain h-100  bg-white">
-//                         <div className="p-3">
-//                             <div className="row">
-//                                 <div className="col-9 col-lg-8 col-md-8 col-sm-9">
-//                                     <div>
-//                                         <h5 className="mb-0 text-capitalize font-weight-bold">
-//                                             $ <span id="payable">{data.payable}</span>
-//                                         </h5>
-//                                         <p className="mb-0 text-sm">Total Collection</p>
-//                                     </div>
-//                                 </div>
-//                                 <div className="col-3 col-lg-4 col-md-4 col-sm-3 text-end">
-//                                     <div className="icon icon-shape bg-gradient-primary shadow float-end border-radius-md">
-//                                         <img className="w-100 " src="/images/icon.svg" />
-//                                     </div>
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-
-//             </div> */}
-            
-//         </div>
-//     );
-// };
-
-// export default DashboardIndexPage;
-
 import { useEffect, useState } from "react";
-import { Button, Card, Modal, Form, InputGroup, FormControl } from "react-bootstrap";
+import { Button, Card, Modal, Form, InputGroup, FormControl, Collapse } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import myaxios from "../../utils/myaxios"; 
+import myaxios from "../../utils/myaxios";
 import Loading from "../../components/Loading";
 import NotFound from "../../components/NotFound";
 import { successToast, errorToast } from "../../utils/toast";
@@ -205,11 +9,11 @@ import { successToast, errorToast } from "../../utils/toast";
 const DashboardIndexPage = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([]); // For category filter
-  const [selectedCategories, setSelectedCategories] = useState([]); // Selected categories
-  const [searchQuery, setSearchQuery] = useState(""); // Search input
-  const [showEditModal, setShowEditModal] = useState(false); // Modal state
-  const [currentRecipe, setCurrentRecipe] = useState(null); // Recipe being edited
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [currentRecipe, setCurrentRecipe] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     ingredients: "",
@@ -217,10 +21,10 @@ const DashboardIndexPage = () => {
     category: [],
     img: "",
   });
+  const [filterOpen, setFilterOpen] = useState(false); // State for collapsible filter on mobile
 
   const navigate = useNavigate();
 
-  // Fetch categories for filtering and modal
   const fetchCategories = async () => {
     try {
       const response = await myaxios.get("recipes/categories/");
@@ -232,10 +36,9 @@ const DashboardIndexPage = () => {
     }
   };
 
-  // Fetch user's recipes with filters
   const fetchRecipes = async () => {
     setLoading(true);
-    let url = "recipes/lists/"; // Updated to relative path since baseURL is set in myaxios
+    let url = "recipes/lists/";
     const params = new URLSearchParams();
 
     if (selectedCategories.length > 0) {
@@ -262,7 +65,6 @@ const DashboardIndexPage = () => {
     fetchRecipes();
   }, [selectedCategories, searchQuery]);
 
-  // Handle delete recipe
   const handleDelete = async (recipeId) => {
     if (window.confirm("Are you sure you want to delete this recipe?")) {
       try {
@@ -276,7 +78,6 @@ const DashboardIndexPage = () => {
     }
   };
 
-  // Open edit modal and populate form data
   const handleEdit = (recipe) => {
     setCurrentRecipe(recipe);
     setFormData({
@@ -289,19 +90,16 @@ const DashboardIndexPage = () => {
     setShowEditModal(true);
   };
 
-  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle category selection
   const handleCategoryChange = (e) => {
     const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
     setFormData((prev) => ({ ...prev, category: selectedOptions }));
   };
 
-  // Handle form submission for editing
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -326,7 +124,6 @@ const DashboardIndexPage = () => {
     }
   };
 
-  // Handle category filter change
   const handleCategoryChangeFilter = (categoryName) => {
     setSelectedCategories((prev) =>
       prev.includes(categoryName)
@@ -335,13 +132,11 @@ const DashboardIndexPage = () => {
     );
   };
 
-  // Clear filters and search
   const clearFilters = () => {
     setSelectedCategories([]);
     setSearchQuery("");
   };
 
-  // Handle search input
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -350,32 +145,105 @@ const DashboardIndexPage = () => {
 
   return (
     <div className="container-fluid py-4">
-      <h1 className=" mb-5" style={{ fontWeight: "bold", color: "#2c3e50" }}>
+      <h1 className="mb-5" style={{ fontWeight: "bold", color: "#2c3e50" }}>
         My Recipes
-        
       </h1>
 
-      {/* Adjusted Search Bar - Smaller and Shifted Left */}
+      {/* Search Bar */}
       <div className="mb-4 d-flex justify-content-start">
-        <InputGroup className="w-75" style={{ maxWidth: "400px" }}>
+        <InputGroup className="w-100 w-md-50 w-lg-25">
           <InputGroup.Text>
             <i className="bi bi-search"></i>
           </InputGroup.Text>
-          <FormControl className="ms-2"
+          <FormControl
             placeholder="Search my recipes..."
             value={searchQuery}
             onChange={handleSearchChange}
           />
-          {/* <Button variant="success" onClick={() => setSearchQuery("")} disabled={!searchQuery}>
-            Clear
-          </Button> */}
         </InputGroup>
       </div>
 
       {/* Main Content Row */}
       <div className="row g-4" style={{ minHeight: "70vh" }}>
-        {/* Recipes Section (Middle) */}
-        <div className="col-12 col-md-8 col-lg-8">
+        {/* Filter Panel (Collapsible on Mobile/Tablet) */}
+        <div className="col-12 col-md-4 col-lg-3 order-md-1 order-2">
+          <div className="d-md-none mb-3">
+            <Button
+              variant="outline-primary"
+              onClick={() => setFilterOpen(!filterOpen)}
+              className="w-100 d-flex justify-content-between align-items-center"
+            >
+              <span>Filter by Category</span>
+              <i className={`bi ${filterOpen ? "bi-chevron-up" : "bi-chevron-down"}`}></i>
+            </Button>
+            <Collapse in={filterOpen}>
+              <div className="p-3 border rounded mt-2">
+                {categories.length > 0 ? (
+                  <>
+                    {categories.map((cat) => (
+                      <Form.Check
+                        key={cat.id}
+                        type="checkbox"
+                        label={cat.name}
+                        checked={selectedCategories.includes(cat.name)}
+                        onChange={() => handleCategoryChangeFilter(cat.name)}
+                        className="mb-2"
+                      />
+                    ))}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="mt-3 w-100"
+                    >
+                      Clear Filters
+                    </Button>
+                  </>
+                ) : (
+                  <p>No categories available.</p>
+                )}
+              </div>
+            </Collapse>
+          </div>
+          <div
+            className="p-3 border rounded d-none d-md-block"
+            style={{
+              position: "sticky",
+              top: "100px",
+              maxHeight: "70vh",
+              overflowY: "auto",
+            }}
+          >
+            <h5 className="mb-3">Filter by Category</h5>
+            {categories.length > 0 ? (
+              <>
+                {categories.map((cat) => (
+                  <Form.Check
+                    key={cat.id}
+                    type="checkbox"
+                    label={cat.name}
+                    checked={selectedCategories.includes(cat.name)}
+                    onChange={() => handleCategoryChangeFilter(cat.name)}
+                    className="mb-2"
+                  />
+                ))}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="mt-3 w-100"
+                >
+                  Clear Filters
+                </Button>
+              </>
+            ) : (
+              <p>No categories available.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Recipes Section */}
+        <div className="col-12 col-md-8 col-lg-9 order-md-2 order-1">
           <div className="row g-4">
             {loading ? (
               <div className="col-12">
@@ -383,7 +251,7 @@ const DashboardIndexPage = () => {
               </div>
             ) : recipes.length > 0 ? (
               recipes.map((recipe) => (
-                <div className="col-6" key={recipe.id}>
+                <div className="col-12 col-sm-6 col-lg-4" key={recipe.id}>
                   <Card className="h-100">
                     <Card.Img
                       variant="top"
@@ -429,40 +297,6 @@ const DashboardIndexPage = () => {
               <div className="col-12">
                 <NotFound message="No recipes found." />
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Fixed Filter Panel (Right Side) */}
-        <div className="col-12 col-md-4 col-lg-4">
-          <div
-            className="p-3 border rounded position-fixed"
-            style={{ top: "30%", right: "2%", width: "250px", maxHeight: "60vh", overflowY: "auto" }}
-          >
-            <h5 className="mb-3">Filter by Category</h5>
-            {categories.length > 0 ? (
-              <>
-                {categories.map((cat) => (
-                  <Form.Check
-                    key={cat.id}
-                    type="checkbox"
-                    label={cat.name}
-                    checked={selectedCategories.includes(cat.name)}
-                    onChange={() => handleCategoryChangeFilter(cat.name)}
-                    className="mb-2"
-                  />
-                ))}
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={clearFilters}
-                  className="mt-3 w-100"
-                >
-                  Clear Filters
-                </Button>
-              </>
-            ) : (
-              <p>No categories available.</p>
             )}
           </div>
         </div>

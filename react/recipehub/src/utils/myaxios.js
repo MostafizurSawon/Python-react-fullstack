@@ -4,6 +4,7 @@ import axios from "axios";
 
 const myaxios = axios.create({
     // baseURL: "https://inventory-api.teamrabbil.com/api",
+    // baseURL: "https://recipe-drf.onrender.com/",
     baseURL: "http://127.0.0.1:8000/",
     headers: {
         "Content-Type": "application/json",
