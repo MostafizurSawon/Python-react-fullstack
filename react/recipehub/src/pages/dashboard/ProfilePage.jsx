@@ -1,7 +1,10 @@
 // pages/dashboard/ProfilePage.jsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Added for navigation
 import myaxios from "../../utils/myaxios";
 import { errorToast, successToast } from "../../utils/toast";
+import Navbar from "../../partials/NavBar"; // Added Navbar
+import Footer from "../Footer"; // Added Footer
 
 const defaultProfileData = {
   email: "",
@@ -20,13 +23,24 @@ const defaultProfileData = {
 };
 
 const ProfilePage = () => {
+  const navigate = useNavigate(); // Added for navigation
   const [profileData, setProfileData] = useState(defaultProfileData);
   const [imagePreview, setImagePreview] = useState(null);
+  const [loading, setLoading] = useState(true); // Added for initial loading state
+  const [submitting, setSubmitting] = useState(false); // Added for form submission spinner
 
   useEffect(() => {
-    myaxios.get("accounts/profile/")
-      .then((response) => {
-        console.log("0000 ->",response.data);
+    const fetchProfileData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          errorToast("Please log in to access this page");
+          navigate("/login");
+          return;
+        }
+
+        const response = await myaxios.get("accounts/profile/");
+        console.log("0000 ->", response.data);
         const apiData = response.data?.data;
         if (apiData) {
           setProfileData({
@@ -50,13 +64,19 @@ const ProfilePage = () => {
         } else {
           setProfileData(defaultProfileData);
           errorToast("Failed to fetch profile data!");
+          navigate("/dashboard"); // Redirect on failure
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error(error);
         errorToast("Failed to fetch profile data!");
-      });
-  }, []);
+        navigate("/dashboard"); // Redirect on error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -90,34 +110,34 @@ const ProfilePage = () => {
     }
   };
 
-  // ProfilePage.jsx
-const handleUpdate = (e) => {
+  const handleUpdate = (e) => {
     e.preventDefault();
-  
+    setSubmitting(true);
+
     // Convert age to an integer or null
     const ageValue = profileData.profile.age ? parseInt(profileData.profile.age, 10) : null;
-  
+
     // Prepare the data to send
     const dataToSend = {
       firstName: profileData.firstName,
       lastName: profileData.lastName,
       mobile: profileData.mobile,
       profile: {
-        age: ageValue,  
+        age: ageValue,
         portfolio: profileData.profile.portfolio,
         sex: profileData.profile.sex,
         bio: profileData.profile.bio,
         facebook: profileData.profile.facebook,
       },
     };
-  
+
     // Only include password if provided
     if (profileData.password) {
       dataToSend.password = profileData.password;
     }
-  
+
     // If there's an image, use FormData to handle file upload
-    if (profileData.profile.image) {
+    if (profileData.profile.image instanceof File) {
       const formData = new FormData();
       formData.append("firstName", profileData.firstName);
       formData.append("lastName", profileData.lastName);
@@ -133,7 +153,7 @@ const handleUpdate = (e) => {
       formData.append("profile.sex", profileData.profile.sex);
       formData.append("profile.bio", profileData.profile.bio);
       formData.append("profile.facebook", profileData.profile.facebook);
-  
+
       myaxios
         .put("accounts/profile/update/", formData, {
           headers: {
@@ -153,6 +173,9 @@ const handleUpdate = (e) => {
         .catch((error) => {
           console.error(error);
           errorToast("Profile Update Failed!");
+        })
+        .finally(() => {
+          setSubmitting(false);
         });
     } else {
       // If no image, send as JSON
@@ -168,23 +191,44 @@ const handleUpdate = (e) => {
         .catch((error) => {
           console.error(error);
           errorToast("Profile Update Failed!");
+        })
+        .finally(() => {
+          setSubmitting(false);
         });
     }
   };
 
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "3rem", height: "3rem" }}
+        >
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-10 col-lg-8">
-          <div className="card shadow-lg p-4">
-            <div className="card-body">
-              <h3 className="card-title text-center mb-4">Update Your Profile</h3>
-              <form onSubmit={handleUpdate}>
-                {/* Basic Information */}
-                <h5 className="mb-3">Basic Information</h5>
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="email" className="form-label">
+    <div className="d-flex flex-column min-vh-100 bg-light">
+      <Navbar />
+      <div className="container my-5 flex-grow-1">
+        <div className="row justify-content-center">
+          <div className="col-md-10 col-lg-8">
+            <div className="card shadow-lg p-4 border-0 rounded-4">
+              <div className="card-body">
+                <h3 className="card-title text-center mb-5 text-primary">
+                  Update Your Profile 
+                </h3>
+                <form onSubmit={handleUpdate}>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="email"
+                      className="form-label text-muted"
+                    >
                       Email Address
                     </label>
                     <input
@@ -197,8 +241,11 @@ const handleUpdate = (e) => {
                       disabled
                     />
                   </div>
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="mobile" className="form-label">
+                  <div className="mb-4">
+                    <label
+                      htmlFor="mobile"
+                      className="form-label text-muted"
+                    >
                       Mobile Number
                     </label>
                     <input
@@ -211,10 +258,11 @@ const handleUpdate = (e) => {
                       placeholder="Enter mobile number"
                     />
                   </div>
-                </div>
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="firstName" className="form-label">
+                  <div className="mb-4">
+                    <label
+                      htmlFor="firstName"
+                      className="form-label text-muted"
+                    >
                       First Name
                     </label>
                     <input
@@ -227,8 +275,11 @@ const handleUpdate = (e) => {
                       placeholder="Enter first name"
                     />
                   </div>
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="lastName" className="form-label">
+                  <div className="mb-4">
+                    <label
+                      htmlFor="lastName"
+                      className="form-label text-muted"
+                    >
                       Last Name
                     </label>
                     <input
@@ -241,54 +292,63 @@ const handleUpdate = (e) => {
                       placeholder="Enter last name"
                     />
                   </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="password" className="form-label">
-                    Password (Leave blank to keep unchanged)
-                  </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    className="form-control"
-                    value={profileData.password}
-                    onChange={handleChange}
-                    placeholder="Enter new password"
-                  />
-                </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="password"
+                      className="form-label text-muted"
+                    >
+                      Password (Leave blank to keep unchanged)
+                    </label>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      className="form-control"
+                      value={profileData.password}
+                      onChange={handleChange}
+                      placeholder="Enter new password"
+                    />
+                  </div>
 
-                {/* Profile Information */}
-                <h5 className="mb-3 mt-4">Profile Information</h5>
-                <div className="mb-3">
-                  <label htmlFor="image" className="form-label">
-                    Profile Image
-                  </label>
-                  {imagePreview && (
-                    <div className="mb-2">
-                      <img
-                        src={imagePreview}
-                        alt="Profile Preview"
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                          objectFit: "cover",
-                          borderRadius: "50%",
-                        }}
-                      />
-                    </div>
-                  )}
-                  <input
-                    id="image"
-                    name="image"
-                    type="file"
-                    className="form-control"
-                    onChange={handleImageChange}
-                    accept="image/*"
-                  />
-                </div>
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="age" className="form-label">
+                  {/* Profile Information */}
+                  <h5 className="mb-4 mt-5 text-primary">
+                    Profile Information
+                  </h5>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="image"
+                      className="form-label text-muted"
+                    >
+                      Profile Image
+                    </label>
+                    {imagePreview && (
+                      <div className="mb-3">
+                        <img
+                          src={imagePreview}
+                          alt="Profile Preview"
+                          className="img-fluid rounded-circle shadow-sm"
+                          style={{
+                            width: "100px",
+                            height: "100px",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </div>
+                    )}
+                    <input
+                      id="image"
+                      name="image"
+                      type="file"
+                      className="form-control"
+                      onChange={handleImageChange}
+                      accept="image/*"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="age"
+                      className="form-label text-muted"
+                    >
                       Age
                     </label>
                     <input
@@ -301,8 +361,11 @@ const handleUpdate = (e) => {
                       placeholder="Enter your age"
                     />
                   </div>
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="sex" className="form-label">
+                  <div className="mb-4">
+                    <label
+                      htmlFor="sex"
+                      className="form-label text-muted"
+                    >
                       Sex
                     </label>
                     <select
@@ -315,26 +378,31 @@ const handleUpdate = (e) => {
                       <option value="">Select</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
+                      <option value="Other">Other</option>
                     </select>
                   </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="bio" className="form-label">
-                    Bio
-                  </label>
-                  <textarea
-                    id="bio"
-                    name="bio"
-                    className="form-control"
-                    value={profileData.profile.bio}
-                    onChange={handleChange}
-                    placeholder="Tell us about yourself"
-                    rows="3"
-                  />
-                </div>
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="portfolio" className="form-label">
+                  <div className="mb-4">
+                    <label
+                      htmlFor="bio"
+                      className="form-label text-muted"
+                    >
+                      Bio
+                    </label>
+                    <textarea
+                      id="bio"
+                      name="bio"
+                      className="form-control"
+                      value={profileData.profile.bio}
+                      onChange={handleChange}
+                      placeholder="Tell us about yourself"
+                      rows="3"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="portfolio"
+                      className="form-label text-muted"
+                    >
                       Portfolio URL
                     </label>
                     <input
@@ -347,8 +415,11 @@ const handleUpdate = (e) => {
                       placeholder="Enter your portfolio URL"
                     />
                   </div>
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="facebook" className="form-label">
+                  <div className="mb-5">
+                    <label
+                      htmlFor="facebook"
+                      className="form-label text-muted"
+                    >
                       Facebook URL
                     </label>
                     <input
@@ -361,19 +432,36 @@ const handleUpdate = (e) => {
                       placeholder="Enter your Facebook URL"
                     />
                   </div>
-                </div>
 
-                {/* Submit Button */}
-                <div className="text-center mt-4">
-                  <button type="submit" className="btn btn-primary btn-lg">
-                    Update Profile
-                  </button>
-                </div>
-              </form>
+                  {/* Submit Button */}
+                  <div className="text-center mt-4">
+                    <button
+                      type="submit"
+                      className="btn btn-primary btn-lg d-flex align-items-center justify-content-center mx-auto"
+                      disabled={submitting}
+                      style={{ minWidth: "200px" }}
+                    >
+                      {submitting ? (
+                        <>
+                          <span
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                          Updating...
+                        </>
+                      ) : (
+                        "Update Profile"
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

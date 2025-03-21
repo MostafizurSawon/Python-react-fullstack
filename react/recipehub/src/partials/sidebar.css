@@ -4,3 +4,62 @@
   /* color: inherit;  */
 
 }
+
+/* un comment for a new design */
+/* .sidebar-container {
+  background-color: #f8f9fa; 
+  padding: 20px;
+  border-right: 1px solid #dee2e6;
+  height: 100%;
+  min-width: 200px;
+}
+
+.side-bar-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  color: #495057; /* Dark gray text */
+  text-decoration: none;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.side-bar-item i {
+  font-size: 1.2rem;
+}
+
+.side-bar-item-caption {
+  font-size: 1rem;
+  margin-left: 10px;
+}
+
+.side-bar-item:hover {
+  background-color: #e9ecef; /* Light gray on hover */
+  color: #007bff; /* Blue text on hover */
+}
+
+.side-bar-item-active {
+  background-color: #e0f7fa; /* Light blue background for active tab */
+  color: #007bff; /* Blue text for active tab */
+  font-weight: bold;
+  border-left: 4px solid #007bff; /* Blue left border for active tab */
+} */
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sidebar-container {
+    padding: 10px;
+    min-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .side-bar-item {
+    padding: 10px 12px;
+  }
+
+  .side-bar-item-caption {
+    font-size: 0.9rem;
+  }
+}

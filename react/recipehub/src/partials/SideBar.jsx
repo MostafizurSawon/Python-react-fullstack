@@ -1,58 +1,67 @@
-import { Link } from "react-router";
+// src/components/SideBar.jsx
+import { NavLink } from "react-router-dom"; // Use NavLink instead of Link
+import { useUser } from "../context/UserContext";
 import './sidebar.css';
 
 const SideBar = () => {
-    return (
-        <>
-            <Link to="/dashboard/index/" className="side-bar-item">
-                <i className="bi bi-graph-up"></i>
-                <span className="side-bar-item-caption">Dashboard</span>
-            </Link>
+  const { user } = useUser(); // Access logged-in user data
 
-            {/* <Link to="/dashboard/profile/" className="side-bar-item">
-                <span className="side-bar-item-caption">Profile</span>
-            </Link> */}
-            <Link to="/dashboard/update-profile/" className="side-bar-item">
-                <i className="bi bi-people"></i>
-                <span className="side-bar-item-caption">Update Profile</span>
-            </Link>
+  return (
+    <div className="sidebar-container">
+      <NavLink
+        to="/dashboard/index/"
+        className={({ isActive }) =>
+          `side-bar-item ${isActive ? "side-bar-item-active" : ""}`
+        }
+      >
+        <i className="bi bi-graph-up me-2"></i>
+        <span className="side-bar-item-caption">Dashboard</span>
+      </NavLink>
 
-            <Link to="/dashboard/add-recipe/" className="side-bar-item">
-                <i className="bi bi-cart-plus-fill"></i>
-                <span className="side-bar-item-caption">Add a recipe</span>
-            </Link>
+      <NavLink
+        to="/dashboard/user-info/"
+        className={({ isActive }) =>
+          `side-bar-item ${isActive ? "side-bar-item-active" : ""}`
+        }
+      >
+        <i className="bi bi-person-lines-fill me-2"></i>
+        <span className="side-bar-item-caption">User Info</span>
+      </NavLink>
 
-            <Link to="/dashboard/users/" className="side-bar-item">
-                <i className="bi bi-people-fill"></i> {/* Nice icon for users */}
-                <span className="side-bar-item-caption">All Users</span>
-            </Link>
+      <NavLink
+        to="/dashboard/update-profile/"
+        className={({ isActive }) =>
+          `side-bar-item ${isActive ? "side-bar-item-active" : ""}`
+        }
+      >
+        <i className="bi bi-people me-2"></i>
+        <span className="side-bar-item-caption">Update Profile</span>
+      </NavLink>
 
-            {/* <Link to="/dashboard/category/" className="side-bar-item">
-                <i className="bi bi-list-nested"></i>
-                <span className="side-bar-item-caption">Category</span>
-            </Link> */}
+      <NavLink
+        to="/dashboard/add-recipe/"
+        className={({ isActive }) =>
+          `side-bar-item ${isActive ? "side-bar-item-active" : ""}`
+        }
+      >
+        <i className="bi bi-cart-plus-fill me-2"></i>
+        <span className="side-bar-item-caption">Add a Recipe</span>
+      </NavLink>
 
-            {/* <Link to="/dashboard/product/" className="side-bar-item">
-                <i className="bi bi-bag"></i>
-                <span className="side-bar-item-caption">Product</span>
-            </Link> */}
-
-            {/* <Link to="/dashboard/sale/" className="side-bar-item">
-                <i className="bi bi-currency-dollar"></i>
-                <span className="side-bar-item-caption">Create Sale</span>
-            </Link> */}
-
-            {/* <Link to="/dashboard/invoice/" className="side-bar-item">
-                <i className="bi bi-receipt"></i>
-                <span className="side-bar-item-caption">Invoice</span>
-            </Link> */}
-
-            {/* <Link to="/dashboard/report/" className="side-bar-item">
-                <i className="bi bi-file-earmark-bar-graph"></i>
-                <span className="side-bar-item-caption">Report</span>
-            </Link> */}
-        </>
-    );
+      {/* Conditionally render "All Users" tab if user is an Admin */}
+      {user?.role === "Admin" && (
+        <NavLink
+          to="/dashboard/users/"
+          className={({ isActive }) =>
+            `side-bar-item ${isActive ? "side-bar-item-active" : ""}`
+          }
+        >
+          <i className="bi bi-people-fill me-2"></i>
+          <span className="side-bar-item-caption">All Users</span>
+        </NavLink>
+      )}
+    </div>
+  );
 };
 
 export default SideBar;

@@ -25,6 +25,7 @@ import RecipeDetail from "./pages/RecipeDetail";
 import "bootstrap/dist/css/bootstrap.min.css";
 import AllUsers from "./partials/AllUsers";
 import UserProfile from "./partials/UserProfile";
+import UserInfo from "./partials/UserInfo";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
               <Route path="update-profile/" element={<ProfilePage />} />
               <Route path="users/" element={<AllUsers />} />
               <Route path="users/:email" element={<UserProfile />} />
+              <Route path="user-info/" element={<UserInfo />} /> 
               <Route path="add-recipe/" element={<RecipeForm />} />
               <Route path="customer/" element={<CustomerPage />} />
               <Route path="category/" element={<CategoryPage />} />
