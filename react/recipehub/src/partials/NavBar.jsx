@@ -23,9 +23,7 @@ const Navbar = ({ navOpenHandler }) => {
                                 <h6>User Name</h6>
                                 <hr className="user-dropdown-divider  p-0" />
                             </div>
-                            <Link to="/dashboard/profile/" className="side-bar-item">
-                                <span className="side-bar-item-caption">Profile</span>
-                            </Link>
+                            
                             <Link to={`/logout/`} className="side-bar-item">
                                 <span className="side-bar-item-caption">Logout</span>
                             </Link>

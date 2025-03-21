@@ -1,0 +1,22 @@
+/* src/styles/UserProfile.css */
+.transition-all {
+  transition: all 0.3s ease-in-out;
+}
+
+.transition-all:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-img-top:hover {
+  opacity: 0.9;
+}
+
+.text-primary:hover {
+  color: #0056b3 !important;
+  text-decoration: underline !important;
+}
+
+.bg-gradient {
+  background: linear-gradient(135deg, #6c757d, #495057);
+}

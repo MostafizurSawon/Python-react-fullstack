@@ -9,9 +9,22 @@ const SideBar = () => {
                 <span className="side-bar-item-caption">Dashboard</span>
             </Link>
 
+            {/* <Link to="/dashboard/profile/" className="side-bar-item">
+                <span className="side-bar-item-caption">Profile</span>
+            </Link> */}
+            <Link to="/dashboard/update-profile/" className="side-bar-item">
+                <i className="bi bi-people"></i>
+                <span className="side-bar-item-caption">Update Profile</span>
+            </Link>
+
             <Link to="/dashboard/add-recipe/" className="side-bar-item">
                 <i className="bi bi-cart-plus-fill"></i>
                 <span className="side-bar-item-caption">Add a recipe</span>
+            </Link>
+
+            <Link to="/dashboard/users/" className="side-bar-item">
+                <i className="bi bi-people-fill"></i> {/* Nice icon for users */}
+                <span className="side-bar-item-caption">All Users</span>
             </Link>
 
             {/* <Link to="/dashboard/category/" className="side-bar-item">

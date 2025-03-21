@@ -187,7 +187,13 @@ function Footer() {
             <div className="col-12 col-sm-6">
               <div className="footer-logo-wrapper text-center text-sm-start">
                 <Link className="navbar-brand h3" to="/">
-                  RecipeHub
+                <img
+                  className="rounded"
+                  src="/logo.png"
+                  alt="RecipeHub"
+                  style={{ height: "40px", width: "auto" }}
+                  onError={(e) => (e.target.src = "https://placehold.co/100x40?text=RecipeHub")}
+                />
                 </Link>
               </div>
             </div>

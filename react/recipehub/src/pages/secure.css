@@ -6,3 +6,55 @@
 .active{
   color: red;
 }
+
+
+/* login page */
+/* secure.css */
+
+/* Enhanced wobble animation for the button */
+@keyframes wobble {
+  0% {
+    transform: translate(${buttonPosition.x}px, ${buttonPosition.y}px) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translate(${buttonPosition.x}px, ${buttonPosition.y}px) rotate(10deg) scale(1.1);
+  }
+  50% {
+    transform: translate(${buttonPosition.x}px, ${buttonPosition.y}px) rotate(0deg) scale(1);
+  }
+  75% {
+    transform: translate(${buttonPosition.x}px, ${buttonPosition.y}px) rotate(-10deg) scale(1.1);
+  }
+  100% {
+    transform: translate(${buttonPosition.x}px, ${buttonPosition.y}px) rotate(0deg) scale(1);
+  }
+}
+
+.wobble {
+  animation: wobble 0.4s ease infinite; /* Faster wobble for more playful effect */
+}
+
+/* Ensure the form inputs are responsive */
+.form-control {
+  font-size: 16px !important;
+}
+
+@media (max-width: 576px) {
+  .form-control {
+    font-size: 14px !important;
+    padding: 10px !important;
+  }
+
+  .card {
+    padding: 15px !important;
+  }
+
+  h4 {
+    font-size: 1.5rem !important;
+  }
+
+  .btn {
+    font-size: 14px !important;
+    padding: 10px 20px !important; /* Adjusted padding for smaller screens */
+  }
+}

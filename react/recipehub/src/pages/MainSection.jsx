@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'; // Import useRef
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Pagination, Form, InputGroup, FormControl } from 'react-bootstrap';
+import { Card, Button, Pagination, Form, InputGroup, FormControl, Collapse } from 'react-bootstrap';
 import myaxios from '../utils/myaxios';
 import Loading from './../components/Loading';
 import NotFound from './../components/NotFound';
@@ -12,20 +12,23 @@ function MainSection() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([]); // List of all categories
-  const [selectedCategories, setSelectedCategories] = useState([]); // Selected categories for filtering
-  const [searchQuery, setSearchQuery] = useState(''); // Search input value
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false); // State for collapsible category panel on mobile
 
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const sectionRef = useRef(null); // Create a ref for the MainSection container
+  const sectionRef = useRef(null);
+  const searchInputRef = useRef(null); // Ref for the search input
+  const searchTimeoutRef = useRef(null); // Ref for debouncing search
 
   // Fetch categories for the filter panel
   const fetchCategories = async () => {
     try {
       const response = await myaxios.get('recipes/categories/');
       const cats = response.data.results || response.data;
-      setCategories(cats); // Store full category objects
+      setCategories(cats);
     } catch (error) {
       console.error('Error fetching categories:', error.response ? error.response.data : error.message);
       setCategories([]);
@@ -53,7 +56,7 @@ function MainSection() {
       url += `&categories=${encodeURIComponent(categories.join(','))}`;
     }
     if (search) {
-      url += `&search=${encodeURIComponent(search)}`; // Pass search to backend
+      url += `&search=${encodeURIComponent(search)}`;
     }
     console.log('Fetching recipes from:', url);
     myaxios
@@ -84,7 +87,6 @@ function MainSection() {
         params.search = searchQuery;
       }
       setSearchParams(params);
-      // Scroll to the top of MainSection
       sectionRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
@@ -97,7 +99,7 @@ function MainSection() {
       updatedCategories = [...selectedCategories, categoryName];
     }
     setSelectedCategories(updatedCategories);
-    const params = { page: 1 }; // Reset to page 1 on filter change
+    const params = { page: 1 };
     if (updatedCategories.length > 0) {
       params.categories = updatedCategories.join(',');
     }
@@ -105,31 +107,44 @@ function MainSection() {
       params.search = searchQuery;
     }
     setSearchParams(params);
-    // Scroll to the top of MainSection
     sectionRef.current.scrollIntoView({ behavior: 'smooth' });
   };
 
   const clearFilters = () => {
     setSelectedCategories([]);
     setSearchQuery('');
-    setSearchParams({ page: 1 }); // Reset to page 1
-    // Scroll to the top of MainSection
+    setSearchParams({ page: 1 });
     sectionRef.current.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
-    const params = { page: 1 };
-    if (selectedCategories.length > 0) {
-      params.categories = selectedCategories.join(',');
+
+    // Debounce the search update to prevent excessive API calls
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
     }
-    if (value) {
-      params.search = value;
-    }
-    setSearchParams(params);
-    // Scroll to the top of MainSection
-    sectionRef.current.scrollIntoView({ behavior: 'smooth' });
+
+    searchTimeoutRef.current = setTimeout(() => {
+      const params = { page: 1 };
+      if (selectedCategories.length > 0) {
+        params.categories = selectedCategories.join(',');
+      }
+      if (value) {
+        params.search = value;
+      }
+      setSearchParams(params);
+      // Only scroll if the search bar is not focused
+      if (document.activeElement !== searchInputRef.current) {
+        sectionRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 500); // 500ms debounce delay
+  };
+
+  const handleSearchFocus = () => {
+    // Ensure the search bar stays in view when focused
+    searchInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
   const handleViewRecipe = (id) => {
@@ -139,37 +154,50 @@ function MainSection() {
   const fallbackImage = 'https://placehold.co/300x200?text=No+Image';
 
   return (
-    <div className="container my-4" ref={sectionRef}> {/* Attach the ref to the container */}
+    <div className="container my-4" ref={sectionRef}>
       <h1 className="text-center mb-5" style={{ fontWeight: 'bold', color: '#2c3e50', fontSize: '2.5rem' }}>
         Our Recipes
       </h1>
       <div className="main-section-wrapper">
         <div className="row">
-          {/* Left Side: Sticky Filter Panel */}
+          {/* Left Side: Collapsible Filter Panel on Mobile */}
           <div className="col-md-3 mb-4 filter-panel-container">
-            <div className="filter-panel sticky-center p-3 border rounded">
-              <h5 className="mb-3">Filter by Category</h5>
-              {categories.length > 0 ? (
-                <div>
-                  {categories.map((cat) => (
-                    <Form.Check
-                      key={cat.id}
-                      type="checkbox"
-                      id={`category-${cat.id}`}
-                      label={cat.name}
-                      checked={selectedCategories.includes(cat.name)}
-                      onChange={() => handleCategoryChange(cat.name)}
-                      className="mb-2 custom-checkbox"
-                    />
-                  ))}
-                  <Button variant="secondary" size="sm" onClick={clearFilters} className="mt-3 w-100">
-                    Clear All Filters
-                  </Button>
+            <Button
+              variant="outline-primary"
+              onClick={() => setIsCategoryPanelOpen(!isCategoryPanelOpen)}
+              aria-controls="category-collapse"
+              aria-expanded={isCategoryPanelOpen}
+              className="d-md-none w-100 mb-3"
+            >
+              {isCategoryPanelOpen ? 'Hide Filters' : 'Show Filters'}
+            </Button>
+            <Collapse in={isCategoryPanelOpen || window.innerWidth >= 768}>
+              <div id="category-collapse" className="sticky-center">
+                <div className="filter-panel p-3 border rounded">
+                  <h5 className="mb-3">Filter by Category</h5>
+                  {categories.length > 0 ? (
+                    <div>
+                      {categories.map((cat) => (
+                        <Form.Check
+                          key={cat.id}
+                          type="checkbox"
+                          id={`category-${cat.id}`}
+                          label={cat.name}
+                          checked={selectedCategories.includes(cat.name)}
+                          onChange={() => handleCategoryChange(cat.name)}
+                          className="mb-2 custom-checkbox"
+                        />
+                      ))}
+                      <Button variant="secondary" size="sm" onClick={clearFilters} className="mt-3 w-100">
+                        Clear All Filters
+                      </Button>
+                    </div>
+                  ) : (
+                    <p>No categories available.</p>
+                  )}
                 </div>
-              ) : (
-                <p>No categories available.</p>
-              )}
-            </div>
+              </div>
+            </Collapse>
           </div>
           {/* Right Side: Recipes with Search */}
           <div className="col-md-9">
@@ -177,10 +205,12 @@ function MainSection() {
               <InputGroup.Text style={{ background: 'none', border: 'none', padding: '10px 16px' }}>
                 <i className="bi bi-search" style={{ color: '#34495e' }}></i>
               </InputGroup.Text>
-              <FormControl 
+              <FormControl
+                ref={searchInputRef}
                 placeholder="Search recipes..."
                 value={searchQuery}
                 onChange={handleSearchChange}
+                onFocus={handleSearchFocus}
                 aria-label="Search recipes"
                 style={{ border: 'none', padding: '10px 16px' }}
               />
@@ -193,6 +223,7 @@ function MainSection() {
                     params.categories = selectedCategories.join(',');
                   }
                   setSearchParams(params);
+                  sectionRef.current.scrollIntoView({ behavior: 'smooth' });
                 }}
                 style={{ border: 'none', padding: '10px 16px', margin: '6px' }}
                 disabled={!searchQuery}
@@ -211,7 +242,7 @@ function MainSection() {
                         border: '1px solid #e0e0e0',
                         overflow: 'hidden',
                         transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                        height: '400px', // Fixed height for uniformity
+                        height: '400px',
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-10px)';

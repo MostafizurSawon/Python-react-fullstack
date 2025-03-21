@@ -1,16 +1,20 @@
+// src/pages/LogoutPage.jsx
 import { useEffect } from "react";
-import { Navigate } from "react-router-dom";
-import { errorToast } from "../utils/toast";
+import { useUser } from "../context/UserContext";
 
 const LogoutPage = () => {
-  useEffect(() => {
-    // Clear token and show toast only once
-    localStorage.removeItem("token");
-    localStorage.removeItem("user"); // Also remove user to match Navbar logic
-    errorToast("Logged out!");
-  }, []); // Empty dependency array ensures this runs only once on mount
+  const { logout } = useUser();
 
-  return <Navigate to="/login/" />;
+  useEffect(() => {
+    logout(); // Use the logout function from context
+  }, [logout]);
+
+  return (
+    <div className="container mt-5 text-center">
+      <h2>Logging out...</h2>
+      <p>You will be redirected to the login page shortly.</p>
+    </div>
+  );
 };
 
 export default LogoutPage;

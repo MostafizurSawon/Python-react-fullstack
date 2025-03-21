@@ -190,14 +190,11 @@
   border-color: #e0e0e0;
 }
 
-
-/* recipe card */
-
+/* Recipe card */
 .ingredient-item {
   white-space: pre-line; /* Preserves newlines and spaces */
   line-height: 2;
   padding: 10px 0;
-  
 }
 
 /* Style for the instructions section */
@@ -206,10 +203,7 @@
   line-height: 1.6;
 }
 
-/* details */
-
-/* Existing styles remain unchanged, appending new styles */
-
+/* Details */
 /* Ingredient item styling */
 .ingredient-item {
   font-size: 0.95rem;
@@ -226,24 +220,71 @@
   white-space: pre-wrap;
 }
 
-/* Recipe info styling (already present, ensuring consistency) */
-.recipe-info {
-  padding-top: 8px;
-  border-top: 1px solid #e0e0e0;
-  color: #34495e;
+/* New styles for mobile responsiveness */
+
+/* Ensure the search bar is accessible on mobile */
+.input-group {
+  position: relative;
+  z-index: 1; /* Ensure the search bar is above other elements */
 }
 
-.recipe-by,
-.shared-date {
-  display: flex;
-  align-items: center;
+/* Remove the conflicting sticky-center style for filter-panel */
+.filter-panel.sticky-center {
+  /* Remove this block to avoid conflicts */
 }
 
-.recipe-by span:last-child,
-.shared-date span:last-child {
-  margin-left: 8px;
-  font-weight: 500;
-  font-size: 0.9rem;
+/* On mobile, make the filter panel less intrusive */
+@media (max-width: 767px) {
+  .filter-panel-container {
+    margin-bottom: 20px;
+  }
+
+  .sticky-center {
+    position: relative !important; /* Disable sticky behavior on mobile */
+    top: 0 !important;
+    max-height: none !important; /* Remove max-height on mobile */
+  }
+
+  .input-group {
+    margin-bottom: 20px;
+  }
+
+  .form-control {
+    font-size: 16px !important;
+    padding: 12px !important;
+  }
+
+  .input-group-text,
+  .btn {
+    padding: 12px !important;
+  }
+
+  /* Adjust the heading for mobile */
+  h1.text-center {
+    font-size: 2rem !important;
+  }
+
+  /* Adjust card height for mobile */
+  .custom-card {
+    height: 380px !important;
+  }
+
+  .custom-card img {
+    height: 200px !important;
+  }
 }
 
+/* Ensure the search bar stays in view when focused */
+.form-control:focus {
+  box-shadow: 0 0 5px rgba(231, 76, 18, 0.5);
+}
 
+/* Ensure the filter panel is sticky on desktop */
+@media (min-width: 768px) {
+  .sticky-center {
+    position: sticky !important;
+    top: 80px !important;
+    max-height: calc(100vh - 140px) !important;
+    overflow-y: auto !important;
+  }
+}
