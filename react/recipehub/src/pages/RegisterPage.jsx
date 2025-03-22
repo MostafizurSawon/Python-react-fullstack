@@ -4,6 +4,7 @@ import myaxios from "../utils/myaxios";
 import { errorToast, successToast } from "../utils/toast";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import "./secure.css";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -169,7 +170,7 @@ const RegisterPage = () => {
                           id="mobile"
                           placeholder="Mobile"
                           className="form-control"
-                          type="tel"  // Corrected type from "mobile" to "tel"
+                          type="tel"
                           name="mobile"
                           value={formData.mobile}
                           onChange={handleChange}
@@ -184,7 +185,18 @@ const RegisterPage = () => {
                           className="btn mt-3 w-100 bg-gradient-primary"
                           disabled={loading}
                         >
-                          {loading ? "Registering..." : "Register"}
+                          {loading ? (
+                            <>
+                              <span
+                                className="spinner-border spinner-border-sm me-2"
+                                role="status"
+                                aria-hidden="true"
+                              ></span>
+                              Registering...
+                            </>
+                          ) : (
+                            "Register"
+                          )}
                         </button>
                       </div>
                     </div>

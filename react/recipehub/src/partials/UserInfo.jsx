@@ -1,16 +1,15 @@
-// src/components/UserInfo.jsx
 import { useUser } from "../context/UserContext";
 import { Link } from "react-router-dom";
 import Navbar from "../partials/NavBar";
 import Footer from "../pages/Footer";
 
 function UserInfo() {
-  const { user } = useUser(); // Access logged-in user data
+  const { user } = useUser(); 
 
-  // Default placeholder image URL
+
   const defaultImage = "https://www.pngkey.com/png/full/72-729716_user-avatar-png-graphic-free-download-icon.png";
 
-  // Get the base URL from environment variables (Vite syntax)
+
   const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
   // Construct the full image URL
@@ -36,7 +35,7 @@ function UserInfo() {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Navbar />
+      {/* <Navbar /> */}
       <section
         className="flex-grow-1 py-5"
         style={{
@@ -83,7 +82,7 @@ function UserInfo() {
                       Role: {user.role || "User"}
                     </span>
                   </div>
-                  {/* User Details (One per line) */}
+                  
                   <div className="mb-4">
                     <div className="d-flex align-items-center mb-3">
                       <i className="bi bi-envelope-fill text-primary me-2"></i>
@@ -116,33 +115,54 @@ function UserInfo() {
                   {/* Bio Section */}
                   {user.profile?.bio && (
                     <div className="mb-4">
-                      <h5 className="text-primary mb-2">
-                        <i className="bi bi-info-circle-fill me-2"></i>About Me
+                      <h5 className="mb-2 text-decoration-none text-muted">
+                        <i className="bi bi-info-circle-fill text-primary me-2"></i>About Me
                       </h5>
                       <p className="text-muted">{user.profile.bio}</p>
                     </div>
                   )}
                   {/* Social Link */}
+                  
+                  <div className="d-flex justify-content-between align-items-center">
                   {user.profile?.facebook && (
                     <div className="mb-4">
-                      <h5 className="text-primary mb-2">
-                        <i className="bi bi-share-fill me-2"></i>Social
-                      </h5>
                       <a
                         href={user.profile.facebook}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-primary me-2"
+                        className="text-primary me-2 text-decoration-none"
                         style={{
                           transition: "color 0.3s ease",
                         }}
                         onMouseEnter={(e) => (e.currentTarget.style.color = "#0056b3")}
                         onMouseLeave={(e) => (e.currentTarget.style.color = "#007bff")}
                       >
-                        <i className="bi bi-facebook fs-4"></i>
+                        <i className="bi bi-facebook fs-4"><span className="px-2 ">Facebook</span></i>
                       </a>
                     </div>
                   )}
+                  {user.profile?.portfolio && (
+                    <div className="mb-4">
+                      
+                        
+                      
+                      <a
+                        href={user.profile.portfolio}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary me-2 text-decoration-none"
+                        style={{
+                          transition: "color 0.3s ease",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = "#0056b3")}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = "#007bff")}
+                      >
+                        <i className="bi bi-browser-chrome fs-4"><span className="px-2">Portfolio</span></i>
+                      </a>
+                    </div>
+                  )}
+                  </div>
+
                   {/* Edit Profile Button */}
                   <div className="text-center">
                     <Link
@@ -167,7 +187,7 @@ function UserInfo() {
           </div>
         </div>
       </section>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

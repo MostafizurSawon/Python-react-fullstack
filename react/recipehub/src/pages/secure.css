@@ -8,6 +8,17 @@
 }
 
 
+/* register page   */
+.spinner-border {
+  color: #ffffff; 
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(90deg, #007bff, #0056b3); 
+  color: #ffffff;
+}
+
+
 /* login page */
 /* secure.css */
 

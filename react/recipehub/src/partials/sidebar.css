@@ -18,7 +18,7 @@
   display: flex;
   align-items: center;
   padding: 12px 15px;
-  color: #495057; /* Dark gray text */
+  color: #495057; 
   text-decoration: none;
   border-radius: 8px;
   margin-bottom: 10px;
@@ -35,15 +35,15 @@
 }
 
 .side-bar-item:hover {
-  background-color: #e9ecef; /* Light gray on hover */
-  color: #007bff; /* Blue text on hover */
+  background-color: #e9ecef; 
+  color: #007bff; 
 }
 
 .side-bar-item-active {
-  background-color: #e0f7fa; /* Light blue background for active tab */
-  color: #007bff; /* Blue text for active tab */
+  background-color: #e0f7fa; 
+  color: #007bff; 
   font-weight: bold;
-  border-left: 4px solid #007bff; /* Blue left border for active tab */
+  border-left: 4px solid #007bff; 
 } */
 
 /* Responsive adjustments */

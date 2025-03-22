@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import myaxios from "../utils/myaxios";
 import { errorToast } from "../utils/toast";
-import Navbar from "./NavBar";
 import Footer from "../pages/Footer";
 import Loading from "./../components/Loading";
 
@@ -74,7 +73,6 @@ const AllUsers = () => {
 
   return (
     <div>
-      <Navbar />
       <div className="container my-5">
         <h2 className="mb-4">All Users</h2>
 

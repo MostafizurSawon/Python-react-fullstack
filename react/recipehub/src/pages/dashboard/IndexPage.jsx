@@ -144,160 +144,184 @@ const DashboardIndexPage = () => {
   const fallbackImage = "https://placehold.co/300x200?text=No+Image";
 
   return (
-    <div className="container-fluid py-4">
-      <h1 className="mb-5" style={{ fontWeight: "bold", color: "#2c3e50" }}>
-        My Recipes
-      </h1>
-
-      {/* Search Bar */}
-      <div className="mb-4 d-flex justify-content-start">
-        <InputGroup className="w-100 w-md-50 w-lg-25">
-          <InputGroup.Text>
-            <i className="bi bi-search"></i>
-          </InputGroup.Text>
-          <FormControl
-            placeholder="Search my recipes..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
-        </InputGroup>
-      </div>
-
-      {/* Main Content Row */}
-      <div className="row g-4" style={{ minHeight: "70vh" }}>
-        {/* Filter Panel (Collapsible on Mobile/Tablet) */}
-        <div className="col-12 col-md-4 col-lg-3 order-md-1 order-2">
-          <div className="d-md-none mb-3">
-            <Button
-              variant="outline-primary"
-              onClick={() => setFilterOpen(!filterOpen)}
-              className="w-100 d-flex justify-content-between align-items-center"
+    <section
+      className="py-5"
+      style={{ background: "linear-gradient(135deg, #e0f7fa 0%, #80deea 100%)" }}
+    >
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-12 col-md-10 col-lg-10">
+            <div
+              className="card border-0 shadow-lg rounded-4"
+              style={{
+                background: "rgba(255, 255, 255, 0.95)",
+                transition: "transform 0.3s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
             >
-              <span>Filter by Category</span>
-              <i className={`bi ${filterOpen ? "bi-chevron-up" : "bi-chevron-down"}`}></i>
-            </Button>
-            <Collapse in={filterOpen}>
-              <div className="p-3 border rounded mt-2">
-                {categories.length > 0 ? (
-                  <>
-                    {categories.map((cat) => (
-                      <Form.Check
-                        key={cat.id}
-                        type="checkbox"
-                        label={cat.name}
-                        checked={selectedCategories.includes(cat.name)}
-                        onChange={() => handleCategoryChangeFilter(cat.name)}
-                        className="mb-2"
-                      />
-                    ))}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={clearFilters}
-                      className="mt-3 w-100"
-                    >
-                      Clear Filters
-                    </Button>
-                  </>
-                ) : (
-                  <p>No categories available.</p>
-                )}
-              </div>
-            </Collapse>
-          </div>
-          <div
-            className="p-3 border rounded d-none d-md-block"
-            style={{
-              position: "sticky",
-              top: "100px",
-              maxHeight: "70vh",
-              overflowY: "auto",
-            }}
-          >
-            <h5 className="mb-3">Filter by Category</h5>
-            {categories.length > 0 ? (
-              <>
-                {categories.map((cat) => (
-                  <Form.Check
-                    key={cat.id}
-                    type="checkbox"
-                    label={cat.name}
-                    checked={selectedCategories.includes(cat.name)}
-                    onChange={() => handleCategoryChangeFilter(cat.name)}
-                    className="mb-2"
-                  />
-                ))}
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={clearFilters}
-                  className="mt-3 w-100"
+              <div className="card-body p-4 p-md-5">
+                <h1
+                  className="text-center text-primary mb-5"
+                  style={{ fontWeight: "bold" }}
                 >
-                  Clear Filters
-                </Button>
-              </>
-            ) : (
-              <p>No categories available.</p>
-            )}
-          </div>
-        </div>
+                  My Recipes
+                </h1>
 
-        {/* Recipes Section */}
-        <div className="col-12 col-md-8 col-lg-9 order-md-2 order-1">
-          <div className="row g-4">
-            {loading ? (
-              <div className="col-12">
-                <Loading />
-              </div>
-            ) : recipes.length > 0 ? (
-              recipes.map((recipe) => (
-                <div className="col-12 col-sm-6 col-lg-4" key={recipe.id}>
-                  <Card className="h-100">
-                    <Card.Img
-                      variant="top"
-                      src={recipe.img || fallbackImage}
-                      alt={recipe.title}
-                      style={{ height: "200px", objectFit: "cover" }}
-                      onError={(e) => (e.target.src = fallbackImage)}
+                {/* Search Bar */}
+                <div className="mb-4 d-flex justify-content-start">
+                  <InputGroup className="w-100 w-md-50 w-lg-25">
+                    <InputGroup.Text>
+                      <i className="bi bi-search"></i>
+                    </InputGroup.Text>
+                    <FormControl
+                      placeholder="Search my recipes..."
+                      value={searchQuery}
+                      onChange={handleSearchChange}
                     />
-                    <Card.Body className="d-flex flex-column">
-                      <Card.Title>{recipe.title}</Card.Title>
-                      <Card.Text>
-                        Category:{" "}
-                        {recipe.category_names?.length > 0
-                          ? recipe.category_names.join(", ")
-                          : "Uncategorized"}
-                      </Card.Text>
-                      <Card.Text>
-                        Shared on: {new Date(recipe.created_on).toLocaleDateString() || "N/A"}
-                      </Card.Text>
-                      <div className="mt-auto d-flex gap-2">
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          className="w-50"
-                          onClick={() => handleEdit(recipe)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          className="w-50"
-                          onClick={() => handleDelete(recipe.id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </Card.Body>
-                  </Card>
+                  </InputGroup>
                 </div>
-              ))
-            ) : (
-              <div className="col-12">
-                <NotFound message="No recipes found." />
+
+                {/* Main Content Row */}
+                <div className="row g-4" style={{ minHeight: "70vh" }}>
+                  {/* Filter Panel (Collapsible on Mobile/Tablet) */}
+                  <div className="col-12 col-md-4 col-lg-3 order-md-1 order-2">
+                    <div className="d-md-none mb-3">
+                      <Button
+                        variant="outline-primary"
+                        onClick={() => setFilterOpen(!filterOpen)}
+                        className="w-100 d-flex justify-content-between align-items-center"
+                      >
+                        <span>Filter by Category</span>
+                        <i className={`bi ${filterOpen ? "bi-chevron-up" : "bi-chevron-down"}`}></i>
+                      </Button>
+                      <Collapse in={filterOpen}>
+                        <div className="p-3 border rounded mt-2">
+                          {categories.length > 0 ? (
+                            <>
+                              {categories.map((cat) => (
+                                <Form.Check
+                                  key={cat.id}
+                                  type="checkbox"
+                                  label={cat.name}
+                                  checked={selectedCategories.includes(cat.name)}
+                                  onChange={() => handleCategoryChangeFilter(cat.name)}
+                                  className="mb-2"
+                                />
+                              ))}
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={clearFilters}
+                                className="mt-3 w-100"
+                              >
+                                Clear Filters
+                              </Button>
+                            </>
+                          ) : (
+                            <p>No categories available.</p>
+                          )}
+                        </div>
+                      </Collapse>
+                    </div>
+                    <div
+                      className="p-3 border rounded d-none d-md-block"
+                      style={{
+                        position: "sticky",
+                        top: "100px",
+                        maxHeight: "70vh",
+                        overflowY: "auto",
+                      }}
+                    >
+                      <h5 className="mb-3">Filter by Category</h5>
+                      {categories.length > 0 ? (
+                        <>
+                          {categories.map((cat) => (
+                            <Form.Check
+                              key={cat.id}
+                              type="checkbox"
+                              label={cat.name}
+                              checked={selectedCategories.includes(cat.name)}
+                              onChange={() => handleCategoryChangeFilter(cat.name)}
+                              className="mb-2"
+                            />
+                          ))}
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={clearFilters}
+                            className="mt-3 w-100"
+                          >
+                            Clear Filters
+                          </Button>
+                        </>
+                      ) : (
+                        <p>No categories available.</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Recipes Section */}
+                  <div className="col-12 col-md-12 col-lg-9 order-md-2 order-1">
+                    <div className="row g-4">
+                      {loading ? (
+                        <div className="col-12">
+                          <Loading />
+                        </div>
+                      ) : recipes.length > 0 ? (
+                        recipes.map((recipe) => (
+                          <div className="col-12 col-sm-6 col-lg-6" key={recipe.id}>
+                            <Card className="h-100">
+                              <Card.Img
+                                variant="top"
+                                src={recipe.img || fallbackImage}
+                                alt={recipe.title}
+                                style={{ height: "200px", objectFit: "cover" }}
+                                onError={(e) => (e.target.src = fallbackImage)}
+                              />
+                              <Card.Body className="d-flex flex-column">
+                                <Card.Title>{recipe.title}</Card.Title>
+                                <Card.Text>
+                                  Category:{" "}
+                                  {recipe.category_names?.length > 0
+                                    ? recipe.category_names.join(", ")
+                                    : "Uncategorized"}
+                                </Card.Text>
+                                <Card.Text>
+                                  Shared on: {new Date(recipe.created_on).toLocaleDateString() || "N/A"}
+                                </Card.Text>
+                                <div className="mt-auto d-flex gap-2">
+                                  <Button
+                                    variant="primary"
+                                    size="sm"
+                                    className="w-50"
+                                    onClick={() => handleEdit(recipe)}
+                                  >
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    variant="danger"
+                                    size="sm"
+                                    className="w-50"
+                                    onClick={() => handleDelete(recipe.id)}
+                                  >
+                                    Delete
+                                  </Button>
+                                </div>
+                              </Card.Body>
+                            </Card>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="col-12">
+                          <NotFound message="No recipes found." />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
@@ -372,14 +396,21 @@ const DashboardIndexPage = () => {
               <Button variant="secondary" onClick={() => setShowEditModal(false)}>
                 Cancel
               </Button>
-              <Button variant="primary" type="submit">
+              <Button
+                variant="primary"
+                type="submit"
+                className="px-4 py-2"
+                style={{ transition: "background-color 0.3s ease" }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#0056b3")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#007bff")}
+              >
                 Save Changes
               </Button>
             </div>
           </Form>
         </Modal.Body>
       </Modal>
-    </div>
+    </section>
   );
 };
 

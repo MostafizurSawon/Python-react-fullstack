@@ -15,15 +15,14 @@ function MainSection() {
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false); // State for collapsible category panel on mobile
+  const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const sectionRef = useRef(null);
-  const searchInputRef = useRef(null); // Ref for the search input
-  const searchTimeoutRef = useRef(null); // Ref for debouncing search
+  const searchInputRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
 
-  // Fetch categories for the filter panel
   const fetchCategories = async () => {
     try {
       const response = await myaxios.get('recipes/categories/');
@@ -41,7 +40,7 @@ function MainSection() {
 
   useEffect(() => {
     const pageFromUrl = parseInt(searchParams.get('page')) || 1;
-    const categoriesFromUrl = searchParams.get('categories') ? searchParams.get('categories').split(',') : [];
+    const categoriesFromUrl = searchParams.get('categories') ? searchParams.get('categories').split(',').map(id => id.toString()) : [];
     const searchFromUrl = searchParams.get('search') || '';
     setCurrentPage(pageFromUrl);
     setSelectedCategories(categoriesFromUrl);
@@ -64,16 +63,14 @@ function MainSection() {
       .then((response) => {
         console.log('All recipe data', response.data);
         setRecipes(response.data.results || response.data);
-        const totalItems = response.data.count || response.data.length;
-        setTotalPages(Math.ceil(totalItems / 10));
+        const totalItems = response.data.count || response.data.length || 0;
+        setTotalPages(Math.max(1, Math.ceil(totalItems / 10)));
       })
       .catch((error) => {
         console.error('Error fetching the recipes:', error.response ? error.response.data : error.message);
         setRecipes([]);
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   };
 
   const handlePageChange = (page) => {
@@ -91,12 +88,13 @@ function MainSection() {
     }
   };
 
-  const handleCategoryChange = (categoryName) => {
+  const handleCategoryChange = (categoryId) => {
+    const categoryIdStr = categoryId.toString();
     let updatedCategories;
-    if (selectedCategories.includes(categoryName)) {
-      updatedCategories = selectedCategories.filter((cat) => cat !== categoryName);
+    if (selectedCategories.includes(categoryIdStr)) {
+      updatedCategories = selectedCategories.filter((cat) => cat !== categoryIdStr);
     } else {
-      updatedCategories = [...selectedCategories, categoryName];
+      updatedCategories = [...selectedCategories, categoryIdStr];
     }
     setSelectedCategories(updatedCategories);
     const params = { page: 1 };
@@ -120,12 +118,7 @@ function MainSection() {
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
-
-    // Debounce the search update to prevent excessive API calls
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     searchTimeoutRef.current = setTimeout(() => {
       const params = { page: 1 };
       if (selectedCategories.length > 0) {
@@ -135,15 +128,13 @@ function MainSection() {
         params.search = value;
       }
       setSearchParams(params);
-      // Only scroll if the search bar is not focused
       if (document.activeElement !== searchInputRef.current) {
         sectionRef.current.scrollIntoView({ behavior: 'smooth' });
       }
-    }, 500); // 500ms debounce delay
+    }, 500);
   };
 
   const handleSearchFocus = () => {
-    // Ensure the search bar stays in view when focused
     searchInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
@@ -160,7 +151,6 @@ function MainSection() {
       </h1>
       <div className="main-section-wrapper">
         <div className="row">
-          {/* Left Side: Collapsible Filter Panel on Mobile */}
           <div className="col-md-3 mb-4 filter-panel-container">
             <Button
               variant="outline-primary"
@@ -183,8 +173,8 @@ function MainSection() {
                           type="checkbox"
                           id={`category-${cat.id}`}
                           label={cat.name}
-                          checked={selectedCategories.includes(cat.name)}
-                          onChange={() => handleCategoryChange(cat.name)}
+                          checked={selectedCategories.includes(cat.id.toString())}
+                          onChange={() => handleCategoryChange(cat.id)}
                           className="mb-2 custom-checkbox"
                         />
                       ))}
@@ -199,7 +189,6 @@ function MainSection() {
               </div>
             </Collapse>
           </div>
-          {/* Right Side: Recipes with Search */}
           <div className="col-md-9">
             <InputGroup className="my-3">
               <InputGroup.Text style={{ background: 'none', border: 'none', padding: '10px 16px' }}>
@@ -235,47 +224,15 @@ function MainSection() {
               {recipes.length > 0 ? (
                 recipes.map((recipe) => (
                   <div className="col-md-6 col-lg-6" key={recipe.id}>
-                    <Card
-                      className="custom-card h-100"
-                      style={{
-                        borderRadius: '20px',
-                        border: '1px solid #e0e0e0',
-                        overflow: 'hidden',
-                        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                        height: '400px',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-10px)';
-                        e.currentTarget.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
-                      }}
-                    >
+                    <Card className="custom-card h-100" style={{ borderRadius: '20px', border: '1px solid #e0e0e0', overflow: 'hidden', transition: 'transform 0.3s ease, box-shadow 0.3s ease', height: '400px' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-10px)'; e.currentTarget.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)'; }}>
                       <div className="card-image-wrapper">
                         {recipe.img ? (
-                          <Card.Img
-                            variant="top"
-                            src={recipe.img}
-                            alt={recipe.title}
-                            style={{ height: '220px', objectFit: 'cover' }}
-                            onError={(e) => {
-                              e.target.src = fallbackImage;
-                              e.target.onError = null;
-                            }}
-                          />
+                          <Card.Img variant="top" src={recipe.img} alt={recipe.title} style={{ height: '220px', objectFit: 'cover' }}
+                            onError={(e) => { e.target.src = fallbackImage; e.target.onError = null; }} />
                         ) : (
-                          <div
-                            style={{
-                              height: '220px',
-                              backgroundColor: '#f8f9fa',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              borderBottom: '1px solid #e0e0e0',
-                            }}
-                          >
+                          <div style={{ height: '220px', backgroundColor: '#f8f9fa', display: 'flex', justifyContent: 'center', alignItems: 'center', borderBottom: '1px solid #e0e0e0' }}>
                             <span style={{ color: '#7f8c8d', fontSize: '1.2rem' }}>No Image Available</span>
                           </div>
                         )}
@@ -284,9 +241,7 @@ function MainSection() {
                       <Card.Body className="p-4 d-flex flex-column">
                         <Card.Title className="mb-3">
                           <span style={{ fontSize: '1.6rem', color: '#e74c3c' }}>🍳</span>
-                          <span style={{ fontSize: '1.4rem', fontWeight: '700', color: '#2c3e50', marginLeft: '10px' }}>
-                            {recipe.title}
-                          </span>
+                          <span style={{ fontSize: '1.4rem', fontWeight: '700', color: '#2c3e50', marginLeft: '10px' }}>{recipe.title}</span>
                         </Card.Title>
                         <Card.Text className="text-muted mb-3">
                           <span style={{ fontSize: '1.1rem', color: '#3498db' }}>📋</span>
@@ -298,7 +253,7 @@ function MainSection() {
                           <div className="recipe-by">
                             <span style={{ fontSize: '1.2rem', color: '#f39c12' }}>👤</span>
                             <span style={{ fontSize: '0.9rem', color: '#34495e', marginLeft: '8px', fontWeight: '500' }}>
-                              Recipe by: {recipe.user?.firstName || 'Unknown'}
+                              Recipe by: {recipe.user?.firstName || 'Unknown'} {recipe.user?.lastName || ''}
                             </span>
                           </div>
                           <div className="shared-date">
@@ -308,22 +263,10 @@ function MainSection() {
                             </span>
                           </div>
                         </div>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          className="mt-3 w-100"
-                          style={{
-                            borderRadius: '12px',
-                            backgroundColor: '#e74c3c',
-                            borderColor: '#e74c3c',
-                            fontWeight: '600',
-                            padding: '10px 0',
-                            transition: 'background-color 0.3s ease',
-                          }}
+                        <Button variant="primary" size="sm" className="mt-3 w-100" style={{ borderRadius: '12px', backgroundColor: '#e74c3c', borderColor: '#e74c3c', fontWeight: '600', padding: '10px 0', transition: 'background-color 0.3s ease' }}
                           onClick={() => handleViewRecipe(recipe.id)}
-                          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#c0392b')}
-                          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#e74c3c')}
-                        >
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c0392b'}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e74c3c'}>
                           View Full Recipe
                         </Button>
                       </Card.Body>
@@ -337,52 +280,24 @@ function MainSection() {
             {totalPages > 1 && (
               <div className="d-flex justify-content-center mt-5">
                 <Pagination>
-                  <Pagination.First
-                    onClick={() => handlePageChange(1)}
-                    disabled={currentPage === 1}
-                    className="custom-pagination"
-                  />
-                  <Pagination.Prev
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="custom-pagination"
-                  />
+                  <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} className="custom-pagination" />
+                  <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="custom-pagination" />
                   {[...Array(totalPages)].map((_, index) => {
                     const page = index + 1;
-                    if (
-                      page === 1 ||
-                      page === totalPages ||
-                      (page >= currentPage - 2 && page <= currentPage + 2)
-                    ) {
+                    if (page === 1 || page === totalPages || (page >= currentPage - 2 && page <= currentPage + 2)) {
                       return (
-                        <Pagination.Item
-                          key={page}
-                          active={page === currentPage}
-                          onClick={() => handlePageChange(page)}
-                          className="custom-pagination"
-                        >
+                        <Pagination.Item key={page} active={page === currentPage} onClick={() => handlePageChange(page)} className="custom-pagination">
                           {page}
                         </Pagination.Item>
                       );
                     }
-                    if (
-                      (page === currentPage - 3 && currentPage > 4) ||
-                      (page === currentPage + 3 && page < totalPages - 3)
-                    ) {
+                    if ((page === currentPage - 3 && currentPage > 4) || (page === currentPage + 3 && page < totalPages - 3)) {
                       return <Pagination.Ellipsis key={page} className="custom-pagination" />;
                     }
                     return null;
                   })}
-                  <Pagination.Next
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="custom-pagination"
-                  />
-                  <Pagination.Last
-                    onClick={() => handlePageChange(totalPages)}
-                    disabled={currentPage === totalPages}
-                    className="custom-pagination"
-                  />
+                  <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="custom-pagination" />
+                  <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} className="custom-pagination" />
                 </Pagination>
               </div>
             )}

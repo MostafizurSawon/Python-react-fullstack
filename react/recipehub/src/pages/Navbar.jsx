@@ -69,7 +69,7 @@ const Navbar = () => {
         ref={navbarRef}
         className={`fixed-top ${isScrolled ? "shadow-lg" : "shadow-sm"}`}
         style={{
-          background: "linear-gradient(90deg, #8B0000 0%, #FFC107 100%)", // Deep red to golden saffron
+          background: "linear-gradient(90deg, #8B0000 0%, #FFC107 100%)", 
           color: "#fff",
           padding: "10px 0",
         }}
@@ -207,7 +207,7 @@ const Navbar = () => {
               {isAuthenticated ? (
                 <>
                   <Link
-                    to="/dashboard/profile"
+                    to="/dashboard/user-info/"
                     className="text-white text-decoration-none px-3 py-2 rounded d-flex align-items-center"
                     onClick={() => setIsMenuOpen(false)}
                     style={{

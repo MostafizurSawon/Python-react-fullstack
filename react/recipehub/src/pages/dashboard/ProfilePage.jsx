@@ -213,8 +213,9 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="d-flex flex-column min-vh-100 bg-light">
-      <Navbar />
+    <div className="d-flex flex-column min-vh-100" style={{
+      background: "linear-gradient(135deg, #e0f7fa 0%, #80deea 100%)",
+    }}>
       <div className="container my-5 flex-grow-1">
         <div className="row justify-content-center">
           <div className="col-md-10 col-lg-8">
@@ -461,7 +462,7 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };

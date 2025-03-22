@@ -1,0 +1,15 @@
+/* RecipeDetail.css */
+.comment-delete-btn {
+  border-radius: 50%;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+}
+
+.comment-delete-btn:hover {
+  background-color: #c0392b;
+  border-color: #c0392b;
+}
+
+.action-btn:hover {
+  transform: scale(1.05);
+}

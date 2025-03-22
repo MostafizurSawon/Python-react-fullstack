@@ -88,9 +88,7 @@ const UserProfile = () => {
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-light">
-      <Navbar />
       <div className="container my-5 flex-grow-1">
-        {/* Profile Header */}
         <div className="text-center mb-5">
           <h2 className="display-5 fw-bold text-dark">
             {user.firstName} {user.lastName}'s Profile
