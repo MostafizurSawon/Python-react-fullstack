@@ -253,7 +253,7 @@ function MainSection() {
                           <div className="recipe-by">
                             <span style={{ fontSize: '1.2rem', color: '#f39c12' }}>👤</span>
                             <span style={{ fontSize: '0.9rem', color: '#34495e', marginLeft: '8px', fontWeight: '500' }}>
-                              Recipe by: {recipe.user?.firstName || 'Unknown'} {recipe.user?.lastName || ''}
+                              Recipe by: {recipe.user?.firstName || 'Anonymous'} {recipe.user?.lastName || ''}
                             </span>
                           </div>
                           <div className="shared-date">

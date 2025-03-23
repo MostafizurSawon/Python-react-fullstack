@@ -1,4 +1,3 @@
-// src/components/RecipeForm.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import myaxios from "./../../utils/myaxios";
@@ -8,17 +7,32 @@ import { useUser } from "./../../context/UserContext";
 const RecipeForm = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [fetchError, setFetchError] = useState(null);
     const navigate = useNavigate();
-    const { user, token } = useUser(); // Get user and token from context
+    const { user, token } = useUser();
 
     useEffect(() => {
         myaxios.get('recipes/categories')
-            .then(response => setCategories(response.data))
+            .then(response => {
+                setCategories(response.data);
+                setFetchError(null);
+            })
             .catch(error => {
                 console.error('Error fetching categories:', error);
                 errorToast("Failed to load categories.");
+                setFetchError("Failed to load categories. Please try again later.");
             });
     }, []);
+
+    const validateUrl = (url) => {
+        if (!url) return true; 
+        try {
+            new URL(url);
+            return true;
+        } catch {
+            return false;
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -27,7 +41,6 @@ const RecipeForm = () => {
             navigate("/login");
             return;
         }
-        setLoading(true);
 
         const formdata = new FormData(e.target);
         const data = {
@@ -35,9 +48,22 @@ const RecipeForm = () => {
             img: formdata.get('img') || '',
             ingredients: formdata.get('ingredients'),
             instructions: formdata.get('instructions'),
-            category: Array.from(document.getElementById('category').selectedOptions).map(option => parseInt(option.value, 10)),
+            category_ids: Array.from(document.getElementById('category').selectedOptions).map(option => parseInt(option.value, 10)),
         };
 
+        // Validate category selection
+        if (!data.category_ids || data.category_ids.length === 0) {
+            errorToast("Please select at least one category.");
+            return;
+        }
+
+        // Validate image URL
+        if (data.img && !validateUrl(data.img)) {
+            errorToast("Please provide a valid image URL.");
+            return;
+        }
+
+        setLoading(true);
         console.log('Submitting data:', data);
 
         myaxios.post("recipes/lists/", data)
@@ -45,7 +71,7 @@ const RecipeForm = () => {
                 if (response.status === 201) {
                     successToast("Recipe created successfully!");
                     e.target.reset();
-                    navigate("/"); // Redirect to home
+                    // navigate("/"); // Redirect to home
                 } else {
                     errorToast("Failed to create recipe!");
                     console.error("Unexpected response:", response.data);
@@ -89,37 +115,88 @@ const RecipeForm = () => {
                                         Submitting as {user.firstName} {user.lastName} ({user.email})
                                     </p>
                                 )}
+                                {fetchError && (
+                                    <div className="alert alert-danger" role="alert">
+                                        {fetchError}
+                                    </div>
+                                )}
                                 <form onSubmit={handleSubmit}>
                                     <div className="form-group mb-3">
                                         <label htmlFor="title" className="form-label">Title:</label>
-                                        <input type="text" className="form-control" id="title" name="title" placeholder="Recipe Title" required disabled={loading} />
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="title"
+                                            name="title"
+                                            placeholder="Recipe Title"
+                                            required
+                                            disabled={loading || fetchError}
+                                        />
                                     </div>
                                     <div className="form-group mb-3">
                                         <label htmlFor="img" className="form-label">Image URL:</label>
-                                        <input type="text" className="form-control" id="img" name="img" placeholder="Image URL" disabled={loading} />
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="img"
+                                            name="img"
+                                            placeholder="Image URL"
+                                            disabled={loading || fetchError}
+                                        />
                                     </div>
                                     <div className="form-group mb-3">
                                         <label htmlFor="ingredients" className="form-label">Ingredients:</label>
-                                        <textarea className="form-control" id="ingredients" name="ingredients" placeholder="Recipe Ingredients" rows="3" required disabled={loading}></textarea>
+                                        <textarea
+                                            className="form-control"
+                                            id="ingredients"
+                                            name="ingredients"
+                                            placeholder="Recipe Ingredients"
+                                            rows="3"
+                                            required
+                                            disabled={loading || fetchError}
+                                        ></textarea>
                                     </div>
                                     <div className="form-group mb-3">
                                         <label htmlFor="category" className="form-label">Category:</label>
-                                        <select className="form-control" id="category" name="category" multiple required disabled={loading}>
-                                            {categories.map(category => (
-                                                <option key={category.id} value={category.id}>{category.name}</option>
-                                            ))}
+                                        <select
+                                            className="form-control"
+                                            id="category"
+                                            name="category"
+                                            multiple
+                                            required
+                                            disabled={loading || fetchError || categories.length === 0}
+                                        >
+                                            {categories.length === 0 ? (
+                                                <option value="" disabled>No categories available</option>
+                                            ) : (
+                                                categories.map(category => (
+                                                    <option key={category.id} value={category.id}>{category.name}</option>
+                                                ))
+                                            )}
                                         </select>
                                         <small className="form-text text-muted">Hold Ctrl/Cmd to select multiple categories</small>
                                     </div>
                                     <div className="form-group mb-4">
                                         <label htmlFor="instructions" className="form-label">Instructions:</label>
-                                        <textarea className="form-control" id="instructions" name="instructions" placeholder="Recipe Instructions" rows="3" required disabled={loading}></textarea>
+                                        <textarea
+                                            className="form-control"
+                                            id="instructions"
+                                            name="instructions"
+                                            placeholder="Recipe Instructions"
+                                            rows="3"
+                                            required
+                                            disabled={loading || fetchError}
+                                        ></textarea>
                                     </div>
                                     <div className="text-center">
-                                        <button type="submit" className="btn btn-primary px-4 py-2" style={{ transition: "background-color 0.3s ease" }}
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary px-4 py-2"
+                                            style={{ transition: "background-color 0.3s ease" }}
                                             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#0056b3"}
                                             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#007bff"}
-                                            disabled={loading}>
+                                            disabled={loading || fetchError}
+                                        >
                                             {loading ? (
                                                 <>
                                                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
