@@ -27,6 +27,7 @@ function MainSection() {
     try {
       const response = await myaxios.get('recipes/categories/');
       const cats = response.data.results || response.data;
+      console.log('Fetched categories:', cats);
       setCategories(cats);
     } catch (error) {
       console.error('Error fetching categories:', error.response ? error.response.data : error.message);
@@ -57,11 +58,11 @@ function MainSection() {
     if (search) {
       url += `&search=${encodeURIComponent(search)}`;
     }
-    console.log('Fetching recipes from:', url);
+    console.log('Fetching recipes with URL:', url);
     myaxios
       .get(url)
       .then((response) => {
-        console.log('All recipe data', response.data);
+        console.log('Recipes response:', response.data);
         setRecipes(response.data.results || response.data);
         const totalItems = response.data.count || response.data.length || 0;
         setTotalPages(Math.max(1, Math.ceil(totalItems / 10)));
@@ -104,6 +105,7 @@ function MainSection() {
     if (searchQuery) {
       params.search = searchQuery;
     }
+    console.log('Updated selected categories:', updatedCategories);
     setSearchParams(params);
     sectionRef.current.scrollIntoView({ behavior: 'smooth' });
   };
@@ -139,7 +141,7 @@ function MainSection() {
   };
 
   const handleViewRecipe = (id) => {
-    navigate(`/recipes/${id}`);
+    navigate(`/recipes/${id}?fromPage=${currentPage}`);
   };
 
   const fallbackImage = 'https://placehold.co/300x200?text=No+Image';
@@ -224,15 +226,47 @@ function MainSection() {
               {recipes.length > 0 ? (
                 recipes.map((recipe) => (
                   <div className="col-md-6 col-lg-6" key={recipe.id}>
-                    <Card className="custom-card h-100" style={{ borderRadius: '20px', border: '1px solid #e0e0e0', overflow: 'hidden', transition: 'transform 0.3s ease, box-shadow 0.3s ease', height: '400px' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-10px)'; e.currentTarget.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)'; }}>
+                    <Card
+                      className="custom-card h-100"
+                      style={{
+                        borderRadius: '20px',
+                        border: '1px solid #e0e0e0',
+                        overflow: 'hidden',
+                        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                        height: '400px',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-10px)';
+                        e.currentTarget.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
+                      }}
+                    >
                       <div className="card-image-wrapper">
                         {recipe.img ? (
-                          <Card.Img variant="top" src={recipe.img} alt={recipe.title} style={{ height: '220px', objectFit: 'cover' }}
-                            onError={(e) => { e.target.src = fallbackImage; e.target.onError = null; }} />
+                          <Card.Img
+                            variant="top"
+                            src={recipe.img}
+                            alt={recipe.title}
+                            style={{ height: '220px', objectFit: 'cover' }}
+                            onError={(e) => {
+                              e.target.src = fallbackImage;
+                              e.target.onError = null;
+                            }}
+                          />
                         ) : (
-                          <div style={{ height: '220px', backgroundColor: '#f8f9fa', display: 'flex', justifyContent: 'center', alignItems: 'center', borderBottom: '1px solid #e0e0e0' }}>
+                          <div
+                            style={{
+                              height: '220px',
+                              backgroundColor: '#f8f9fa',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              borderBottom: '1px solid #e0e0e0',
+                            }}
+                          >
                             <span style={{ color: '#7f8c8d', fontSize: '1.2rem' }}>No Image Available</span>
                           </div>
                         )}
@@ -241,7 +275,9 @@ function MainSection() {
                       <Card.Body className="p-4 d-flex flex-column">
                         <Card.Title className="mb-3">
                           <span style={{ fontSize: '1.6rem', color: '#e74c3c' }}>🍳</span>
-                          <span style={{ fontSize: '1.4rem', fontWeight: '700', color: '#2c3e50', marginLeft: '10px' }}>{recipe.title}</span>
+                          <span style={{ fontSize: '1.4rem', fontWeight: '700', color: '#2c3e50', marginLeft: '10px' }}>
+                            {recipe.title}
+                          </span>
                         </Card.Title>
                         <Card.Text className="text-muted mb-3">
                           <span style={{ fontSize: '1.1rem', color: '#3498db' }}>📋</span>
@@ -263,10 +299,22 @@ function MainSection() {
                             </span>
                           </div>
                         </div>
-                        <Button variant="primary" size="sm" className="mt-3 w-100" style={{ borderRadius: '12px', backgroundColor: '#e74c3c', borderColor: '#e74c3c', fontWeight: '600', padding: '10px 0', transition: 'background-color 0.3s ease' }}
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          className="mt-3 w-100"
+                          style={{
+                            borderRadius: '12px',
+                            backgroundColor: '#e74c3c',
+                            borderColor: '#e74c3c',
+                            fontWeight: '600',
+                            padding: '10px 0',
+                            transition: 'background-color 0.3s ease',
+                          }}
                           onClick={() => handleViewRecipe(recipe.id)}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c0392b'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e74c3c'}>
+                          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#c0392b')}
+                          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#e74c3c')}
+                        >
                           View Full Recipe
                         </Button>
                       </Card.Body>
@@ -286,7 +334,12 @@ function MainSection() {
                     const page = index + 1;
                     if (page === 1 || page === totalPages || (page >= currentPage - 2 && page <= currentPage + 2)) {
                       return (
-                        <Pagination.Item key={page} active={page === currentPage} onClick={() => handlePageChange(page)} className="custom-pagination">
+                        <Pagination.Item
+                          key={page}
+                          active={page === currentPage}
+                          onClick={() => handlePageChange(page)}
+                          className="custom-pagination"
+                        >
                           {page}
                         </Pagination.Item>
                       );

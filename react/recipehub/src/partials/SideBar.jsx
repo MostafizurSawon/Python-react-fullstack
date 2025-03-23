@@ -1,15 +1,14 @@
-// src/components/SideBar.jsx
-import { NavLink } from "react-router-dom"; // Use NavLink instead of Link
+import { NavLink } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import './sidebar.css';
 
 const SideBar = () => {
-  const { user } = useUser(); // Access logged-in user data
+  const { user } = useUser();
 
   return (
     <div className="sidebar-container">
       <NavLink
-        to="/dashboard/index/"
+        to="/dashboard/index" // Removed trailing slash
         className={({ isActive }) =>
           `side-bar-item ${isActive ? "side-bar-item-active" : ""}`
         }
@@ -19,7 +18,7 @@ const SideBar = () => {
       </NavLink>
 
       <NavLink
-        to="/dashboard/user-info/"
+        to="/dashboard/user-info" // Removed trailing slash
         className={({ isActive }) =>
           `side-bar-item ${isActive ? "side-bar-item-active" : ""}`
         }
@@ -29,7 +28,7 @@ const SideBar = () => {
       </NavLink>
 
       <NavLink
-        to="/dashboard/update-profile/"
+        to="/dashboard/update-profile" // Removed trailing slash
         className={({ isActive }) =>
           `side-bar-item ${isActive ? "side-bar-item-active" : ""}`
         }
@@ -39,7 +38,7 @@ const SideBar = () => {
       </NavLink>
 
       <NavLink
-        to="/dashboard/add-recipe/"
+        to="/dashboard/add-recipe" // Removed trailing slash
         className={({ isActive }) =>
           `side-bar-item ${isActive ? "side-bar-item-active" : ""}`
         }
@@ -48,10 +47,9 @@ const SideBar = () => {
         <span className="side-bar-item-caption">Add a Recipe</span>
       </NavLink>
 
-      {/* Conditionally render "All Users" tab if user is an Admin */}
       {user?.role === "Admin" && (
         <NavLink
-          to="/dashboard/users/"
+          to="/dashboard/users" // Removed trailing slash
           className={({ isActive }) =>
             `side-bar-item ${isActive ? "side-bar-item-active" : ""}`
           }

@@ -21,7 +21,7 @@ const DashboardIndexPage = () => {
     category: [],
     img: "",
   });
-  const [filterOpen, setFilterOpen] = useState(false); // State for collapsible filter on mobile
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -29,6 +29,7 @@ const DashboardIndexPage = () => {
     try {
       const response = await myaxios.get("recipes/categories/");
       const cats = response.data.results || response.data;
+      console.log('Fetched categories:', cats);
       setCategories(cats);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -40,6 +41,7 @@ const DashboardIndexPage = () => {
     setLoading(true);
     let url = "recipes/lists/";
     const params = new URLSearchParams();
+    params.append("my_recipes", "true"); // Add query parameter to fetch only user's recipes
 
     if (selectedCategories.length > 0) {
       params.append("categories", selectedCategories.join(","));
@@ -49,12 +51,14 @@ const DashboardIndexPage = () => {
     }
     url += `?${params.toString()}`;
 
+    console.log('Fetching recipes with URL:', url);
     try {
       const response = await myaxios.get(url);
       setRecipes(response.data.results || response.data);
     } catch (error) {
       console.error("Error fetching recipes:", error);
       setRecipes([]);
+      errorToast("Failed to fetch recipes.");
     } finally {
       setLoading(false);
     }
@@ -73,7 +77,11 @@ const DashboardIndexPage = () => {
         successToast("Recipe deleted successfully!");
       } catch (error) {
         console.error("Error deleting recipe:", error);
-        errorToast("Failed to delete recipe.");
+        if (error.response?.status === 403) {
+          errorToast("You do not have permission to delete this recipe.");
+        } else {
+          errorToast("Failed to delete recipe.");
+        }
       }
     }
   };
@@ -120,15 +128,20 @@ const DashboardIndexPage = () => {
       setShowEditModal(false);
     } catch (error) {
       console.error("Error updating recipe:", error);
-      errorToast("Failed to update recipe.");
+      if (error.response?.status === 403) {
+        errorToast("You do not have permission to update this recipe.");
+      } else {
+        errorToast("Failed to update recipe.");
+      }
     }
   };
 
-  const handleCategoryChangeFilter = (categoryName) => {
+  const handleCategoryChangeFilter = (categoryId) => {
+    const categoryIdStr = categoryId.toString();
     setSelectedCategories((prev) =>
-      prev.includes(categoryName)
-        ? prev.filter((cat) => cat !== categoryName)
-        : [...prev, categoryName]
+      prev.includes(categoryIdStr)
+        ? prev.filter((cat) => cat !== categoryIdStr)
+        : [...prev, categoryIdStr]
     );
   };
 
@@ -204,8 +217,8 @@ const DashboardIndexPage = () => {
                                   key={cat.id}
                                   type="checkbox"
                                   label={cat.name}
-                                  checked={selectedCategories.includes(cat.name)}
-                                  onChange={() => handleCategoryChangeFilter(cat.name)}
+                                  checked={selectedCategories.includes(cat.id.toString())}
+                                  onChange={() => handleCategoryChangeFilter(cat.id)}
                                   className="mb-2"
                                 />
                               ))}
@@ -241,8 +254,8 @@ const DashboardIndexPage = () => {
                               key={cat.id}
                               type="checkbox"
                               label={cat.name}
-                              checked={selectedCategories.includes(cat.name)}
-                              onChange={() => handleCategoryChangeFilter(cat.name)}
+                              checked={selectedCategories.includes(cat.id.toString())}
+                              onChange={() => handleCategoryChangeFilter(cat.id)}
                               className="mb-2"
                             />
                           ))}

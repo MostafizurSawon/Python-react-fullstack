@@ -1,10 +1,8 @@
-// pages/dashboard/ProfilePage.jsx
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Added for navigation
+import { useNavigate } from "react-router-dom";
 import myaxios from "../../utils/myaxios";
 import { errorToast, successToast } from "../../utils/toast";
-import Navbar from "../../partials/NavBar"; // Added Navbar
-import Footer from "../Footer"; // Added Footer
+import { useUser } from "../../context/UserContext"; // Import useUser to access refreshUserData
 
 const defaultProfileData = {
   email: "",
@@ -23,11 +21,12 @@ const defaultProfileData = {
 };
 
 const ProfilePage = () => {
-  const navigate = useNavigate(); // Added for navigation
+  const navigate = useNavigate();
+  const { refreshUserData } = useUser(); // Access refreshUserData from UserContext
   const [profileData, setProfileData] = useState(defaultProfileData);
   const [imagePreview, setImagePreview] = useState(null);
-  const [loading, setLoading] = useState(true); // Added for initial loading state
-  const [submitting, setSubmitting] = useState(false); // Added for form submission spinner
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -40,7 +39,7 @@ const ProfilePage = () => {
         }
 
         const response = await myaxios.get("accounts/profile/");
-        console.log("0000 ->", response.data);
+        console.log("Fetched profile data:", response.data);
         const apiData = response.data?.data;
         if (apiData) {
           setProfileData({
@@ -64,12 +63,12 @@ const ProfilePage = () => {
         } else {
           setProfileData(defaultProfileData);
           errorToast("Failed to fetch profile data!");
-          navigate("/dashboard"); // Redirect on failure
+          navigate("/dashboard");
         }
       } catch (error) {
         console.error(error);
         errorToast("Failed to fetch profile data!");
-        navigate("/dashboard"); // Redirect on error
+        navigate("/dashboard");
       } finally {
         setLoading(false);
       }
@@ -110,7 +109,7 @@ const ProfilePage = () => {
     }
   };
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
@@ -136,65 +135,59 @@ const ProfilePage = () => {
       dataToSend.password = profileData.password;
     }
 
-    // If there's an image, use FormData to handle file upload
-    if (profileData.profile.image instanceof File) {
-      const formData = new FormData();
-      formData.append("firstName", profileData.firstName);
-      formData.append("lastName", profileData.lastName);
-      formData.append("mobile", profileData.mobile);
-      if (profileData.password) {
-        formData.append("password", profileData.password);
-      }
-      formData.append("profile.image", profileData.profile.image);
-      if (ageValue !== null) {
-        formData.append("profile.age", ageValue);
-      }
-      formData.append("profile.portfolio", profileData.profile.portfolio);
-      formData.append("profile.sex", profileData.profile.sex);
-      formData.append("profile.bio", profileData.profile.bio);
-      formData.append("profile.facebook", profileData.profile.facebook);
+    try {
+      let response;
+      if (profileData.profile.image instanceof File) {
+        // If there's an image, use FormData to handle file upload
+        const formData = new FormData();
+        formData.append("firstName", profileData.firstName);
+        formData.append("lastName", profileData.lastName);
+        formData.append("mobile", profileData.mobile);
+        if (profileData.password) {
+          formData.append("password", profileData.password);
+        }
+        formData.append("profile.image", profileData.profile.image);
+        if (ageValue !== null) {
+          formData.append("profile.age", ageValue);
+        }
+        formData.append("profile.portfolio", profileData.profile.portfolio);
+        formData.append("profile.sex", profileData.profile.sex);
+        formData.append("profile.bio", profileData.profile.bio);
+        formData.append("profile.facebook", profileData.profile.facebook);
 
-      myaxios
-        .put("accounts/profile/update/", formData, {
+        response = await myaxios.put("accounts/profile/update/", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        })
-        .then((response) => {
-          if (response.data.status === "success") {
-            successToast("Profile Updated Successfully!");
-            if (profileData.profile.image) {
-              setImagePreview(URL.createObjectURL(profileData.profile.image));
-            }
-          } else {
-            errorToast("Profile Update Failed!");
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          errorToast("Profile Update Failed!");
-        })
-        .finally(() => {
-          setSubmitting(false);
         });
-    } else {
-      // If no image, send as JSON
-      myaxios
-        .put("accounts/profile/update/", dataToSend)
-        .then((response) => {
-          if (response.data.status === "success") {
-            successToast("Profile Updated Successfully!");
-          } else {
-            errorToast("Profile Update Failed!");
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          errorToast("Profile Update Failed!");
-        })
-        .finally(() => {
-          setSubmitting(false);
-        });
+      } else {
+        // If no image, send as JSON
+        response = await myaxios.put("accounts/profile/update/", dataToSend);
+      }
+
+      if (response.data.status === "success") {
+        successToast("Profile Updated Successfully!");
+
+        // Refresh the user data in UserContext
+        await refreshUserData();
+
+        // Update the image preview with the new image URL from the backend
+        const updatedResponse = await myaxios.get("accounts/profile/");
+        const updatedUserData = updatedResponse.data?.data;
+        if (updatedUserData?.profile?.image) {
+          setImagePreview(updatedUserData.profile.image);
+        }
+
+        // Navigate to UserInfo page
+        navigate("/dashboard/user-info");
+      } else {
+        errorToast("Profile Update Failed!");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      errorToast("Profile Update Failed!");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -226,10 +219,7 @@ const ProfilePage = () => {
                 </h3>
                 <form onSubmit={handleUpdate}>
                   <div className="mb-4">
-                    <label
-                      htmlFor="email"
-                      className="form-label text-muted"
-                    >
+                    <label htmlFor="email" className="form-label text-muted">
                       Email Address
                     </label>
                     <input
@@ -243,10 +233,7 @@ const ProfilePage = () => {
                     />
                   </div>
                   <div className="mb-4">
-                    <label
-                      htmlFor="mobile"
-                      className="form-label text-muted"
-                    >
+                    <label htmlFor="mobile" className="form-label text-muted">
                       Mobile Number
                     </label>
                     <input
@@ -260,10 +247,7 @@ const ProfilePage = () => {
                     />
                   </div>
                   <div className="mb-4">
-                    <label
-                      htmlFor="firstName"
-                      className="form-label text-muted"
-                    >
+                    <label htmlFor="firstName" className="form-label text-muted">
                       First Name
                     </label>
                     <input
@@ -277,10 +261,7 @@ const ProfilePage = () => {
                     />
                   </div>
                   <div className="mb-4">
-                    <label
-                      htmlFor="lastName"
-                      className="form-label text-muted"
-                    >
+                    <label htmlFor="lastName" className="form-label text-muted">
                       Last Name
                     </label>
                     <input
@@ -294,10 +275,7 @@ const ProfilePage = () => {
                     />
                   </div>
                   <div className="mb-4">
-                    <label
-                      htmlFor="password"
-                      className="form-label text-muted"
-                    >
+                    <label htmlFor="password" className="form-label text-muted">
                       Password (Leave blank to keep unchanged)
                     </label>
                     <input
@@ -316,10 +294,7 @@ const ProfilePage = () => {
                     Profile Information
                   </h5>
                   <div className="mb-4">
-                    <label
-                      htmlFor="image"
-                      className="form-label text-muted"
-                    >
+                    <label htmlFor="image" className="form-label text-muted">
                       Profile Image
                     </label>
                     {imagePreview && (
@@ -346,10 +321,7 @@ const ProfilePage = () => {
                     />
                   </div>
                   <div className="mb-4">
-                    <label
-                      htmlFor="age"
-                      className="form-label text-muted"
-                    >
+                    <label htmlFor="age" className="form-label text-muted">
                       Age
                     </label>
                     <input
@@ -363,10 +335,7 @@ const ProfilePage = () => {
                     />
                   </div>
                   <div className="mb-4">
-                    <label
-                      htmlFor="sex"
-                      className="form-label text-muted"
-                    >
+                    <label htmlFor="sex" className="form-label text-muted">
                       Sex
                     </label>
                     <select
@@ -383,10 +352,7 @@ const ProfilePage = () => {
                     </select>
                   </div>
                   <div className="mb-4">
-                    <label
-                      htmlFor="bio"
-                      className="form-label text-muted"
-                    >
+                    <label htmlFor="bio" className="form-label text-muted">
                       Bio
                     </label>
                     <textarea
@@ -400,10 +366,7 @@ const ProfilePage = () => {
                     />
                   </div>
                   <div className="mb-4">
-                    <label
-                      htmlFor="portfolio"
-                      className="form-label text-muted"
-                    >
+                    <label htmlFor="portfolio" className="form-label text-muted">
                       Portfolio URL
                     </label>
                     <input
@@ -417,10 +380,7 @@ const ProfilePage = () => {
                     />
                   </div>
                   <div className="mb-5">
-                    <label
-                      htmlFor="facebook"
-                      className="form-label text-muted"
-                    >
+                    <label htmlFor="facebook" className="form-label text-muted">
                       Facebook URL
                     </label>
                     <input
@@ -462,7 +422,6 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-      {/* <Footer /> */}
     </div>
   );
 };

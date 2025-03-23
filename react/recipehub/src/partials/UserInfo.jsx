@@ -1,41 +1,63 @@
 import { useUser } from "../context/UserContext";
 import { Link } from "react-router-dom";
-import Navbar from "../partials/NavBar";
-import Footer from "../pages/Footer";
+import { useEffect, useState } from "react"; // Added for loading state
 
 function UserInfo() {
-  const { user } = useUser(); 
+  const { user, refreshUserData } = useUser();
+  const [loading, setLoading] = useState(true); // Added for loading state
 
+  // Fetch user data on mount if user is null
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) {
+        await refreshUserData();
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [user, refreshUserData]);
 
   const defaultImage = "https://www.pngkey.com/png/full/72-729716_user-avatar-png-graphic-free-download-icon.png";
-
-
   const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
   // Construct the full image URL
   const profileImage = user?.profile?.image
-    ? `${BASE_URL}${user.profile.image}` // e.g., http://127.0.0.1:8000/media/users/images/gojo.jpg
+    ? user.profile.image.startsWith("http")
+      ? user.profile.image // If it's a full URL, use it directly
+      : `${BASE_URL}${user.profile.image}` // Otherwise, prepend BASE_URL
     : defaultImage;
+
+  // Show loading spinner while fetching user data
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "3rem", height: "3rem" }}
+        >
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   // If user is not logged in, show a message
   if (!user) {
     return (
       <div className="d-flex flex-column min-vh-100">
-        <Navbar />
         <div className="container my-5 flex-grow-1 text-center">
           <h2 className="mb-4 display-5 text-primary">Profile</h2>
           <p className="text-muted lead fs-4 mb-5">
             Please log in to view your profile.
           </p>
         </div>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      {/* <Navbar /> */}
       <section
         className="flex-grow-1 py-5"
         style={{
@@ -67,6 +89,7 @@ function UserInfo() {
                         objectFit: "cover",
                         border: "3px solid #007bff",
                       }}
+                      onError={(e) => (e.target.src = defaultImage)} // Fallback to default image on error
                     />
                   </div>
                   {/* User Name */}
@@ -121,46 +144,42 @@ function UserInfo() {
                       <p className="text-muted">{user.profile.bio}</p>
                     </div>
                   )}
-                  {/* Social Link */}
-                  
+                  {/* Social Links */}
                   <div className="d-flex justify-content-between align-items-center">
-                  {user.profile?.facebook && (
-                    <div className="mb-4">
-                      <a
-                        href={user.profile.facebook}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary me-2 text-decoration-none"
-                        style={{
-                          transition: "color 0.3s ease",
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = "#0056b3")}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = "#007bff")}
-                      >
-                        <i className="bi bi-facebook fs-4"><span className="px-2 ">Facebook</span></i>
-                      </a>
-                    </div>
-                  )}
-                  {user.profile?.portfolio && (
-                    <div className="mb-4">
-                      
-                        
-                      
-                      <a
-                        href={user.profile.portfolio}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary me-2 text-decoration-none"
-                        style={{
-                          transition: "color 0.3s ease",
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = "#0056b3")}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = "#007bff")}
-                      >
-                        <i className="bi bi-browser-chrome fs-4"><span className="px-2">Portfolio</span></i>
-                      </a>
-                    </div>
-                  )}
+                    {user.profile?.facebook && (
+                      <div className="mb-4">
+                        <a
+                          href={user.profile.facebook}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary me-2 text-decoration-none"
+                          style={{
+                            transition: "color 0.3s ease",
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = "#0056b3")}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = "#007bff")}
+                        >
+                          <i className="bi bi-facebook fs-4"><span className="px-2">Facebook</span></i>
+                        </a>
+                      </div>
+                    )}
+                    {user.profile?.portfolio && (
+                      <div className="mb-4">
+                        <a
+                          href={user.profile.portfolio}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary me-2 text-decoration-none"
+                          style={{
+                            transition: "color 0.3s ease",
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = "#0056b3")}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = "#007bff")}
+                        >
+                          <i className="bi bi-browser-chrome fs-4"><span className="px-2">Portfolio</span></i>
+                        </a>
+                      </div>
+                    )}
                   </div>
 
                   {/* Edit Profile Button */}
@@ -187,7 +206,6 @@ function UserInfo() {
           </div>
         </div>
       </section>
-      {/* <Footer /> */}
     </div>
   );
 }
