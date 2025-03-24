@@ -5,8 +5,10 @@ import myaxios from "../../utils/myaxios";
 import Loading from "../../components/Loading";
 import NotFound from "../../components/NotFound";
 import { successToast, errorToast } from "../../utils/toast";
+import { useUser } from "../../context/UserContext";
 
 const DashboardIndexPage = () => {
+  const { user } = useUser();
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -41,7 +43,10 @@ const DashboardIndexPage = () => {
     setLoading(true);
     let url = "recipes/lists/";
     const params = new URLSearchParams();
-    params.append("my_recipes", "true"); // Add query parameter to fetch only user's recipes
+
+    if (user && user.role !== 'Admin') {
+      params.append("my_recipes", "true");
+    }
 
     if (selectedCategories.length > 0) {
       params.append("categories", selectedCategories.join(","));
@@ -67,7 +72,7 @@ const DashboardIndexPage = () => {
   useEffect(() => {
     fetchCategories();
     fetchRecipes();
-  }, [selectedCategories, searchQuery]);
+  }, [selectedCategories, searchQuery, user]);
 
   const handleDelete = async (recipeId) => {
     if (window.confirm("Are you sure you want to delete this recipe?")) {
@@ -88,11 +93,14 @@ const DashboardIndexPage = () => {
 
   const handleEdit = (recipe) => {
     setCurrentRecipe(recipe);
+    const categoryIds = recipe.category
+      ? recipe.category.map(id => id.toString())
+      : [];
     setFormData({
       title: recipe.title || "",
       ingredients: recipe.ingredients || "",
       instructions: recipe.instructions || "",
-      category: recipe.category_ids ? recipe.category_ids.map(String) : [],
+      category: categoryIds,
       img: recipe.img || "",
     });
     setShowEditModal(true);
@@ -113,8 +121,10 @@ const DashboardIndexPage = () => {
     try {
       const updatedData = {
         ...formData,
-        category: formData.category.map((cat) => parseInt(cat, 10)),
+        category_ids: formData.category.map((cat) => parseInt(cat, 10)),
       };
+      delete updatedData.category;
+      console.log('Updating recipe with payload:', updatedData);
       const response = await myaxios.put(
         `recipes/lists/${currentRecipe.id}/`,
         updatedData
@@ -130,6 +140,9 @@ const DashboardIndexPage = () => {
       console.error("Error updating recipe:", error);
       if (error.response?.status === 403) {
         errorToast("You do not have permission to update this recipe.");
+      } else if (error.response?.status === 400) {
+        console.log('Validation errors:', error.response.data);
+        errorToast(error.response.data.category_ids || "Failed to update recipe.");
       } else {
         errorToast("Failed to update recipe.");
       }
@@ -152,6 +165,12 @@ const DashboardIndexPage = () => {
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
+  };
+
+  const canEditOrDelete = (recipe) => {
+    if (!user) return false;
+    if (user.role === 'Admin') return true;
+    return user.email === recipe.user.email;
   };
 
   const fallbackImage = "https://placehold.co/300x200?text=No+Image";
@@ -284,42 +303,51 @@ const DashboardIndexPage = () => {
                       ) : recipes.length > 0 ? (
                         recipes.map((recipe) => (
                           <div className="col-12 col-sm-6 col-lg-6" key={recipe.id}>
-                            <Card className="h-100">
+                            <Card className="h-100 shadow-sm">
                               <Card.Img
                                 variant="top"
                                 src={recipe.img || fallbackImage}
                                 alt={recipe.title}
-                                style={{ height: "200px", objectFit: "cover" }}
+                                style={{ height: "180px", objectFit: "cover" }}
                                 onError={(e) => (e.target.src = fallbackImage)}
                               />
                               <Card.Body className="d-flex flex-column">
-                                <Card.Title>{recipe.title}</Card.Title>
-                                <Card.Text>
+                                <Card.Title className="text-truncate" style={{ fontSize: "1.1rem" }}>
+                                  {recipe.title}
+                                </Card.Title>
+                                <Card.Text style={{ fontSize: "0.9rem" }}>
                                   Category:{" "}
                                   {recipe.category_names?.length > 0
                                     ? recipe.category_names.join(", ")
                                     : "Uncategorized"}
                                 </Card.Text>
-                                <Card.Text>
+                                <Card.Text style={{ fontSize: "0.9rem" }}>
+                                  By: {recipe.user?.firstName ? `${recipe.user.firstName} ${recipe.user.lastName || ''}` : 'Anonymous'}
+                                </Card.Text>
+                                <Card.Text style={{ fontSize: "0.9rem" }}>
                                   Shared on: {new Date(recipe.created_on).toLocaleDateString() || "N/A"}
                                 </Card.Text>
                                 <div className="mt-auto d-flex gap-2">
-                                  <Button
-                                    variant="primary"
-                                    size="sm"
-                                    className="w-50"
-                                    onClick={() => handleEdit(recipe)}
-                                  >
-                                    Edit
-                                  </Button>
-                                  <Button
-                                    variant="danger"
-                                    size="sm"
-                                    className="w-50"
-                                    onClick={() => handleDelete(recipe.id)}
-                                  >
-                                    Delete
-                                  </Button>
+                                  {canEditOrDelete(recipe) && (
+                                    <>
+                                      <Button
+                                        variant="primary"
+                                        size="sm"
+                                        className="w-50"
+                                        onClick={() => handleEdit(recipe)}
+                                      >
+                                        Edit
+                                      </Button>
+                                      <Button
+                                        variant="danger"
+                                        size="sm"
+                                        className="w-50"
+                                        onClick={() => handleDelete(recipe.id)}
+                                      >
+                                        Delete
+                                      </Button>
+                                    </>
+                                  )}
                                 </div>
                               </Card.Body>
                             </Card>
@@ -344,7 +372,7 @@ const DashboardIndexPage = () => {
         <Modal.Header closeButton>
           <Modal.Title>Edit Recipe</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="p-4 pt-5">
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="title">
               <Form.Label>Title</Form.Label>
@@ -354,6 +382,7 @@ const DashboardIndexPage = () => {
                 value={formData.title}
                 onChange={handleChange}
                 required
+                className="rounded-3"
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="ingredients">
@@ -365,6 +394,7 @@ const DashboardIndexPage = () => {
                 value={formData.ingredients}
                 onChange={handleChange}
                 required
+                className="rounded-3"
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="instructions">
@@ -376,6 +406,7 @@ const DashboardIndexPage = () => {
                 value={formData.instructions}
                 onChange={handleChange}
                 required
+                className="rounded-3"
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="category">
@@ -385,6 +416,8 @@ const DashboardIndexPage = () => {
                 name="category"
                 value={formData.category}
                 onChange={handleCategoryChange}
+                className="rounded-3"
+                style={{ height: '150px' }}
               >
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
@@ -403,6 +436,7 @@ const DashboardIndexPage = () => {
                 name="img"
                 value={formData.img}
                 onChange={handleChange}
+                className="rounded-3"
               />
             </Form.Group>
             <div className="d-flex justify-content-end gap-2">

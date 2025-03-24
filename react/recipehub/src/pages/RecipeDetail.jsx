@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button, Card, ListGroup, Modal, Form, Badge, FormControl } from 'react-bootstrap';
-import { PencilSquare, Trash, Heart, HeartFill, Chat, Bookmark, BookmarkFill, Star, StarFill } from 'react-bootstrap-icons';
+import { PencilSquare, Trash, Heart, Chat, Bookmark, BookmarkFill, Star, StarFill } from 'react-bootstrap-icons';
 import myaxios from '../utils/myaxios';
 import Navbar from './Navbar';
 import Footer from './Footer';
@@ -20,6 +20,7 @@ function RecipeDetail() {
   const [loading, setLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showReactionsModal, setShowReactionsModal] = useState(false);
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
@@ -39,8 +40,9 @@ function RecipeDetail() {
   const [userReview, setUserReview] = useState(null);
   const [reviewBody, setReviewBody] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
+  const [activeTab, setActiveTab] = useState('ingredients');
+  const [reactionsList, setReactionsList] = useState([]);
 
-  // Extract the fromPage query parameter for pagination
   const query = new URLSearchParams(location.search);
   const fromPage = parseInt(query.get('fromPage')) || 1;
 
@@ -48,13 +50,15 @@ function RecipeDetail() {
     try {
       const response = await myaxios.get(`recipes/lists/${id}/`);
       const data = response.data;
-      console.log('Fetched recipe with comments:', data);
       setRecipe(data);
+      const categoryIds = data.category
+        ? data.category.map(id => id.toString())
+        : [];
       setFormData({
         title: data.title || '',
         ingredients: data.ingredients || '',
         instructions: data.instructions || '',
-        category: data.category_ids ? data.category_ids.map(id => id.toString()) : [],
+        category: categoryIds,
         img: data.img || '',
       });
       setReactionCounts(data.reaction_counts || {});
@@ -80,7 +84,7 @@ function RecipeDetail() {
         if (existingReview) {
           setUserReview(existingReview);
           setReviewBody(existingReview.body);
-          setReviewRating(existingReview.rating); // Now an integer (1-5)
+          setReviewRating(existingReview.rating);
         }
       }
     } catch (error) {
@@ -89,13 +93,30 @@ function RecipeDetail() {
     }
   };
 
+  const fetchReactions = async () => {
+    try {
+      const response = await myaxios.get(`recipes/reactions/?recipe=${id}`);
+      setReactionsList(response.data);
+    } catch (error) {
+      console.error('Error fetching reactions:', error);
+      errorToast("Failed to load reactions.");
+    }
+  };
+
   useEffect(() => {
-    setLoading(true);
-    myaxios.get('recipes/categories')
-      .then(response => setCategories(response.data))
-      .catch(error => console.error('Error fetching categories:', error));
-    fetchRecipeDetails();
-    fetchReviews();
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const categoriesResponse = await myaxios.get('recipes/categories');
+        setCategories(categoriesResponse.data);
+        await fetchRecipeDetails();
+        await fetchReviews();
+        await fetchReactions();
+      } catch (error) {
+        console.error('Error fetching initial data:', error);
+      }
+    };
+    fetchData();
   }, [id, user]);
 
   const handleSubmit = async (e) => {
@@ -105,14 +126,22 @@ function RecipeDetail() {
       return;
     }
     try {
-      const updatedData = { ...formData, category: formData.category.map(cat => parseInt(cat, 10)) };
+      const updatedData = {
+        ...formData,
+        category_ids: formData.category.map(cat => parseInt(cat, 10)),
+      };
+      delete updatedData.category;
       const response = await myaxios.put(`recipes/lists/${id}/`, updatedData);
       setRecipe(response.data);
       successToast("Recipe Updated Successfully!");
       setShowEditModal(false);
     } catch (error) {
       console.error('Error updating recipe:', error);
-      errorToast("Failed to update recipe.");
+      if (error.response && error.response.status === 400) {
+        errorToast(error.response.data.category_ids || "Failed to update recipe.");
+      } else {
+        errorToast("Failed to update recipe.");
+      }
     }
   };
 
@@ -121,10 +150,9 @@ function RecipeDetail() {
       await myaxios.delete(`recipes/lists/${id}/`);
       successToast("Recipe deleted successfully!");
       setShowDeleteModal(false);
-      // Fetch the total number of recipes to determine the new total pages
       const response = await myaxios.get('recipes/lists/');
       const totalRecipes = response.data.count;
-      const pageSize = 10; // Should match backend page_size
+      const pageSize = 10;
       const newTotalPages = Math.ceil(totalRecipes / pageSize);
       const redirectPage = Math.min(fromPage, newTotalPages) || 1;
       navigate(`/recipes?page=${redirectPage}`);
@@ -141,18 +169,15 @@ function RecipeDetail() {
       navigate('/login');
       return;
     }
-
     if (reviewRating < 1 || reviewRating > 5) {
       errorToast("Please select a rating between 1 and 5 stars.");
       return;
     }
-
     const reviewData = {
-      recipe: parseInt(id), // Ensure recipe ID is an integer
-      body: reviewBody || '', // Send empty string if body is empty
-      rating: reviewRating, // Send the integer rating (1-5)
+      recipe: parseInt(id),
+      body: reviewBody || '',
+      rating: reviewRating,
     };
-
     try {
       const request = userReview
         ? myaxios.put(`recipes/reviews/${userReview.id}/`, reviewData)
@@ -165,12 +190,11 @@ function RecipeDetail() {
         setUserReview(response.data);
       }
       setReviewBody(response.data.body);
-      setReviewRating(response.data.rating); // Already an integer
+      setReviewRating(response.data.rating);
       fetchReviews();
     } catch (error) {
       console.error('Error submitting review:', error);
       if (error.response && error.response.status === 400) {
-        // Extract and display the detailed error message from the backend
         const errorMessage = error.response.data.body || error.response.data.rating || error.response.data.detail || "Failed to submit review.";
         errorToast(errorMessage);
       } else {
@@ -185,7 +209,6 @@ function RecipeDetail() {
       navigate("/login");
       return;
     }
-
     try {
       const response = await myaxios.post(`recipes/lists/${id}/like/`, { reaction_type: reactionType });
       if (response.data.status === 'reaction removed') {
@@ -209,6 +232,7 @@ function RecipeDetail() {
       }
       setShowReactions(false);
       successToast(response.data.status);
+      fetchReactions();
     } catch (error) {
       console.error('Error adding reaction:', error);
       errorToast("Failed to add reaction.");
@@ -222,27 +246,6 @@ function RecipeDetail() {
   const handleModalClose = () => setShowEditModal(false);
   const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   const handleCategoryChange = (e) => setFormData(prev => ({ ...prev, category: Array.from(e.target.selectedOptions, opt => opt.value) }));
-
-  const handleLike = async () => {
-    if (!token) {
-      errorToast("Please log in to like this recipe.");
-      navigate("/login");
-      return;
-    }
-    try {
-      await myaxios.post(`recipes/lists/${id}/like/`, { reaction_type: 'LIKE' });
-      setLiked(!liked);
-      setReactionCounts(prev => ({
-        ...prev,
-        LIKE: liked ? (prev.LIKE || 1) - 1 : (prev.LIKE || 0) + 1,
-      }));
-      setUserReaction(liked ? null : 'LIKE');
-      successToast(liked ? "Recipe unliked!" : "Recipe liked!");
-    } catch (error) {
-      console.error('Error liking recipe:', error);
-      errorToast("Failed to like recipe.");
-    }
-  };
 
   const handleSave = async () => {
     if (!token) {
@@ -269,14 +272,11 @@ function RecipeDetail() {
     }
     if (!newComment.trim()) return;
     try {
-      console.log('Posting comment for recipe ID:', id, 'with payload:', { content: newComment });
       const response = await myaxios.post(`recipes/lists/${id}/comments/`, { content: newComment });
-      console.log('Comment POST response:', response.status, response.data);
       if (response.status === 201) {
         setComments(prev => [...prev, response.data]);
         setNewComment('');
         successToast("Comment added!");
-        await new Promise(resolve => setTimeout(resolve, 1000));
         await fetchRecipeDetails();
       } else {
         throw new Error("Unexpected response status");
@@ -300,10 +300,19 @@ function RecipeDetail() {
     }
   };
 
+  const totalReactions = Object.values(reactionCounts).reduce((sum, count) => sum + (count || 0), 0);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
+  };
+
   if (loading) return <Loading />;
   if (!recipe) return <NotFound />;
 
-  const isOwner = user && recipe.user && user.email === recipe.user.email;
+  const canEditOrDelete = (user && recipe.user && user.email === recipe.user.email) || (user && user.role === 'Admin');
 
   return (
     <>
@@ -326,16 +335,13 @@ function RecipeDetail() {
                 Category: {recipe.category_names && recipe.category_names.length > 0 ? recipe.category_names.join(', ') : 'Uncategorized'}
               </span>
             </Card.Text>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <div className="d-flex gap-3 position-relative">
-                <div
-                  onMouseEnter={() => setShowReactions(true)}
-                  onMouseLeave={() => setTimeout(() => setShowReactions(false), 300)}
-                >
+            <div className="reaction-section">
+              <div className="reaction-buttons">
+                <div className="reaction-wrapper">
                   <Button
-                    variant={userReaction ? 'danger' : 'outline-danger'}
-                    className="d-flex align-items-center gap-2 action-btn"
-                    style={{ borderRadius: '12px', padding: '8px 16px', transition: 'all 0.3s' }}
+                    className="reaction-btn reaction-like"
+                    onMouseEnter={() => setShowReactions(true)}
+                    onMouseLeave={() => setShowReactions(false)}
                     onClick={() => handleReaction('LIKE')}
                   >
                     {userReaction ? (
@@ -344,64 +350,97 @@ function RecipeDetail() {
                       userReaction === 'WOW' ? '😮' :
                       '😢'
                     ) : <Heart size={20} />}
-                    <span>{userReaction || 'Like'}</span>
-                    <Badge bg="light" text="dark">{reactionCounts.LIKE || 0}</Badge>
+                    <span className="reaction-count">{totalReactions}</span>
                   </Button>
                   {showReactions && (
                     <div
-                      className="position-absolute d-flex bg-light border rounded p-1"
-                      style={{ zIndex: 10, top: '-50px' }}
+                      className="reaction-menu"
                       onMouseEnter={() => setShowReactions(true)}
-                      onMouseLeave={() => setTimeout(() => setShowReactions(false), 300)}
+                      onMouseLeave={() => setShowReactions(false)}
                     >
-                      <Button className="btn btn-sm btn-light mx-1" onClick={() => handleReaction('LIKE')}>
-                        👍 Like
+                      <Button className="reaction-icon" onClick={() => handleReaction('LIKE')}>
+                        👍
                       </Button>
-                      <Button className="btn btn-sm btn-light mx-1" onClick={() => handleReaction('LOVE')}>
-                        ❤️ Love
+                      <Button className="reaction-icon" onClick={() => handleReaction('LOVE')}>
+                        ❤️
                       </Button>
-                      <Button className="btn btn-sm btn-light mx-1" onClick={() => handleReaction('WOW')}>
-                        😮 Wow
+                      <Button className="reaction-icon" onClick={() => handleReaction('WOW')}>
+                        😮
                       </Button>
-                      <Button className="btn btn-sm btn-light mx-1" onClick={() => handleReaction('SAD')}>
-                        😢 Sad
+                      <Button className="reaction-icon" onClick={() => handleReaction('SAD')}>
+                        😢
                       </Button>
                     </div>
                   )}
                 </div>
-                <Button variant="outline-primary" className="d-flex align-items-center gap-2 action-btn" style={{ borderRadius: '12px', padding: '8px 16px', transition: 'all 0.3s' }} onClick={() => document.getElementById('comments-section').scrollIntoView({ behavior: 'smooth' })}>
+                <Button
+                  className="reaction-btn reaction-comment"
+                  onClick={() => document.getElementById('comments-section').scrollIntoView({ behavior: 'smooth' })}
+                >
                   <Chat size={20} />
-                  <Badge bg="light" text="dark">{comments.length}</Badge>
+                  <span className="reaction-count">{comments.length}</span>
                 </Button>
-                <Button variant="outline-success" className="d-flex align-items-center gap-2 action-btn" style={{ borderRadius: '12px', padding: '8px 16px', transition: 'all 0.3s' }} onClick={handleSave}>
+                <Button
+                  className="reaction-btn reaction-save"
+                  onClick={handleSave}
+                >
                   {saved ? <BookmarkFill size={20} /> : <Bookmark size={20} />}
-                  <span>{saved ? 'Saved' : 'Save'}</span>
+                  <span className="reaction-label">{saved ? 'SAVED' : 'SAVE'}</span>
+                </Button>
+              </div>
+              <div className="reaction-summary">
+                <span className="reaction-total">
+                  Total Reactions: {totalReactions}
+                </span>
+                <Button
+                  className="view-reactions-btn"
+                  onClick={() => setShowReactionsModal(true)}
+                >
+                  <span role="img" aria-label="view reactions">👀</span> View Reactions
                 </Button>
               </div>
             </div>
-            <Card.Subtitle className="d-flex align-items-center text-muted mb-3">
-              <span style={{ fontSize: '1.4rem', color: '#3498db' }}>📋</span>
-              <span style={{ fontSize: '1.2rem', marginLeft: '10px', fontWeight: '600', color: '#2c3e50' }}>Ingredients</span>
-            </Card.Subtitle>
-            <ListGroup variant="flush" className="mb-4">
-              {splitIngredients(recipe.ingredients).map((item, index) => (
-                <ListGroup.Item key={index} className="py-2" style={{ fontSize: '1rem', border: 'none', color: '#7f8c8d', background: '#f9f9f9', borderRadius: '8px', marginBottom: '8px', padding: '12px' }}>
-                  {item}
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
-            <Card.Subtitle className="d-flex align-items-center text-muted mb-3">
-              <span style={{ fontSize: '1.4rem', color: '#27ae60' }}>ℹ️</span>
-              <span style={{ fontSize: '1.2rem', marginLeft: '10px', fontWeight: '600', color: '#2c3e50' }}>Instructions</span>
-            </Card.Subtitle>
-            <ListGroup variant="flush" className="mb-4">
-              {splitInstructions(recipe.instructions).map((item, index) => (
-                <ListGroup.Item key={index} className="py-2" style={{ fontSize: '1rem', border: 'none', color: '#7f8c8d', background: '#f9f9f9', borderRadius: '8px', marginBottom: '8px', padding: '12px' }}>
-                  {item}
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
-            {/* Review Form */}
+            <div className="recipe-tabs mb-4">
+              <div className="d-flex border-bottom">
+                <div
+                  className={`tab-item d-flex align-items-center ${activeTab === 'ingredients' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('ingredients')}
+                >
+                  <span style={{ fontSize: '1.4rem', color: '#3498db' }}>📋</span>
+                  <span style={{ fontSize: '1.2rem', marginLeft: '10px', fontWeight: '600', color: '#2c3e50' }}>
+                    Ingredients
+                  </span>
+                </div>
+                <div
+                  className={`tab-item d-flex align-items-center ${activeTab === 'instructions' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('instructions')}
+                >
+                  <span style={{ fontSize: '1.4rem', color: '#27ae60' }}>ℹ️</span>
+                  <span style={{ fontSize: '1.2rem', marginLeft: '10px', fontWeight: '600', color: '#2c3e50' }}>
+                    Instructions
+                  </span>
+                </div>
+              </div>
+              <div className="tab-content mt-3">
+                {activeTab === 'ingredients' ? (
+                  <ListGroup variant="flush">
+                    {splitIngredients(recipe.ingredients).map((item, index) => (
+                      <ListGroup.Item key={index} className="py-2" style={{ fontSize: '1rem', border: 'none', color: '#7f8c8d', background: '#f9f9f9', borderRadius: '8px', marginBottom: '8px', padding: '12px' }}>
+                        {item}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                ) : (
+                  <ListGroup variant="flush">
+                    {splitInstructions(recipe.instructions).map((item, index) => (
+                      <ListGroup.Item key={index} className="py-2" style={{ fontSize: '1rem', border: 'none', color: '#7f8c8d', background: '#f9f9f9', borderRadius: '8px', marginBottom: '8px', padding: '12px' }}>
+                        {item}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                )}
+              </div>
+            </div>
             {user && (
               <div className="mb-4">
                 <h5 className="d-flex align-items-center mb-3">
@@ -445,7 +484,6 @@ function RecipeDetail() {
                 </Form>
               </div>
             )}
-            {/* Display Reviews */}
             <div className="mb-4">
               <h5 className="d-flex align-items-center mb-3">
                 <span style={{ fontSize: '1.4rem', color: '#f39c12' }}>📝</span>
@@ -461,7 +499,7 @@ function RecipeDetail() {
                             {review.reviewer?.firstName ? `${review.reviewer.firstName} ${review.reviewer.lastName || ''}` : 'Anonymous'}
                           </strong>
                           <small style={{ color: '#7f8c8d', marginLeft: '10px' }}>
-                            {new Date(review.created).toLocaleString('en-US', { timeZone: 'UTC' })}
+                            {formatDate(review.created)}
                           </small>
                           <div>
                             <span style={{ color: '#f39c12' }}>{'★'.repeat(review.rating)}</span>
@@ -500,7 +538,7 @@ function RecipeDetail() {
                               : `${comment.user?.firstName || 'Anonymous'} ${comment.user?.lastName || ''}`}
                           </strong>
                           <small style={{ color: '#7f8c8d', marginLeft: '10px' }}>
-                            {new Date(comment.created).toLocaleString('en-US', { timeZone: 'UTC' })}
+                            {formatDate(comment.created)}
                           </small>
                         </div>
                         {comment.can_delete && (
@@ -527,21 +565,21 @@ function RecipeDetail() {
               <div className="shared-date d-flex align-items-center">
                 <span style={{ fontSize: '1.4rem', color: '#f39c12' }}>📅</span>
                 <span style={{ fontSize: '1rem', color: '#34495e', marginLeft: '10px', fontWeight: '500' }}>
-                  Created: {recipe.created_on ? new Date(recipe.created_on).toLocaleDateString() : 'N/A'}
+                  Created: {recipe.created_on ? formatDate(recipe.created_on) : 'N/A'}
                 </span>
               </div>
             </div>
-            <div className="d-flex justify-content-between gap-3">
-              <Button variant="outline-secondary" className="w-100" style={{ borderRadius: '12px', padding: '10px', fontWeight: '600', transition: 'all 0.3s' }} onClick={() => navigate(-1)}>
+            <div className="d-flex justify-content-between gap-3 flex-wrap">
+              <Button variant="outline-secondary" className="w-100 w-md-auto" style={{ borderRadius: '12px', padding: '10px', fontWeight: '600', transition: 'all 0.3s' }} onClick={() => navigate(-1)}>
                 Back to Recipes
               </Button>
-              {isOwner && (
+              {canEditOrDelete && (
                 <>
-                  <Button variant="primary" className="w-100 action-btn" style={{ borderRadius: '12px', padding: '10px', fontWeight: '600', backgroundColor: '#3498db', borderColor: '#3498db', transition: 'all 0.3s' }} onClick={handleEdit}>
+                  <Button variant="primary" className="w-100 w-md-auto action-btn" style={{ borderRadius: '12px', padding: '10px', fontWeight: '600', backgroundColor: '#3498db', borderColor: '#3498db', transition: 'all 0.3s' }} onClick={handleEdit}>
                     <PencilSquare size={18} className="me-2" />
                     Edit Recipe
                   </Button>
-                  <Button variant="danger" className="w-100 action-btn" style={{ borderRadius: '12px', padding: '10px', fontWeight: '600', transition: 'all 0.3s' }} onClick={() => setShowDeleteModal(true)}>
+                  <Button variant="danger" className="w-100 w-md-auto action-btn" style={{ borderRadius: '12px', padding: '10px', fontWeight: '600', transition: 'all 0.3s' }} onClick={() => setShowDeleteModal(true)}>
                     <Trash size={18} className="me-2" />
                     Delete Recipe
                   </Button>
@@ -601,6 +639,44 @@ function RecipeDetail() {
             </Button>
             <Button variant="danger" onClick={handleDelete}>
               Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        <Modal show={showReactionsModal} onHide={() => setShowReactionsModal(false)} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Reactions</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {reactionsList.length > 0 ? (
+              <ListGroup variant="flush">
+                {reactionsList.map((reaction, index) => (
+                  <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <strong style={{ color: '#34495e' }}>
+                        {reaction.user?.firstName ? `${reaction.user.firstName} ${reaction.user.lastName || ''}` : 'Anonymous'}
+                      </strong>
+                      {reaction.created_on && (
+                        <small style={{ color: '#7f8c8d', marginLeft: '10px' }}>
+                          {formatDate(reaction.created_on)}
+                        </small>
+                      )}
+                    </div>
+                    <span>
+                      {reaction.reaction_type === 'LIKE' ? '👍' :
+                       reaction.reaction_type === 'LOVE' ? '❤️' :
+                       reaction.reaction_type === 'WOW' ? '😮' :
+                       '😢'}
+                    </span>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            ) : (
+              <p style={{ color: '#7f8c8d', textAlign: 'center' }}>No reactions yet.</p>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowReactionsModal(false)}>
+              Close
             </Button>
           </Modal.Footer>
         </Modal>

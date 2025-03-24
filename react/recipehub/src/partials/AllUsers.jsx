@@ -4,19 +4,32 @@ import myaxios from "../utils/myaxios";
 import { errorToast } from "../utils/toast";
 import Footer from "../pages/Footer";
 import Loading from "./../components/Loading";
+import { useUser } from "../context/UserContext"; // Import useUser
 
 const AllUsers = () => {
   const navigate = useNavigate();
+  const { user: currentUser } = useUser(); // Get the current user
 
-  // State for users, filters, and search
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [roleFilter, setRoleFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Fetch all users on component mount
+  // Check if the user is an admin
   useEffect(() => {
+    if (!currentUser) {
+      errorToast("Please log in to access this page");
+      navigate("/login");
+      return;
+    }
+
+    if (currentUser?.role !== "Admin") {
+      errorToast("You do not have permission to view this page");
+      navigate("/dashboard");
+      return;
+    }
+
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -47,18 +60,16 @@ const AllUsers = () => {
     };
 
     fetchUsers();
-  }, [navigate]);
+  }, [navigate, currentUser]); // Add currentUser as a dependency
 
   // Handle role filter and search
   useEffect(() => {
     let filtered = users;
 
-    // Filter by role
     if (roleFilter) {
       filtered = filtered.filter((user) => user.role === roleFilter);
     }
 
-    // Filter by search query
     if (searchQuery) {
       filtered = filtered.filter(
         (user) =>
@@ -81,7 +92,7 @@ const AllUsers = () => {
           className="filter-bar d-flex flex-column flex-md-row justify-content-between align-items-center p-3 mb-4 bg-light shadow-sm"
           style={{
             position: "sticky",
-            top: "70px", // Adjust based on your navbar height
+            top: "70px",
             zIndex: 1000,
             borderRadius: "8px",
           }}
@@ -145,10 +156,15 @@ const AllUsers = () => {
                     </p>
                     <p className="card-text">
                       <strong>Role:</strong>{" "}
-                      <span className={`badge bg-${
-                        user.role === "Admin" ? "danger" :
-                        user.role === "Chef" ? "success" : "secondary"
-                      }`}>
+                      <span
+                        className={`badge bg-${
+                          user.role === "Admin"
+                            ? "danger"
+                            : user.role === "Chef"
+                            ? "success"
+                            : "secondary"
+                        }`}
+                      >
                         {user.role}
                       </span>
                     </p>

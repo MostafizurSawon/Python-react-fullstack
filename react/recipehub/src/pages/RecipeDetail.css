@@ -1,15 +1,362 @@
-/* RecipeDetail.css */
+/* src/styles/RecipeDetail.css */
+
+/* Import Google Fonts for modern typography */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500&display=swap');
+
+/* Base styles */
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* Reaction section */
+.reaction-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Reaction buttons */
+.reaction-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.reaction-wrapper {
+  position: relative;
+  min-width: 100px;
+}
+
+/* Reaction button styles */
+.reaction-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.reaction-like {
+  background: linear-gradient(135deg, #ff6b6b, #ff8787);
+  color: #fff;
+}
+
+.reaction-like:hover {
+  background: linear-gradient(135deg, #ff8787, #ff6b6b);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+}
+
+.reaction-comment {
+  background: linear-gradient(135deg, #4a90e2, #6ab0f3);
+  color: #fff;
+}
+
+.reaction-comment:hover {
+  background: linear-gradient(135deg, #6ab0f3, #4a90e2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+}
+
+.reaction-save {
+  background: linear-gradient(135deg, #2ecc71, #54d98c);
+  color: #fff;
+}
+
+.reaction-save:hover {
+  background: linear-gradient(135deg, #54d98c, #2ecc71);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+}
+
+.reaction-count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+
+.reaction-label {
+  font-size: 0.85rem;
+}
+
+/* Reaction menu */
+.reaction-menu {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 15px;
+  padding: 10px;
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  z-index: 10;
+}
+
+/* Reaction icons */
+.reaction-icon {
+  font-size: 1.8rem;
+  padding: 8px !important;
+  border-radius: 50% !important;
+  transition: all 0.3s ease;
+  background: transparent !important;
+}
+
+.reaction-icon:hover {
+  transform: scale(1.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Reaction summary */
+.reaction-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Reaction total */
+.reaction-total {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2c3e50;
+  background: #e6f0fa;
+  padding: 8px 15px;
+  border-radius: 30px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.reaction-total:hover {
+  background: #d1e4f8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+}
+
+/* View reactions button */
+.view-reactions-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  border-radius: 30px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, #f1c40f, #f7d731);
+  color: #2c3e50;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.view-reactions-btn:hover {
+  background: linear-gradient(135deg, #f7d731, #f1c40f);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(241, 196, 15, 0.3);
+}
+
+/* Recipe tabs */
+.recipe-tabs {
+  margin-bottom: 2rem;
+}
+
+.tab-item {
+  padding: 10px 20px;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.tab-item:hover {
+  color: #2c3e50;
+}
+
+.tab-item.active {
+  color: #2c3e50;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #3498db;
+  border-radius: 2px;
+}
+
+.tab-content {
+  padding: 10px 0;
+}
+
+/* Comment delete button */
 .comment-delete-btn {
   border-radius: 50%;
   padding: 4px 10px;
   font-size: 0.9rem;
+  transition: all 0.3s ease;
 }
 
 .comment-delete-btn:hover {
   background-color: #c0392b;
   border-color: #c0392b;
+  transform: scale(1.1);
 }
 
-.action-btn:hover {
-  transform: scale(1.05);
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .reaction-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 10px;
+  }
+
+  .reaction-buttons {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .reaction-wrapper {
+    min-width: 90px;
+  }
+
+  .reaction-menu {
+    top: -55px;
+    width: 180px;
+    padding: 8px;
+  }
+
+  .reaction-icon {
+    font-size: 1.6rem;
+    padding: 6px !important;
+  }
+
+  .reaction-summary {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .reaction-btn {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+
+  .reaction-total {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+
+  .view-reactions-btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+
+  .card-img-top {
+    height: 350px !important;
+  }
+
+  .card-title {
+    font-size: 1.5rem !important;
+  }
+
+  .card-text {
+    font-size: 1rem !important;
+  }
+
+  .comment-delete-btn {
+    font-size: 0.85rem;
+    padding: 3px 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .reaction-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .reaction-wrapper {
+    min-width: 100%;
+  }
+
+  .reaction-menu {
+    top: -50px;
+    width: 160px;
+    padding: 6px;
+  }
+
+  .reaction-icon {
+    font-size: 1.4rem;
+    padding: 5px !important;
+  }
+
+  .reaction-summary {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .reaction-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    width: 100%;
+  }
+
+  .reaction-total {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .view-reactions-btn {
+    padding: 5px 10px;
+    font-size: 0.85rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .card-img-top {
+    height: 300px !important;
+  }
+
+  .card-title {
+    font-size: 1.3rem !important;
+  }
+
+  .card-text {
+    font-size: 0.9rem !important;
+  }
+
+  .comment-delete-btn {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+  }
 }
