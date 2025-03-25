@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Button, Card, ListGroup, Modal, Form, Badge, FormControl } from 'react-bootstrap';
+import { Button, Card, ListGroup, Modal, Form, Badge, FormControl, Alert } from 'react-bootstrap';
 import { PencilSquare, Trash, Heart, Chat, Bookmark, BookmarkFill, Star, StarFill } from 'react-bootstrap-icons';
 import myaxios from '../utils/myaxios';
 import Navbar from './Navbar';
@@ -79,13 +79,22 @@ function RecipeDetail() {
     try {
       const response = await myaxios.get(`recipes/reviews/?recipe=${id}`);
       setReviews(response.data);
-      if (user) {
-        const existingReview = response.data.find(review => review.reviewer.id === user.id);
+      if (user && user.email) {
+        // Match the review by the user's email instead of ID to handle potential mismatches
+        const existingReview = response.data.find(review => review.reviewer.email === user.email);
         if (existingReview) {
           setUserReview(existingReview);
-          setReviewBody(existingReview.body);
-          setReviewRating(existingReview.rating);
+          setReviewBody(existingReview.body || '');
+          setReviewRating(existingReview.rating || 5);
+        } else {
+          setUserReview(null);
+          setReviewBody('');
+          setReviewRating(5);
         }
+      } else {
+        setUserReview(null);
+        setReviewBody('');
+        setReviewRating(5);
       }
     } catch (error) {
       console.error('Error fetching reviews:', error);
@@ -150,12 +159,24 @@ function RecipeDetail() {
       await myaxios.delete(`recipes/lists/${id}/`);
       successToast("Recipe deleted successfully!");
       setShowDeleteModal(false);
+
       const response = await myaxios.get('recipes/lists/');
-      const totalRecipes = response.data.count;
+      const totalRecipes = response.data.count || 0;
       const pageSize = 10;
-      const newTotalPages = Math.ceil(totalRecipes / pageSize);
-      const redirectPage = Math.min(fromPage, newTotalPages) || 1;
-      navigate(`/recipes?page=${redirectPage}`);
+      const newTotalPages = Math.max(1, Math.ceil(totalRecipes / pageSize));
+
+      let redirectPage = fromPage;
+      if (redirectPage > newTotalPages) redirectPage = newTotalPages;
+      else if (redirectPage < 1) redirectPage = 1;
+
+      const categories = query.get('categories') || '';
+      const search = query.get('search') || '';
+
+      const params = { page: redirectPage };
+      if (categories) params.categories = categories;
+      if (search) params.search = search;
+
+      navigate(`/?${new URLSearchParams(params).toString()}`);
     } catch (error) {
       console.error('Error deleting recipe:', error);
       errorToast("Failed to delete recipe.");
@@ -189,9 +210,9 @@ function RecipeDetail() {
         successToast("Review submitted successfully!");
         setUserReview(response.data);
       }
-      setReviewBody(response.data.body);
-      setReviewRating(response.data.rating);
-      fetchReviews();
+      setReviewBody(response.data.body || '');
+      setReviewRating(response.data.rating || 5);
+      await fetchReviews();
     } catch (error) {
       console.error('Error submitting review:', error);
       if (error.response && error.response.status === 400) {
@@ -200,6 +221,29 @@ function RecipeDetail() {
       } else {
         errorToast("Failed to submit review.");
       }
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    if (window.confirm('Are you sure you want to delete your review?')) {
+      try {
+        await myaxios.delete(`recipes/reviews/${userReview.id}/`);
+        successToast("Review deleted successfully!");
+        setUserReview(null);
+        setReviewBody('');
+        setReviewRating(5);
+        await fetchReviews();
+      } catch (error) {
+        console.error('Error deleting review:', error);
+        errorToast("Failed to delete review.");
+      }
+    }
+  };
+
+  const handleCancelEditReview = () => {
+    if (userReview) {
+      setReviewBody(userReview.body || '');
+      setReviewRating(userReview.rating || 5);
     }
   };
 
@@ -367,9 +411,6 @@ function RecipeDetail() {
                       <Button className="reaction-icon" onClick={() => handleReaction('WOW')}>
                         😮
                       </Button>
-                      <Button className="reaction-icon" onClick={() => handleReaction('SAD')}>
-                        😢
-                      </Button>
                     </div>
                   )}
                 </div>
@@ -389,9 +430,10 @@ function RecipeDetail() {
                 </Button>
               </div>
               <div className="reaction-summary">
-                <span className="reaction-total">
+                <Button
+                  className="view-reactions-btn">
                   Total Reactions: {totalReactions}
-                </span>
+                </Button>
                 <Button
                   className="view-reactions-btn"
                   onClick={() => setShowReactionsModal(true)}
@@ -401,7 +443,7 @@ function RecipeDetail() {
               </div>
             </div>
             <div className="recipe-tabs mb-4">
-              <div className="d-flex border-bottom">
+              <div className="d-flex justify-content-center border-bottom">
                 <div
                   className={`tab-item d-flex align-items-center ${activeTab === 'ingredients' ? 'active' : ''}`}
                   onClick={() => setActiveTab('ingredients')}
@@ -441,49 +483,93 @@ function RecipeDetail() {
                 )}
               </div>
             </div>
-            {user && (
-              <div className="mb-4">
-                <h5 className="d-flex align-items-center mb-3">
-                  <span style={{ fontSize: '1.4rem', color: '#f39c12' }}>⭐</span>
-                  <span style={{ fontSize: '1.2rem', marginLeft: '10px', fontWeight: '600', color: '#2c3e50' }}>
-                    {userReview ? 'Edit Your Review' : 'Add a Review'}
-                  </span>
-                </h5>
-                <Form onSubmit={handleReviewSubmit}>
-                  <Form.Group className="mb-3" controlId="reviewBody">
-                    <Form.Label>Review (Optional):</Form.Label>
-                    <Form.Control
-                      as="textarea"
-                      rows={3}
-                      value={reviewBody}
-                      onChange={(e) => setReviewBody(e.target.value)}
-                      placeholder="Write your review..."
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="reviewRating">
-                    <Form.Label>Rating (1-5):</Form.Label>
-                    <div className="d-flex align-items-center">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <span
-                          key={star}
-                          onClick={() => setReviewRating(star)}
-                          style={{ cursor: 'pointer', fontSize: '1.5rem', marginRight: '5px' }}
-                        >
-                          {star <= reviewRating ? (
-                            <StarFill color="#f39c12" />
-                          ) : (
-                            <Star color="#d3d3d3" />
-                          )}
-                        </span>
-                      ))}
-                    </div>
-                  </Form.Group>
-                  <Button type="submit" variant="primary" style={{ borderRadius: '12px', padding: '10px 20px' }}>
-                    {userReview ? 'Update Review' : 'Submit Review'}
+            <div className="mb-4">
+              <h5 className="d-flex align-items-center mb-3">
+                <span style={{ fontSize: '1.4rem', color: '#f39c12' }}>⭐</span>
+                <span style={{ fontSize: '1.2rem', marginLeft: '10px', fontWeight: '600', color: '#2c3e50' }}>
+                  {user && userReview ? 'Your Review' : 'Add a Review'}
+                </span>
+              </h5>
+              {!user ? (
+                <Alert variant="info" className="d-flex align-items-center justify-content-between">
+                  <span>Please log in to submit a review for this recipe.</span>
+                  <Button
+                    variant="primary"
+                    onClick={() => navigate('/login')}
+                    style={{ borderRadius: '12px', padding: '8px 16px' }}
+                  >
+                    Log In
                   </Button>
-                </Form>
-              </div>
-            )}
+                </Alert>
+              ) : (
+                <>
+                  {userReview && (user.email === userReview.reviewer.email || user.role === 'Admin') && (
+                    <Alert variant="success" className="mb-3">
+                      You have already reviewed this recipe. You can edit or delete your review below.
+                    </Alert>
+                  )}
+                  <Form onSubmit={handleReviewSubmit}>
+                    <Form.Group className="mb-3" controlId="reviewBody">
+                      <Form.Label>Review (Optional):</Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={3}
+                        value={reviewBody}
+                        onChange={(e) => setReviewBody(e.target.value)}
+                        placeholder="Write your review..."
+                        disabled={userReview && user.email !== userReview.reviewer.email && user.role !== 'Admin'}
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="reviewRating">
+                      <Form.Label>Rating (1-5):</Form.Label>
+                      <div className="d-flex align-items-center">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <span
+                            key={star}
+                            onClick={() => setReviewRating(star)}
+                            style={{ cursor: userReview && user.email !== userReview.reviewer.email && user.role !== 'Admin' ? 'default' : 'pointer', fontSize: '1.5rem', marginRight: '5px' }}
+                          >
+                            {star <= reviewRating ? (
+                              <StarFill color="#f39c12" />
+                            ) : (
+                              <Star color="#d3d3d3" />
+                            )}
+                          </span>
+                        ))}
+                      </div>
+                    </Form.Group>
+                    <div className="d-flex gap-2">
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        style={{ borderRadius: '12px', padding: '10px 20px' }}
+                        disabled={userReview && user.email !== userReview.reviewer.email && user.role !== 'Admin'}
+                      >
+                        {userReview ? 'Edit Review' : 'Submit Review'}
+                      </Button>
+                      {userReview && (user.email === userReview.reviewer.email || user.role === 'Admin') && (
+                        <>
+                          <Button
+                            variant="secondary"
+                            style={{ borderRadius: '12px', padding: '10px 20px' }}
+                            onClick={handleCancelEditReview}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="danger"
+                            style={{ borderRadius: '12px', padding: '10px 20px' }}
+                            onClick={handleDeleteReview}
+                          >
+                            Delete Review
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </Form>
+                </>
+              )}
+            </div>
             <div className="mb-4">
               <h5 className="d-flex align-items-center mb-3">
                 <span style={{ fontSize: '1.4rem', color: '#f39c12' }}>📝</span>

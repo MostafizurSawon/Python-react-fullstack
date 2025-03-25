@@ -147,13 +147,13 @@ function MainSection() {
   const fallbackImage = 'https://placehold.co/300x200?text=No+Image';
 
   return (
-    <div className="container my-4" ref={sectionRef}>
-      <h1 className="text-center mb-5" style={{ fontWeight: 'bold', color: '#2c3e50', fontSize: '2.5rem' }}>
+    <div className="container my-4" ref={sectionRef} id="main-section">
+      <h1 className="text-center mb-5" style={{ fontWeight: 'bold', color: '#2c3e50', fontSize: 'clamp(2rem, 5vw, 2.5rem)' }}>
         Our Recipes
       </h1>
       <div className="main-section-wrapper">
         <div className="row">
-          <div className="col-md-3 mb-4 filter-panel-container">
+          <div className="col-12 col-md-3 mb-4 filter-panel-container">
             <Button
               variant="outline-primary"
               onClick={() => setIsCategoryPanelOpen(!isCategoryPanelOpen)}
@@ -164,21 +164,22 @@ function MainSection() {
               {isCategoryPanelOpen ? 'Hide Filters' : 'Show Filters'}
             </Button>
             <Collapse in={isCategoryPanelOpen || window.innerWidth >= 768}>
-              <div id="category-collapse" className="sticky-center">
+              <div id="category-collapse" className="filter-panel-wrapper">
                 <div className="filter-panel p-3 border rounded">
                   <h5 className="mb-3">Filter by Category</h5>
                   {categories.length > 0 ? (
-                    <div>
+                    <div className="category-list">
                       {categories.map((cat) => (
-                        <Form.Check
-                          key={cat.id}
-                          type="checkbox"
-                          id={`category-${cat.id}`}
-                          label={cat.name}
-                          checked={selectedCategories.includes(cat.id.toString())}
-                          onChange={() => handleCategoryChange(cat.id)}
-                          className="mb-2 custom-checkbox"
-                        />
+                        <div className="custom-checkbox-wrapper" key={cat.id}>
+                          <Form.Check
+                            type="checkbox"
+                            id={`category-${cat.id}`}
+                            label={cat.name}
+                            checked={selectedCategories.includes(cat.id.toString())}
+                            onChange={() => handleCategoryChange(cat.id)}
+                            className="mb-2 px-3 custom-checkbox"
+                          />
+                        </div>
                       ))}
                       <Button variant="secondary" size="sm" onClick={clearFilters} className="mt-3 w-100">
                         Clear All Filters
@@ -191,7 +192,7 @@ function MainSection() {
               </div>
             </Collapse>
           </div>
-          <div className="col-md-9">
+          <div className="col-12 col-md-9 recipe-content">
             <InputGroup className="my-3">
               <InputGroup.Text style={{ background: 'none', border: 'none', padding: '10px 16px' }}>
                 <i className="bi bi-search" style={{ color: '#34495e' }}></i>
@@ -225,7 +226,7 @@ function MainSection() {
             <div className="row g-4">
               {recipes.length > 0 ? (
                 recipes.map((recipe) => (
-                  <div className="col-md-6 col-lg-6" key={recipe.id}>
+                  <div className="col-12 col-md-6 col-lg-6" key={recipe.id}>
                     <Card
                       className="custom-card h-100"
                       style={{
@@ -233,7 +234,7 @@ function MainSection() {
                         border: '1px solid #e0e0e0',
                         overflow: 'hidden',
                         transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                        height: '400px',
+                        height: 'clamp(350px, 50vw, 400px)',
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-10px)';
@@ -272,29 +273,29 @@ function MainSection() {
                         )}
                         <div className="image-overlay"></div>
                       </div>
-                      <Card.Body className="p-4 d-flex flex-column">
+                      <Card.Body className="p-3 p-md-4 d-flex flex-column">
                         <Card.Title className="mb-3">
                           <span style={{ fontSize: '1.6rem', color: '#e74c3c' }}>🍳</span>
-                          <span style={{ fontSize: '1.4rem', fontWeight: '700', color: '#2c3e50', marginLeft: '10px' }}>
+                          <span style={{ fontSize: 'clamp(1.2rem, 2vw, 1.4rem)', fontWeight: '700', color: '#2c3e50', marginLeft: '10px' }}>
                             {recipe.title}
                           </span>
                         </Card.Title>
                         <Card.Text className="text-muted mb-3">
                           <span style={{ fontSize: '1.1rem', color: '#3498db' }}>📋</span>
-                          <span style={{ fontSize: '1rem', marginLeft: '8px', fontWeight: '500', color: '#34495e' }}>
+                          <span style={{ fontSize: 'clamp(0.9rem, 1.5vw, 1rem)', marginLeft: '8px', fontWeight: '500', color: '#34495e' }}>
                             Category: {recipe.category_names && recipe.category_names.length > 0 ? recipe.category_names.join(', ') : 'Uncategorized'}
                           </span>
                         </Card.Text>
-                        <div className="recipe-info mt-auto d-flex justify-content-between align-items-center">
-                          <div className="recipe-by">
+                        <div className="recipe-info mt-auto d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                          <div className="recipe-by mb-2 mb-md-0">
                             <span style={{ fontSize: '1.2rem', color: '#f39c12' }}>👤</span>
-                            <span style={{ fontSize: '0.9rem', color: '#34495e', marginLeft: '8px', fontWeight: '500' }}>
+                            <span style={{ fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)', color: '#34495e', marginLeft: '8px', fontWeight: '500' }}>
                               Recipe by: {recipe.user?.firstName || 'Anonymous'} {recipe.user?.lastName || ''}
                             </span>
                           </div>
                           <div className="shared-date">
                             <span style={{ fontSize: '1.2rem', color: '#f39c12' }}>📅</span>
-                            <span style={{ fontSize: '0.9rem', color: '#34495e', marginLeft: '8px', fontWeight: '500' }}>
+                            <span style={{ fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)', color: '#34495e', marginLeft: '8px', fontWeight: '500' }}>
                               Shared on: {recipe.created_on ? new Date(recipe.created_on).toLocaleDateString() : 'N/A'}
                             </span>
                           </div>

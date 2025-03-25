@@ -1,7 +1,6 @@
-// src/pages/LoginPage.jsx
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { useUser } from "../context/UserContext"; // Import useUser
+import { useUser } from "../context/UserContext";
 import myaxios from "../utils/myaxios";
 import { errorToast, successToast } from "../utils/toast";
 import "./secure.css";
@@ -10,17 +9,33 @@ import Footer from "./Footer";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useUser(); // Get the login function from context
+  const { login } = useUser();
   const [errorFields, setErrorFields] = useState([]);
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1024);
   const buttonRef = useRef(null);
   const lastMoveTimeRef = useRef(0);
   const funnyAudioRef = useRef(null);
   const successAudioRef = useRef(null);
 
+  // Detect device type on mount and on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth > 1024);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  // Initialize audio elements
   useEffect(() => {
     funnyAudioRef.current = new Audio(
       "https://www.myinstants.com/media/sounds/boing.mp3"
@@ -36,6 +51,7 @@ const LoginPage = () => {
     };
   }, []);
 
+  // Validate password with increased debounce time and better error handling
   useEffect(() => {
     if (!email || !password) {
       setIsPasswordCorrect(false);
@@ -56,22 +72,27 @@ const LoginPage = () => {
             }, 3000);
           } else {
             setIsPasswordCorrect(false);
-            funnyAudioRef.current.play();
+            if (isDesktop) {
+              funnyAudioRef.current.play();
+            }
           }
         })
         .catch((error) => {
           console.error("Password validation error ->", error);
           setIsPasswordCorrect(false);
-          funnyAudioRef.current.play();
+          if (isDesktop) {
+            funnyAudioRef.current.play();
+          }
         });
-    }, 500);
+    }, 1000); // Increased debounce time to 1000ms
 
     return () => clearTimeout(debounceTimeout);
-  }, [email, password]);
+  }, [email, password, isDesktop]);
 
+  // Handle button movement on mouse move (only for desktop)
   useEffect(() => {
     const handleMouseMove = (e) => {
-      if (isPasswordCorrect) {
+      if (!isDesktop || isPasswordCorrect) {
         setButtonPosition({ x: 0, y: 0 });
         return;
       }
@@ -116,30 +137,39 @@ const LoginPage = () => {
       }
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    // Only add the mousemove event listener on desktop devices
+    if (isDesktop) {
+      window.addEventListener("mousemove", handleMouseMove);
+    }
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
+      if (isDesktop) {
+        window.removeEventListener("mousemove", handleMouseMove);
+      }
     };
-  }, [isPasswordCorrect, buttonPosition]);
+  }, [isPasswordCorrect, buttonPosition, isDesktop]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission behavior
 
     const formdata = new FormData(e.target);
     const data = Object.fromEntries(formdata);
 
-    // console.log("login data -> ", data);
-
-    // Use the login function from context
-    const success = await login(data.email, data.password);
-    if (success) {
-      setTimeout(() => {
-        navigate("/dashboard/index/");
-      }, 500);
-    } else {
+    try {
+      const success = await login(data.email, data.password);
+      if (success) {
+        setTimeout(() => {
+          navigate("/dashboard/index/");
+        }, 500);
+      } else {
+        setErrorFields(["email", "password"]);
+        setIsPasswordCorrect(false);
+      }
+    } catch (error) {
+      console.error("Login error ->", error);
       setErrorFields(["email", "password"]);
       setIsPasswordCorrect(false);
+      errorToast("Failed to log in. Please check your email and password.");
     }
   };
 
@@ -229,7 +259,7 @@ const LoginPage = () => {
               <button
                 ref={buttonRef}
                 type="submit"
-                className={`btn ${isPasswordCorrect ? "" : "wobble"}`}
+                className={`btn ${isDesktop && !isPasswordCorrect ? "wobble" : ""}`}
                 style={{
                   background:
                     "linear-gradient(90deg, #8B0000 0%, #FFC107 100%)",
@@ -238,10 +268,11 @@ const LoginPage = () => {
                   borderRadius: "10px",
                   fontWeight: "500",
                   transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                  position: isPasswordCorrect ? "relative" : "absolute",
-                  transform: isPasswordCorrect
-                    ? "none"
-                    : `translate(${buttonPosition.x}px, ${buttonPosition.y}px)`,
+                  position: isDesktop && !isPasswordCorrect ? "absolute" : "relative",
+                  transform:
+                    isDesktop && !isPasswordCorrect
+                      ? `translate(${buttonPosition.x}px, ${buttonPosition.y}px)`
+                      : "none",
                   zIndex: 1000,
                   display: "block",
                   margin: "0 auto",

@@ -1,8 +1,8 @@
 // src/utils/myaxios.js
 import axios from "axios";
 
-// let baseURL = "https://recipe-drf.onrender.com/";
-let baseURL = "http://127.0.0.1:8000/";
+let baseURL = "https://recipe-drf.onrender.com/";
+// let baseURL = "http://127.0.0.1:8000/";
 
 const myaxios = axios.create({
   baseURL,

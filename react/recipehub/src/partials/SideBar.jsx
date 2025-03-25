@@ -58,6 +58,17 @@ const SideBar = () => {
           <span className="side-bar-item-caption">All Users</span>
         </NavLink>
       )}
+      {user?.role === "Admin" && (
+        <NavLink
+          to="/dashboard/messages" 
+          className={({ isActive }) =>
+            `side-bar-item ${isActive ? "side-bar-item-active" : ""}`
+          }
+        >
+          <i className="bi bi-people-fill me-2"></i>
+          <span className="side-bar-item-caption">User Messages</span>
+        </NavLink>
+      )}
     </div>
   );
 };

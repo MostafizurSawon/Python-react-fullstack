@@ -6,6 +6,7 @@ import Loading from "../../components/Loading";
 import NotFound from "../../components/NotFound";
 import { successToast, errorToast } from "../../utils/toast";
 import { useUser } from "../../context/UserContext";
+import "./../MainSection.css";
 
 const DashboardIndexPage = () => {
   const { user } = useUser();
@@ -238,7 +239,7 @@ const DashboardIndexPage = () => {
                                   label={cat.name}
                                   checked={selectedCategories.includes(cat.id.toString())}
                                   onChange={() => handleCategoryChangeFilter(cat.id)}
-                                  className="mb-2"
+                                  className="mb-2 custom-checkbox"
                                 />
                               ))}
                               <Button

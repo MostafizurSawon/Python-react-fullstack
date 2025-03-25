@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -8,6 +8,8 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const navbarRef = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Handle authentication state
   useEffect(() => {
@@ -63,13 +65,46 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
+  // Handle scroll to MainSection with animation
+  const handleScrollToMainSection = () => {
+    setIsMenuOpen(false); // Close the mobile menu if open
+
+    // Check if we're already on the homepage
+    if (location.pathname === "/") {
+      // Find the MainSection element by its ID
+      const mainSection = document.getElementById("main-section");
+      if (mainSection) {
+        mainSection.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+        // Add a class to trigger the animation
+        mainSection.classList.add("animate-on-scroll");
+      }
+    } else {
+      // Navigate to the homepage and scroll after navigation
+      navigate("/");
+      // Use a slight delay to ensure the page has loaded
+      setTimeout(() => {
+        const mainSection = document.getElementById("main-section");
+        if (mainSection) {
+          mainSection.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+          mainSection.classList.add("animate-on-scroll");
+        }
+      }, 100);
+    }
+  };
+
   return (
     <div className="mb-5 pb-4">
       <nav
         ref={navbarRef}
         className={`fixed-top ${isScrolled ? "shadow-lg" : "shadow-sm"}`}
         style={{
-          background: "linear-gradient(90deg, #8B0000 0%, #FFC107 100%)", 
+          background: "linear-gradient(90deg, #8B0000 0%, #FFC107 100%)",
           color: "#fff",
           padding: "10px 0",
         }}
@@ -128,7 +163,8 @@ const Navbar = () => {
                   style={{
                     transition: "background 0.3s ease",
                     fontWeight: "500",
-                    lineHeight: "1.5", // Ensure consistent vertical alignment
+                    lineHeight: "1.5",
+                    display: "inline-block", // Ensure consistent rendering
                   }}
                   onMouseEnter={(e) =>
                     (e.target.style.background = "rgba(255, 255, 255, 0.15)")
@@ -141,14 +177,16 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/"
-                  className="text-white text-decoration-none px-3 py-2 rounded"
-                  onClick={() => setIsMenuOpen(false)}
+                <button
+                  onClick={handleScrollToMainSection}
+                  className="text-white text-decoration-none px-3 py-2 rounded border-0 bg-transparent"
                   style={{
                     transition: "background 0.3s ease",
                     fontWeight: "500",
                     lineHeight: "1.5",
+                    display: "inline-block", // Match Link styling
+                    fontSize: "inherit", // Ensure font size matches
+                    cursor: "pointer", // Ensure pointer cursor
                   }}
                   onMouseEnter={(e) =>
                     (e.target.style.background = "rgba(255, 255, 255, 0.15)")
@@ -158,28 +196,8 @@ const Navbar = () => {
                   }
                 >
                   Recipe
-                </Link>
+                </button>
               </li>
-              {/* <li>
-                <Link
-                  to="/dashboard/profile"
-                  className="text-white text-decoration-none px-3 py-2 rounded"
-                  onClick={() => setIsMenuOpen(false)}
-                  style={{
-                    transition: "background 0.3s ease",
-                    fontWeight: "500",
-                    lineHeight: "1.5",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.target.style.background = "rgba(255, 255, 255, 0.15)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.target.style.background = "transparent")
-                  }
-                >
-                  Profile
-                </Link>
-              </li> */}
               <li>
                 <Link
                   to="/dashboard/index"
@@ -189,6 +207,7 @@ const Navbar = () => {
                     transition: "background 0.3s ease",
                     fontWeight: "500",
                     lineHeight: "1.5",
+                    display: "inline-block",
                   }}
                   onMouseEnter={(e) =>
                     (e.target.style.background = "rgba(255, 255, 255, 0.15)")
@@ -231,7 +250,7 @@ const Navbar = () => {
                     onClick={handleLogout}
                     className="text-white text-decoration-none px-3 py-2 rounded d-flex align-items-center"
                     style={{
-                      background: "rgba(255, 255, 255, 0.2)", // Slightly different background to distinguish
+                      background: "rgba(255, 255, 255, 0.2)",
                       transition: "background 0.3s ease",
                       fontWeight: "500",
                       lineHeight: "1.5",

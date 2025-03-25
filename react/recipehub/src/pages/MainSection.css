@@ -1,241 +1,315 @@
-/* MainSection.css */
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
-
-/* Reset default styles */
-* {
-  box-sizing: border-box;
-}
-
-/* Navbar assumption */
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background-color: #fff;
-  z-index: 2000;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Main container styles */
-.custom-card {
-  border: 1px solid #e0e0e0 !important;
-  background-color: #fff;
-}
-
-.card-image-wrapper {
+/* Custom checkbox wrapper */
+.custom-checkbox-wrapper {
   position: relative;
-}
-
-.card-image-wrapper .image-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.4));
-  pointer-events: none;
-}
-
-.custom-card:hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.custom-pagination .page-item .page-link {
-  color: #e74c12;
-  background-color: #fff;
-  border-color: #e0e0e0;
-  font-weight: 600;
-  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  padding: 8px 12px;
   border-radius: 8px;
-  margin: 0 4px;
+}
+
+/* Hover effect for checkbox wrapper */
+.custom-checkbox-wrapper:hover {
+  background-color: rgba(231, 76, 18, 0.1);
+}
+
+/* Hide the default checkbox input */
+.custom-checkbox .form-check-input {
+  position: absolute;
+  opacity: 0;
+  width: 1.2em;
+  height: 1.2em;
+  z-index: 1;
+  margin-right: 8px;
+}
+
+/* Style the label to include a custom checkbox */
+.custom-checkbox .form-check-label {
+  position: relative;
+  padding-left: 60px; /* Increased padding to add more space between checkmark and text */
+  color: #34495e;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: clamp(0.9rem, 2vw, 1rem); /* Responsive font size */
+}
+
+/* Create a custom checkbox square */
+.custom-checkbox .form-check-label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.2em;
+  height: 1.2em;
+  border: 2px solid #ced4da;
+  border-radius: 4px;
+  background-color: #fff;
   transition: all 0.3s ease;
 }
 
-.custom-pagination .page-item.active .page-link {
+/* Style the custom checkbox when checked */
+.custom-checkbox .form-check-input:checked + .form-check-label::before {
   background-color: #e74c12;
   border-color: #e74c12;
-  color: #fff;
 }
 
-.custom-pagination .page-item.disabled .page-link {
-  color: #b0b0b0;
-  background-color: #f8f9fa;
-  border-color: #e0e0e0;
+/* Add a custom tick sign when checked */
+.custom-checkbox .form-check-input:checked + .form-check-label::after {
+  content: '\2713'; /* Unicode for checkmark */
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
 }
 
-.custom-pagination .page-link:hover {
-  background-color: #e74c12;
-  color: #fff;
+/* Focus state */
+.custom-checkbox .form-check-input:focus + .form-check-label::before {
+  box-shadow: 0 0 0 0.2rem rgba(231, 76, 18, 0.25);
+}
+
+/* Hover effect */
+.custom-checkbox .form-check-label:hover::before {
   border-color: #e74c12;
 }
 
-.recipe-info {
-  padding-top: 8px;
-  border-top: 1px solid #e0e0e0;
-  color: #34495e;
-}
-
-.recipe-by,
-.shared-date {
-  display: flex;
-  align-items: center;
-}
-
-.recipe-by span:last-child,
-.shared-date span:last-child {
-  margin-left: 8px;
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-
-/* Wrapper for MainSection content */
-.main-section-wrapper {
-  position: relative;
-  min-height: calc(100vh - 120px); /* Navbar (60px) + Footer (60px) */
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
-/* Add padding to the filter panel container */
+/* Filter panel container */
 .filter-panel-container {
-  padding-top: 20px;
+  position: relative;
+  min-height: 100vh; /* Ensure the container takes full height for sticky to work */
 }
 
-/* Styles for the filter panel */
-.filter-panel {
-  background-color: #f8f9fa;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+/* Sticky filter panel on desktop */
+@media (min-width: 768px) {
+  .filter-panel-wrapper {
+    position: sticky;
+    top: 80px; /* Adjust based on Navbar height */
+    height: calc(100vh - 100px); /* Fit within viewport */
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .filter-panel {
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 25px;
+    border: 1px solid #dee2e6;
+  }
+}
+
+/* Mobile styles for filter panel */
+@media (max-width: 767px) {
+  .filter-panel-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .filter-panel {
+    padding: 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+  }
+
+  .custom-checkbox .form-check-label {
+    padding-left: 35px; /* Slightly less padding on mobile for better fit */
+  }
+}
+
+/* Ensure the category list is scrollable */
+.category-list {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 5px; /* Prevent scrollbar overlap */
+}
+
+/* Filter panel styles for DashboardIndexPage */
+.p-3.border.rounded {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
 }
 
-.filter-panel h5 {
+.p-3.border.rounded h5 {
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 15px;
 }
 
-.filter-panel .form-check {
+.p-3.border.rounded .form-check {
   cursor: pointer;
   margin-bottom: 10px;
 }
 
-.filter-panel .form-check-label {
+.p-3.border.rounded .form-check-label {
   color: #34495e;
-  padding-left: 8px;
+  padding-left: 25px;
 }
 
-.filter-panel .custom-checkbox .form-check-input {
-  margin-right: 8px;
-  width: 1.2em;
-  height: 1.2em;
+/* Optional animation for MainSection when scrolled into view */
+#main-section.animate-on-scroll {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
-.filter-panel .custom-checkbox .form-check-input:checked {
-  background-color: #e74c12;
-  border-color: #e74c12;
+#main-section.animate-on-scroll .container {
+  animation: scaleIn 0.5s ease-out forwards;
 }
 
-.filter-panel .custom-checkbox .form-check-input:focus {
-  box-shadow: 0 0 0 0.2rem rgba(231, 76, 18, 0.25);
+@keyframes scaleIn {
+  0% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
-/* Sticky filter panel */
-.sticky-center {
-  position: sticky;
-  top: 70px;
-  max-height: calc(100vh - 80px);
-  overflow-y: auto;
-  z-index: 1000;
+/* Staggered animation for recipe cards */
+#main-section.animate-on-scroll .custom-card {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease-out forwards;
 }
 
-.sticky-center::-webkit-scrollbar {
-  width: 8px;
+#main-section.animate-on-scroll .custom-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+#main-section.animate-on-scroll .custom-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+#main-section.animate-on-scroll .custom-card:nth-child(3) {
+  animation-delay: 0.3s;
 }
 
-.sticky-center::-webkit-scrollbar-thumb {
-  background-color: #888;
-  border-radius: 4px;
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.sticky-center::-webkit-scrollbar-track {
-  background-color: #f1f1f1;
+/* Recipe content styling */
+.recipe-content {
+  padding: 0 15px;
 }
 
-/* Search bar styles */
-.input-group .form-control {
-  border-color: #e0e0e0;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+/* Responsive search bar */
+.input-group {
+  max-width: 100%;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.input-group .form-control:focus {
-  border-color: #e74c12;
-  box-shadow: 0 0 5px rgba(231, 76, 18, 0.5);
-}
-
-.input-group .btn {
-  color: #34495e;
-  border-color: #e0e0e0;
-}
-
-.input-group .btn:hover {
-  background-color: #e74c12;
-  color: #fff;
-  border-color: #e74c12;
-}
-
-.input-group .btn:disabled {
-  background-color: #f8f9fa;
-  color: #b0b0b0;
-  border-color: #e0e0e0;
-}
-
-/* Mobile responsiveness */
-@media (max-width: 767px) {
-  .filter-panel-container {
-    margin-bottom: 20px;
+@media (max-width: 576px) {
+  .input-group .form-control {
+    font-size: 0.9rem;
+    padding: 8px 12px;
   }
 
-  .sticky-center {
-    position: static;
-    max-height: none;
+  .input-group .btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
   }
+}
 
-  .input-group {
-    margin-bottom: 20px;
-  }
+/* Responsive recipe cards */
+.custom-card {
+  margin-bottom: 1.5rem;
+  background-color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-  .form-control {
-    font-size: 16px !important;
-    padding: 12px !important;
-  }
-
-  .input-group-text,
-  .btn {
-    padding: 12px !important;
-  }
-
-  h1.text-center {
-    font-size: 2rem !important;
-  }
-
+@media (max-width: 576px) {
   .custom-card {
     height: auto !important;
-    min-height: 380px;
   }
 
-  .custom-card img {
-    height: 200px !important;
+  .card-image-wrapper img {
+    height: 180px !important;
+  }
+
+  .card-body {
+    padding: 1rem !important;
   }
 }
 
-@media (min-width: 768px) {
-  .sticky-center {
-    position: sticky !important;
-    top: 70px !important;
-    max-height: calc(100vh - 80px) !important;
-    overflow-y: auto !important;
+/* Responsive pagination */
+.custom-pagination {
+  margin: 0 2px;
+}
+
+@media (max-width: 576px) {
+  .custom-pagination {
+    font-size: 0.8rem;
+    padding: 5px 8px;
+  }
+}
+
+/* Ensure main section wrapper doesn't overflow */
+.main-section-wrapper {
+  padding: 0;
+}
+
+/* Adjust container padding for smaller screens */
+@media (max-width: 576px) {
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+/* Image overlay for recipe cards */
+.card-image-wrapper {
+  position: relative;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
+  pointer-events: none;
+}
+
+/* Ensure proper spacing for smaller screens */
+@media (max-width: 576px) {
+  .custom-checkbox-wrapper {
+    padding: 6px 10px;
+  }
+
+  .custom-checkbox .form-check-label {
+    padding-left: 30px; /* Further reduce padding on smaller screens */
+  }
+
+  .custom-checkbox .form-check-label::before {
+    width: 1em;
+    height: 1em;
+  }
+
+  .custom-checkbox .form-check-input:checked + .form-check-label::after {
+    left: 4px;
+    font-size: 12px;
   }
 }

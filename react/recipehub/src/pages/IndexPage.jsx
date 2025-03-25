@@ -51,7 +51,7 @@ const IndexPage = () => {
 
       <Home />
 
-      <div className="container my-5">
+      <div id="main-section" className="container my-5">
         <MainSection />
       </div>
 

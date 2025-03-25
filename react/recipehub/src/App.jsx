@@ -1,4 +1,3 @@
-// App.jsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -26,6 +25,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import AllUsers from "./partials/AllUsers";
 import UserProfile from "./partials/UserProfile";
 import UserInfo from "./partials/UserInfo";
+import UserMessages from "./partials/UserMessages";
 
 function App() {
   return (
@@ -47,6 +47,7 @@ function App() {
               <Route path="index/" element={<DashboardIndexPage />} />
               <Route path="update-profile/" element={<ProfilePage />} />
               <Route path="users/" element={<AllUsers />} />
+              <Route path="messages/" element={<UserMessages/>} />
               <Route path="users/:email" element={<UserProfile />} />
               <Route path="user-info/" element={<UserInfo />} /> 
               <Route path="add-recipe/" element={<RecipeForm />} />
