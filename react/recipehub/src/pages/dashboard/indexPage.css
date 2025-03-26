@@ -1,0 +1,54 @@
+/* MainSection.css or DashboardIndexPage.css */
+.recipe-card {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.recipe-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure buttons are responsive */
+.btn {
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 12px);
+}
+
+/* Adjust tab font size for smaller screens */
+.nav-tabs .nav-link {
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 15px);
+}
+
+@media (max-width: 576px) {
+  .nav-tabs {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-tabs .nav-item {
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-tabs .nav-link {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 5px;
+  }
+}

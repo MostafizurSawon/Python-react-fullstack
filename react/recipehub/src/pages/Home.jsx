@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Slider from "react-slick";
 import { Card, Badge } from 'react-bootstrap';
-import { HeartFill } from 'react-bootstrap-icons';
+import { HandThumbsUpFill } from 'react-bootstrap-icons'; // New icon for total reactions
 import { useNavigate } from 'react-router-dom';
 import myaxios from '../utils/myaxios';
 import Loading from '../components/Loading';
@@ -137,14 +137,14 @@ function Home() {
                       </span>
                     </Card.Text>
                     <div className="d-flex align-items-center">
-                      <HeartFill size={18} color="#e74c3c" />
+                      <HandThumbsUpFill size={18} color="#e74c3c" /> 
                       <Badge
                         bg="light"
                         text="dark"
                         className="ms-2"
                         style={{ fontSize: '0.9rem', padding: '5px 10px', borderRadius: '10px' }}
                       >
-                        {recipe.reaction_counts?.LIKE || 0} Likes
+                        Total Reactions: {recipe.reaction_counts?.total || 0} {/* Updated to total */}
                       </Badge>
                     </div>
                   </Card.Body>

@@ -6,6 +6,7 @@ import Home from "./Home";
 import MainSection from "./MainSection";
 import myaxios from "../utils/myaxios";
 import { successToast, errorToast } from "../utils/toast";
+import "./IndexPage.css";
 
 const IndexPage = () => {
   const [formData, setFormData] = useState({
@@ -49,14 +50,17 @@ const IndexPage = () => {
     <div>
       <Navbar />
 
+      <div className="container-fluid x">
+
       <Home />
+      </div>
 
       <div id="main-section" className="container my-5">
         <MainSection />
       </div>
 
-      {/* contact us */}
-      <section className="py-5">
+
+      <section className="py-5 x">
         <div className="container">
           <div className="row align-items-center">
             <div className="col-12 col-lg-5 mb-5 mb-lg-0">
@@ -111,8 +115,9 @@ const IndexPage = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
+      <div className="x">
+        <Footer />
+      </div>
     </div>
   );
 };

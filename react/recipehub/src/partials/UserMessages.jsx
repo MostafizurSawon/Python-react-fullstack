@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
 import { Navigate } from "react-router-dom";
-import axios from "axios";
+import myaxios from "../utils/myaxios";
 import "./UserMessages.css";
 
 const UserMessages = () => {
@@ -11,14 +11,13 @@ const UserMessages = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch messages when the component mounts
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:8000/contact/messages/", {
+        const response = await myaxios.get("/contact/messages/", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust based on your auth method
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
         setMessages(response.data);
@@ -30,13 +29,11 @@ const UserMessages = () => {
       }
     };
 
-    // Only fetch messages if the user is an admin
     if (user?.role === "Admin") {
       fetchMessages();
     }
   }, [user]);
 
-  // Redirect non-admin users to the dashboard
   if (!user || user.role !== "Admin") {
     return <Navigate to="/dashboard/index" replace />;
   }
@@ -60,30 +57,57 @@ const UserMessages = () => {
           No messages received yet.
         </div>
       ) : (
-        <div className="table-responsive">
-          <table className="table table-striped table-bordered">
-            <thead className="table-dark">
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Sender Name</th>
-                <th scope="col">Sender Email</th>
-                <th scope="col">Message</th>
-                <th scope="col">Date Sent</th>
-              </tr>
-            </thead>
-            <tbody>
-              {messages.map((message, index) => (
-                <tr key={message.id}>
-                  <td>{index + 1}</td>
-                  <td>{message.name}</td>
-                  <td>{message.email || "N/A"}</td>
-                  <td>{message.message}</td>
-                  <td>{new Date(message.created_at).toLocaleString()}</td>
+        <>
+          {/* Table for desktop */}
+          <div className="table-responsive d-none d-md-block">
+            <table className="table table-striped table-bordered">
+              <thead className="table-dark">
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Sender Name</th>
+                  <th scope="col">Sender Email</th>
+                  <th scope="col">Message</th>
+                  <th scope="col">Date Sent</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {messages.map((message, index) => (
+                  <tr key={message.id}>
+                    <td>{index + 1}</td>
+                    <td>{message.name}</td>
+                    <td>{message.email || "N/A"}</td>
+                    <td>{message.message}</td>
+                    <td>{new Date(message.created_at).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Card layout for mobile */}
+          <div className="d-md-none">
+            {messages.map((message, index) => (
+              <div key={message.id} className="card mb-3 shadow-sm">
+                <div className="card-body">
+                  <h5 className="card-title">Message #{index + 1}</h5>
+                  <p className="card-text">
+                    <strong>Sender Name:</strong> {message.name}
+                  </p>
+                  <p className="card-text">
+                    <strong>Sender Email:</strong> {message.email || "N/A"}
+                  </p>
+                  <p className="card-text">
+                    <strong>Message:</strong> {message.message}
+                  </p>
+                  <p className="card-text">
+                    <strong>Date Sent:</strong>{" "}
+                    {new Date(message.created_at).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Card, Modal, Form, InputGroup, FormControl, Collapse } from "react-bootstrap";
+import { Button, Card, Modal, Form, InputGroup, FormControl, Collapse, Nav } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import myaxios from "../../utils/myaxios";
 import Loading from "../../components/Loading";
@@ -7,6 +7,7 @@ import NotFound from "../../components/NotFound";
 import { successToast, errorToast } from "../../utils/toast";
 import { useUser } from "../../context/UserContext";
 import "./../MainSection.css";
+import "./indexPage.css";
 
 const DashboardIndexPage = () => {
   const { user } = useUser();
@@ -25,6 +26,8 @@ const DashboardIndexPage = () => {
     img: "",
   });
   const [filterOpen, setFilterOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("my_recipes");
+  const [removing, setRemoving] = useState(null); // Track which recipe is being removed
 
   const navigate = useNavigate();
 
@@ -45,8 +48,12 @@ const DashboardIndexPage = () => {
     let url = "recipes/lists/";
     const params = new URLSearchParams();
 
-    if (user && user.role !== 'Admin') {
-      params.append("my_recipes", "true");
+    if (user) {
+      if (activeTab === "my_recipes" && user.role !== 'Admin') {
+        params.append("my_recipes", "true");
+      } else if (activeTab === "saved_recipes") {
+        params.append("saved_recipes", "true");
+      }
     }
 
     if (selectedCategories.length > 0) {
@@ -73,7 +80,7 @@ const DashboardIndexPage = () => {
   useEffect(() => {
     fetchCategories();
     fetchRecipes();
-  }, [selectedCategories, searchQuery, user]);
+  }, [selectedCategories, searchQuery, user, activeTab]);
 
   const handleDelete = async (recipeId) => {
     if (window.confirm("Are you sure you want to delete this recipe?")) {
@@ -89,6 +96,25 @@ const DashboardIndexPage = () => {
           errorToast("Failed to delete recipe.");
         }
       }
+    }
+  };
+
+  const handleRemoveFromSaved = async (recipeId) => {
+    setRemoving(recipeId);
+    try {
+      const response = await myaxios.post(`recipes/lists/${recipeId}/save/`);
+      if (response.data.status === 'recipe unsaved') {
+        setRecipes(recipes.filter((recipe) => recipe.id !== recipeId));
+        successToast("Recipe removed from saved list!");
+      } else {
+        errorToast("Failed to remove recipe from saved list.");
+      }
+    } catch (error) {
+      console.error("Error removing recipe from saved list:", error);
+      const errorMessage = error.response?.data?.detail || "Failed to remove recipe from saved list.";
+      errorToast(errorMessage);
+    } finally {
+      setRemoving(null);
     }
   };
 
@@ -164,6 +190,12 @@ const DashboardIndexPage = () => {
     setSearchQuery("");
   };
 
+  const setActiveTabAndReset = (tab) => {
+    setActiveTab(tab);
+    setSelectedCategories([]);
+    setSearchQuery("");
+  };
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -194,12 +226,29 @@ const DashboardIndexPage = () => {
               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
             >
               <div className="card-body p-4 p-md-5">
-                <h1
-                  className="text-center text-primary mb-5"
-                  style={{ fontWeight: "bold" }}
-                >
-                  My Recipes
-                </h1>
+                {/* Tabs for My Recipes and Saved Recipes */}
+                <div className="d-flex justify-content-center mb-4">
+                  <Nav variant="tabs" defaultActiveKey="my_recipes">
+                    <Nav.Item>
+                      <Nav.Link
+                        eventKey="my_recipes"
+                        onClick={() => setActiveTabAndReset("my_recipes")}
+                        className={activeTab === "my_recipes" ? "active" : ""}
+                      >
+                        My Recipes
+                      </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                      <Nav.Link
+                        eventKey="saved_recipes"
+                        onClick={() => setActiveTabAndReset("saved_recipes")}
+                        className={activeTab === "saved_recipes" ? "active" : ""}
+                      >
+                        Saved Recipes
+                      </Nav.Link>
+                    </Nav.Item>
+                  </Nav>
+                </div>
 
                 {/* Search Bar */}
                 <div className="mb-4 d-flex justify-content-start">
@@ -208,7 +257,11 @@ const DashboardIndexPage = () => {
                       <i className="bi bi-search"></i>
                     </InputGroup.Text>
                     <FormControl
-                      placeholder="Search my recipes..."
+                      placeholder={
+                        activeTab === "my_recipes"
+                          ? "Search my recipes..."
+                          : "Search saved recipes..."
+                      }
                       value={searchQuery}
                       onChange={handleSearchChange}
                     />
@@ -304,7 +357,7 @@ const DashboardIndexPage = () => {
                       ) : recipes.length > 0 ? (
                         recipes.map((recipe) => (
                           <div className="col-12 col-sm-6 col-lg-6" key={recipe.id}>
-                            <Card className="h-100 shadow-sm">
+                            <Card className="h-100 shadow-sm recipe-card">
                               <Card.Img
                                 variant="top"
                                 src={recipe.img || fallbackImage}
@@ -329,7 +382,7 @@ const DashboardIndexPage = () => {
                                   Shared on: {new Date(recipe.created_on).toLocaleDateString() || "N/A"}
                                 </Card.Text>
                                 <div className="mt-auto d-flex gap-2">
-                                  {canEditOrDelete(recipe) && (
+                                  {activeTab === "my_recipes" && canEditOrDelete(recipe) && (
                                     <>
                                       <Button
                                         variant="primary"
@@ -349,6 +402,31 @@ const DashboardIndexPage = () => {
                                       </Button>
                                     </>
                                   )}
+                                  {activeTab === "saved_recipes" && (
+                                    <>
+                                      <Button
+                                        variant="primary"
+                                        size="sm"
+                                        className="w-50"
+                                        onClick={() => navigate(`/recipe/${recipe.id}`)}
+                                      >
+                                        View
+                                      </Button>
+                                      <Button
+                                        variant="warning"
+                                        size="sm"
+                                        className="w-50"
+                                        onClick={() => handleRemoveFromSaved(recipe.id)}
+                                        disabled={removing === recipe.id}
+                                      >
+                                        {removing === recipe.id ? (
+                                          <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        ) : (
+                                          "Remove"
+                                        )}
+                                      </Button>
+                                    </>
+                                  )}
                                 </div>
                               </Card.Body>
                             </Card>
@@ -356,7 +434,7 @@ const DashboardIndexPage = () => {
                         ))
                       ) : (
                         <div className="col-12">
-                          <NotFound message="No recipes found." />
+                          <NotFound message={activeTab === "my_recipes" ? "No recipes found." : "No saved recipes found."} />
                         </div>
                       )}
                     </div>

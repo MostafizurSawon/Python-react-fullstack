@@ -21,7 +21,13 @@ const Navbar = ({ navOpenHandler }) => {
                     />
                     </Link>
 
-                <div className="float-right h-auto d-flex">
+                    <div className="float-right h-auto d-flex">
+                    <Link to={`/logout/`} className="side-bar-item text-danger">
+                            <i className="bi bi-box-arrow-right"></i><span className="side-bar-item-caption">Logout</span>
+                            </Link>
+                     </div>
+
+                {/* <div className="float-right h-auto d-flex">
                     <div className="user-dropdown">
                         <img className="icon-nav-img" src="/images/user.webp" alt="" />
                         <div className="user-dropdown-content ">
@@ -36,7 +42,7 @@ const Navbar = ({ navOpenHandler }) => {
                             </Link>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
         </nav>
     );

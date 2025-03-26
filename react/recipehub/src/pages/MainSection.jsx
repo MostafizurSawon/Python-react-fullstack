@@ -15,7 +15,7 @@ function MainSection() {
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
+  const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(true); // Changed to true for default visibility
 
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -295,7 +295,7 @@ function MainSection() {
                           </div>
                           <div className="shared-date">
                             <span style={{ fontSize: '1.2rem', color: '#f39c12' }}>📅</span>
-                            <span style={{ fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)', color: '#34495e', marginLeft: '8px', fontWeight: '500' }}>
+                            <span style={{ fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)', color: '#34495e', marginLeft: '8 8px', fontWeight: '500' }}>
                               Shared on: {recipe.created_on ? new Date(recipe.created_on).toLocaleDateString() : 'N/A'}
                             </span>
                           </div>

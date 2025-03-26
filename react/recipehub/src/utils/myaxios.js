@@ -1,4 +1,3 @@
-// src/utils/myaxios.js
 import axios from "axios";
 
 let baseURL = "https://recipe-drf.onrender.com/";

@@ -16,6 +16,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1024);
+  const [isLoading, setIsLoading] = useState(false); // New state for loading
   const buttonRef = useRef(null);
   const lastMoveTimeRef = useRef(0);
   const funnyAudioRef = useRef(null);
@@ -155,6 +156,7 @@ const LoginPage = () => {
     const formdata = new FormData(e.target);
     const data = Object.fromEntries(formdata);
 
+    setIsLoading(true); // Start loading
     try {
       const success = await login(data.email, data.password);
       if (success) {
@@ -170,6 +172,8 @@ const LoginPage = () => {
       setErrorFields(["email", "password"]);
       setIsPasswordCorrect(false);
       errorToast("Failed to log in. Please check your email and password.");
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -260,6 +264,7 @@ const LoginPage = () => {
                 ref={buttonRef}
                 type="submit"
                 className={`btn ${isDesktop && !isPasswordCorrect ? "wobble" : ""}`}
+                disabled={isLoading} // Disable button while loading
                 style={{
                   background:
                     "linear-gradient(90deg, #8B0000 0%, #FFC107 100%)",
@@ -278,20 +283,31 @@ const LoginPage = () => {
                   margin: "0 auto",
                 }}
                 onMouseEnter={(e) => {
-                  if (isPasswordCorrect) {
+                  if (isPasswordCorrect && !isLoading) {
                     e.target.style.transform = "scale(1.02)";
                     e.target.style.boxShadow =
                       "0 4px 15px rgba(139, 0, 0, 0.3)";
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (isPasswordCorrect) {
+                  if (isPasswordCorrect && !isLoading) {
                     e.target.style.transform = "scale(1)";
                     e.target.style.boxShadow = "none";
                   }
                 }}
               >
-                Sign In
+                {isLoading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    Signing In...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
               </button>
               <hr className="my-4" style={{ borderColor: "#ced4da" }} />
               <div className="text-center">
