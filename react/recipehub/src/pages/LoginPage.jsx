@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom"; // Added useLocation
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "../context/UserContext";
 import myaxios from "../utils/myaxios";
@@ -9,6 +9,7 @@ import Footer from "./Footer";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // Added to access query parameters
   const { login } = useUser();
   const [errorFields, setErrorFields] = useState([]);
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
@@ -21,6 +22,22 @@ const LoginPage = () => {
   const lastMoveTimeRef = useRef(0);
   const funnyAudioRef = useRef(null);
   const successAudioRef = useRef(null);
+
+  // Check for verified query parameter on mount
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const verifiedStatus = queryParams.get("verified");
+
+    if (verifiedStatus) {
+      if (verifiedStatus === "true") {
+        successToast("Email verified successfully! You can log in NOW!");
+      } else if (verifiedStatus === "already") {
+        errorToast("Email already verified.");
+      } else if (verifiedStatus === "failed") {
+        errorToast("Invalid or expired activation link.");
+      }
+    }
+  }, [location.search]); 
 
   // Detect device type on mount and on window resize
   useEffect(() => {
@@ -61,7 +78,7 @@ const LoginPage = () => {
 
     const debounceTimeout = setTimeout(() => {
       myaxios
-        .post("/accounts/validate-password/", { email, password })  // Updated endpoint
+        .post("/accounts/validate-password/", { email, password })
         .then((response) => {
           if (response.data.status === "valid") {
             setIsPasswordCorrect(true);
@@ -157,14 +174,14 @@ const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      const response = await myaxios.post("/accounts/login/", {  // Updated endpoint
+      const response = await myaxios.post("/accounts/login/", {
         email: data.email,
         password: data.password,
       });
 
       if (response.data.status === "success") {
         const token = response.data.token;
-        const success = await login(data.email, data.password, token);  // Pass token to context
+        const success = await login(data.email, data.password, token);
         if (success) {
           successToast("Login Successful!");
           setTimeout(() => {
@@ -175,7 +192,7 @@ const LoginPage = () => {
         }
       } else if (response.data.status === "unverified") {
         errorToast(response.data.message);
-        navigate("/not-verified", { state: { email: data.email } });  // Redirect to not verified page
+        navigate("/not-verified", { state: { email: data.email } });
       } else {
         throw new Error(response.data.message || "Invalid Credentials");
       }
