@@ -59,13 +59,24 @@ function Home() {
   if (loading) return <Loading />;
 
   return (
-    <div className="my-5 pt-5">
+    <div className="my-3">
       <div className="container">
-        <h1 className="mb-4" style={{ fontSize: '2.5rem', fontWeight: '700', color: '#2c3e50', textAlign: 'center' }}>
-          Trending Recipes
-        </h1>
+      <h1
+        className="mb-4"
+        style={{
+          fontSize: '2.5rem',
+          fontWeight: '700',
+          background: 'linear-gradient(to right, #ff5733, #ffb733)', // Gradient matching the nav bar
+          WebkitBackgroundClip: 'text', // Clips the background to the text (for Webkit browsers)
+          backgroundClip: 'text', // Standard property for background clipping
+          color: 'transparent', // Makes the text transparent so the gradient shows through
+          textAlign: 'center',
+        }}
+      >
+        Trending Recipes
+      </h1>
         {recipes.length > 0 ? (
-          <Slider {...settings}>
+          <Slider {...settings} style={{ maxHeight: '400px', overflow: 'hidden' }}>
             {recipes.map(recipe => (
               <div key={recipe.id} className="p-3">
                 <Card
@@ -76,7 +87,7 @@ function Home() {
                     overflow: 'hidden',
                     background: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
                     cursor: 'pointer',
-                    transition: 'transform 0.3s',
+                    transition: 'transform 0.5s',
                   }}
                   onClick={() => navigate(`/recipes/${recipe.id}`)}
                   onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
@@ -144,7 +155,7 @@ function Home() {
                         className="ms-2"
                         style={{ fontSize: '0.9rem', padding: '5px 10px', borderRadius: '10px' }}
                       >
-                        Total Reactions: {recipe.reaction_counts?.total || 0} {/* Updated to total */}
+                        Total Reactions: {recipe.reaction_counts?.total || 0} 
                       </Badge>
                     </div>
                   </Card.Body>
@@ -153,7 +164,7 @@ function Home() {
             ))}
           </Slider>
         ) : (
-          <p className="text-center text-muted mt-4">No trending recipes available.</p>
+          <p className="text-center text-muted mt-4"><Loading /></p>
         )}
       </div>
     </div>

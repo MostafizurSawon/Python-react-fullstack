@@ -1,4 +1,3 @@
-// src/pages/LogoutPage.jsx
 import { useEffect } from "react";
 import { useUser } from "../context/UserContext";
 

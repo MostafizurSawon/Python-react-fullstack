@@ -148,7 +148,18 @@ function MainSection() {
 
   return (
     <div className="container my-4" ref={sectionRef} id="main-section">
-      <h1 className="text-center mb-5" style={{ fontWeight: 'bold', color: '#2c3e50', fontSize: 'clamp(2rem, 5vw, 2.5rem)' }}>
+      <h1
+        className="mb-4"
+        style={{
+          fontSize: '2.5rem',
+          fontWeight: '700',
+          background: 'linear-gradient(to right, #ff5733, #ffb733)', 
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text', 
+          color: 'transparent',
+          textAlign: 'center',
+        }}
+      >
         Our Recipes
       </h1>
       <div className="main-section-wrapper">
@@ -195,7 +206,7 @@ function MainSection() {
           <div className="col-12 col-md-9 recipe-content">
             <InputGroup className="my-3">
               <InputGroup.Text style={{ background: 'none', border: 'none', padding: '10px 16px' }}>
-                <i className="bi bi-search" style={{ color: '#34495e' }}></i>
+                <i className="bi bi-search search-sm" style={{ color: '#34495e' }}></i>
               </InputGroup.Text>
               <FormControl
                 ref={searchInputRef}
@@ -204,7 +215,7 @@ function MainSection() {
                 onChange={handleSearchChange}
                 onFocus={handleSearchFocus}
                 aria-label="Search recipes"
-                style={{ border: 'none', padding: '10px 16px' }}
+                style={{ border: 'none', padding: '10px 16px' }} className=""
               />
               <Button
                 variant="success"

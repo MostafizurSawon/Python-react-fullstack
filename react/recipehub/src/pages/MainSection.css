@@ -26,7 +26,7 @@
 /* Style the label to include a custom checkbox */
 .custom-checkbox .form-check-label {
   position: relative;
-  padding-left: 60px; /* Increased padding to add more space between checkmark and text */
+  padding-left: 40px; /* Reduced for better balance, adjusted per breakpoint */
   color: #34495e;
   cursor: pointer;
   font-weight: 500;
@@ -62,11 +62,11 @@
   top: 50%;
   transform: translateY(-50%);
   color: #fff;
-  font-size: 14px;
+  font-size: 0.9em; /* Scale with checkbox size */
   font-weight: bold;
 }
 
-/* Focus state */
+/* Focus state for accessibility */
 .custom-checkbox .form-check-input:focus + .form-check-label::before {
   box-shadow: 0 0 0 0.2rem rgba(231, 76, 18, 0.25);
 }
@@ -123,18 +123,69 @@
   }
 
   .custom-checkbox .form-check-label {
-    padding-left: 35px; /* Slightly less padding on mobile for better fit */
+    padding-left: 32px; /* Slightly less padding on mobile for better fit */
+  }
+
+  .custom-checkbox .form-check-label::before {
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  .custom-checkbox .form-check-input:checked + .form-check-label::after {
+    left: 4px;
+    font-size: 0.85em; /* Slightly smaller checkmark for mobile */
   }
 }
 
-/* Ensure the category list is scrollable */
+/* Ensure proper spacing for smaller screens */
+@media (max-width: 576px) {
+  .custom-checkbox-wrapper {
+    padding: 6px 10px;
+  }
+
+  .custom-checkbox .form-check-label {
+    padding-left: 28px; /* Further reduce padding on smaller screens */
+  }
+
+  .custom-checkbox .form-check-label::before {
+    width: 1em;
+    height: 1em;
+  }
+
+  .custom-checkbox .form-check-input:checked + .form-check-label::after {
+    left: 4px;
+    font-size: 0.8em; /* Even smaller checkmark for smaller screens */
+  }
+}
+
+/* Ensure the category list is scrollable with custom scrollbar */
 .category-list {
   max-height: 60vh;
   overflow-y: auto;
   padding-right: 5px; /* Prevent scrollbar overlap */
 }
 
-/* Filter panel styles for DashboardIndexPage */
+/* Custom scrollbar for category list */
+.category-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.category-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.category-list::-webkit-scrollbar-thumb {
+  background: #e74c12;
+  border-radius: 10px;
+}
+
+.category-list::-webkit-scrollbar-thumb:hover {
+  background: #c0392b;
+}
+
+/* Filter panel styles (consolidated) */
+.filter-panel,
 .p-3.border.rounded {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -143,17 +194,20 @@
   border: 1px solid #dee2e6;
 }
 
+.filter-panel h5,
 .p-3.border.rounded h5 {
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 15px;
 }
 
+.filter-panel .form-check,
 .p-3.border.rounded .form-check {
   cursor: pointer;
   margin-bottom: 10px;
 }
 
+.filter-panel .form-check-label,
 .p-3.border.rounded .form-check-label {
   color: #34495e;
   padding-left: 25px;
@@ -179,21 +233,36 @@
   }
 }
 
-/* Staggered animation for recipe cards */
+/* Staggered animation for recipe cards (dynamic delay) */
 #main-section.animate-on-scroll .custom-card {
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 0.5s ease-out forwards;
 }
 
-#main-section.animate-on-scroll .custom-card:nth-child(1) {
-  animation-delay: 0.1s;
+/* Dynamic delay for all cards */
+#main-section.animate-on-scroll .custom-card {
+  animation-delay: calc(0.1s * var(--card-index));
 }
-#main-section.animate-on-scroll .custom-card:nth-child(2) {
-  animation-delay: 0.2s;
-}
-#main-section.animate-on-scroll .custom-card:nth-child(3) {
-  animation-delay: 0.3s;
+
+/* Fallback for older browsers */
+@supports not (animation-delay: calc(0.1s * var(--card-index))) {
+  #main-section.animate-on-scroll .custom-card:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  #main-section.animate-on-scroll .custom-card:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  #main-section.animate-on-scroll .custom-card:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  #main-section.animate-on-scroll .custom-card:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  #main-section.animate-on-scroll .custom-card:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+  /* Add more as needed */
 }
 
 @keyframes fadeInUp {
@@ -220,15 +289,41 @@
   overflow: hidden;
 }
 
+/* Adjust the InputGroup.Text to add more space after the icon */
+.input-group .input-group-text {
+  padding-right: 20px; /* Increase the right padding to create space */
+}
+
+/* Ensure the FormControl has enough left padding to separate the placeholder text */
+.input-group .form-control {
+  padding-left: 16px; /* Ensure enough space for the placeholder text */
+}
+
+/* Add margin to the search icon for extra spacing */
+.input-group .bi-search {
+  margin-right: 8px; /* Add a small margin to the right of the icon */
+}
+
+/* Fine-tune for smaller screens */
 @media (max-width: 576px) {
+  .input-group .input-group-text {
+    padding: 8px 12px; /* Match the reduced padding for smaller screens */
+    padding-right: 16px; /* Still ensure enough space after the icon */
+  }
+
   .input-group .form-control {
     font-size: 0.9rem;
     padding: 8px 12px;
+    padding-left: 14px; 
   }
 
   .input-group .btn {
     padding: 8px 12px;
     font-size: 0.9rem;
+  }
+
+  .search-sm{
+    display: none;
   }
 }
 
@@ -276,6 +371,7 @@
     padding-left: 10px;
     padding-right: 10px;
   }
+
 }
 
 /* Image overlay for recipe cards */
@@ -291,25 +387,4 @@
   height: 100%;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
   pointer-events: none;
-}
-
-/* Ensure proper spacing for smaller screens */
-@media (max-width: 576px) {
-  .custom-checkbox-wrapper {
-    padding: 6px 10px;
-  }
-
-  .custom-checkbox .form-check-label {
-    padding-left: 30px; /* Further reduce padding on smaller screens */
-  }
-
-  .custom-checkbox .form-check-label::before {
-    width: 1em;
-    height: 1em;
-  }
-
-  .custom-checkbox .form-check-input:checked + .form-check-label::after {
-    left: 4px;
-    font-size: 12px;
-  }
 }

@@ -26,6 +26,7 @@ import AllUsers from "./partials/AllUsers";
 import UserProfile from "./partials/UserProfile";
 import UserInfo from "./partials/UserInfo";
 import UserMessages from "./partials/UserMessages";
+import NotVerifiedPage from "./pages/NotVerifiedPage"; // Added import
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
           <Route path="/set-new-password" element={<SetPasswordPage />} />
           <Route path="/logout" element={<LogoutPage />} />
           <Route path="/recipes/:id" element={<RecipeDetail />} />
+          <Route path="/not-verified" element={<NotVerifiedPage />} /> {/* Added route */}
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
@@ -47,9 +49,9 @@ function App() {
               <Route path="index/" element={<DashboardIndexPage />} />
               <Route path="update-profile/" element={<ProfilePage />} />
               <Route path="users/" element={<AllUsers />} />
-              <Route path="messages/" element={<UserMessages/>} />
+              <Route path="messages/" element={<UserMessages />} />
               <Route path="users/:email" element={<UserProfile />} />
-              <Route path="user-info/" element={<UserInfo />} /> 
+              <Route path="user-info/" element={<UserInfo />} />
               <Route path="add-recipe/" element={<RecipeForm />} />
               <Route path="customer/" element={<CustomerPage />} />
               <Route path="category/" element={<CategoryPage />} />

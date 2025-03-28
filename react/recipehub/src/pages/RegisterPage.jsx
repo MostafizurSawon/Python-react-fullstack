@@ -54,11 +54,12 @@ const RegisterPage = () => {
     setErrors({});
 
     myaxios
-      .post("accounts/register/", formData)
+      .post("accounts/register/", formData)  // Updated endpoint to match Project 2
       .then((response) => {
         if (response.data.status === "success") {
-          successToast("Registered Successfully!");
-          navigate("/login");
+          successToast(response.data.message);  // Show "Please check your email to verify your account."
+          // Optionally, navigate to a verification pending page or stay on the register page
+          // navigate("/login");  // Comment out or delay until verification
         } else {
           errorToast("Registration Failed!");
         }
@@ -68,15 +69,15 @@ const RegisterPage = () => {
           const errorData = error.response.data;
           if (errorData.message === "User Registration failed!") {
             // Handle specific field errors from the backend
-            const backendErrors = errorData.message || {};
+            const backendErrors = errorData.errors || {};  // Adjusted to match backend response structure
             setErrors(backendErrors);
             if (backendErrors.email) {
-              errorToast(backendErrors.email || "Email already exists!");
+              errorToast(backendErrors.email[0] || "Email already exists!");  // Handle array of errors
             } else {
               errorToast("Registration Failed!");
             }
           } else {
-            errorToast("Registration Failed!");
+            errorToast(errorData.message || "Registration Failed!");
           }
         } else {
           errorToast("An error occurred. Please try again.");

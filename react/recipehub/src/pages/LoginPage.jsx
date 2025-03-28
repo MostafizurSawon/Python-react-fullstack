@@ -16,7 +16,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1024);
-  const [isLoading, setIsLoading] = useState(false); // New state for loading
+  const [isLoading, setIsLoading] = useState(false);
   const buttonRef = useRef(null);
   const lastMoveTimeRef = useRef(0);
   const funnyAudioRef = useRef(null);
@@ -61,7 +61,7 @@ const LoginPage = () => {
 
     const debounceTimeout = setTimeout(() => {
       myaxios
-        .post("/accounts/validate-password/", { email, password })
+        .post("/accounts/validate-password/", { email, password })  // Updated endpoint
         .then((response) => {
           if (response.data.status === "valid") {
             setIsPasswordCorrect(true);
@@ -85,7 +85,7 @@ const LoginPage = () => {
             funnyAudioRef.current.play();
           }
         });
-    }, 1000); // Increased debounce time to 1000ms
+    }, 1000);
 
     return () => clearTimeout(debounceTimeout);
   }, [email, password, isDesktop]);
@@ -138,7 +138,6 @@ const LoginPage = () => {
       }
     };
 
-    // Only add the mousemove event listener on desktop devices
     if (isDesktop) {
       window.addEventListener("mousemove", handleMouseMove);
     }
@@ -151,29 +150,47 @@ const LoginPage = () => {
   }, [isPasswordCorrect, buttonPosition, isDesktop]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
+    e.preventDefault();
 
     const formdata = new FormData(e.target);
     const data = Object.fromEntries(formdata);
 
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
     try {
-      const success = await login(data.email, data.password);
-      if (success) {
-        setTimeout(() => {
-          navigate("/dashboard/index/");
-        }, 500);
+      const response = await myaxios.post("/accounts/login/", {  // Updated endpoint
+        email: data.email,
+        password: data.password,
+      });
+
+      if (response.data.status === "success") {
+        const token = response.data.token;
+        const success = await login(data.email, data.password, token);  // Pass token to context
+        if (success) {
+          successToast("Login Successful!");
+          setTimeout(() => {
+            navigate("/dashboard/index/");
+          }, 500);
+        } else {
+          throw new Error("Context login failed");
+        }
+      } else if (response.data.status === "unverified") {
+        errorToast(response.data.message);
+        navigate("/not-verified", { state: { email: data.email } });  // Redirect to not verified page
       } else {
-        setErrorFields(["email", "password"]);
-        setIsPasswordCorrect(false);
+        throw new Error(response.data.message || "Invalid Credentials");
       }
     } catch (error) {
       console.error("Login error ->", error);
       setErrorFields(["email", "password"]);
       setIsPasswordCorrect(false);
-      errorToast("Failed to log in. Please check your email and password.");
+      if (error.response?.data?.status === "unverified") {
+        errorToast(error.response.data.message);
+        navigate("/not-verified", { state: { email: data.email } });
+      } else {
+        errorToast("Failed to log in. Please check your email and password.");
+      }
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
@@ -264,7 +281,7 @@ const LoginPage = () => {
                 ref={buttonRef}
                 type="submit"
                 className={`btn ${isDesktop && !isPasswordCorrect ? "wobble" : ""}`}
-                disabled={isLoading} // Disable button while loading
+                disabled={isLoading}
                 style={{
                   background:
                     "linear-gradient(90deg, #8B0000 0%, #FFC107 100%)",
