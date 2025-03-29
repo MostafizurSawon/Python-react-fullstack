@@ -16,7 +16,7 @@ const PasswordResetOTP = () => {
         console.log(data);
 
         myaxios.post(
-            "accounts/verify-otp",
+            "accounts/verify-otp/",
             data,
         ).then((response) => {
             if (response.data.status === "success") {

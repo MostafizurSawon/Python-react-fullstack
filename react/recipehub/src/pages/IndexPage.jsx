@@ -31,7 +31,7 @@ const IndexPage = () => {
     try {
       const response = await myaxios.post("contact/", formData);
       successToast(response.data.message || "Message sent successfully!");
-      setFormData({ name: "", email: "", message: "" }); // Reset form
+      setFormData({ name: "", email: "", message: "" }); 
     } catch (error) {
       console.error("Error submitting contact form:", error.response?.data || error.message);
       errorToast(

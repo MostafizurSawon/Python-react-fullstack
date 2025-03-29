@@ -29,6 +29,17 @@
   padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 12px);
 }
 
+.input-group-text {
+  position: absolute;
+  right: 0;
+  /* z-index: 9999;
+  height: 100%;
+  border-right: 39;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: -1px; */
+}
+
 /* Adjust tab font size for smaller screens */
 .nav-tabs .nav-link {
   font-size: clamp(0.9rem, 2.5vw, 1rem);
