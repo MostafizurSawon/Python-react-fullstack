@@ -24,7 +24,10 @@ myaxios.interceptors.request.use(
 myaxios.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (
+      error.response?.status === 401 &&
+      error.config.url !== "/accounts/login/"
+    ) {
       localStorage.removeItem("token");
       window.location.href = "/login";
     }

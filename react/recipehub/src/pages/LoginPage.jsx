@@ -1,5 +1,5 @@
-import { Link, useNavigate, useLocation } from "react-router-dom"; // Added useLocation
-import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 import myaxios from "../utils/myaxios";
 import { errorToast, successToast } from "../utils/toast";
@@ -9,19 +9,13 @@ import Footer from "./Footer";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Added to access query parameters
+  const location = useLocation();
   const { login } = useUser();
   const [errorFields, setErrorFields] = useState([]);
-  const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
-  const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1024);
   const [isLoading, setIsLoading] = useState(false);
-  const buttonRef = useRef(null);
-  const lastMoveTimeRef = useRef(0);
-  const funnyAudioRef = useRef(null);
-  const successAudioRef = useRef(null);
 
   // Check for verified query parameter on mount
   useEffect(() => {
@@ -37,7 +31,7 @@ const LoginPage = () => {
         errorToast("Invalid or expired activation link.");
       }
     }
-  }, [location.search]); 
+  }, [location.search]);
 
   // Detect device type on mount and on window resize
   useEffect(() => {
@@ -53,131 +47,22 @@ const LoginPage = () => {
     };
   }, []);
 
-  // Initialize audio elements
-  useEffect(() => {
-    funnyAudioRef.current = new Audio(
-      "https://www.myinstants.com/media/sounds/boing.mp3"
-    );
-    successAudioRef.current = new Audio(
-      "https://www.myinstants.com/media/sounds/success.mp3"
-    );
-    funnyAudioRef.current.loop = true;
-
-    return () => {
-      funnyAudioRef.current.pause();
-      successAudioRef.current.pause();
-    };
-  }, []);
-
-  // Validate password with increased debounce time and better error handling
-  useEffect(() => {
-    if (!email || !password) {
-      setIsPasswordCorrect(false);
-      return;
-    }
-
-    const debounceTimeout = setTimeout(() => {
-      myaxios
-        .post("/accounts/validate-password/", { email, password })
-        .then((response) => {
-          if (response.data.status === "valid") {
-            setIsPasswordCorrect(true);
-            funnyAudioRef.current.pause();
-            successAudioRef.current.play();
-            setTimeout(() => {
-              successAudioRef.current.pause();
-              successAudioRef.current.currentTime = 0;
-            }, 3000);
-          } else {
-            setIsPasswordCorrect(false);
-            if (isDesktop) {
-              funnyAudioRef.current.play();
-            }
-          }
-        })
-        .catch((error) => {
-          console.error("Password validation error ->", error);
-          setIsPasswordCorrect(false);
-          if (isDesktop) {
-            funnyAudioRef.current.play();
-          }
-        });
-    }, 1000);
-
-    return () => clearTimeout(debounceTimeout);
-  }, [email, password, isDesktop]);
-
-  // Handle button movement on mouse move (only for desktop)
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (!isDesktop || isPasswordCorrect) {
-        setButtonPosition({ x: 0, y: 0 });
-        return;
-      }
-
-      const button = buttonRef.current;
-      if (!button) return;
-
-      const rect = button.getBoundingClientRect();
-      const buttonCenterX = rect.left + rect.width / 2;
-      const buttonCenterY = rect.top + rect.height / 2;
-
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-
-      const deltaX = mouseX - buttonCenterX;
-      const deltaY = mouseY - buttonCenterY;
-      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-      const currentTime = Date.now();
-      const timeSinceLastMove = currentTime - lastMoveTimeRef.current;
-      const moveDelay = 300;
-
-      if (distance < 50 && timeSinceLastMove > moveDelay) {
-        const moveRange = 300;
-        const angle = Math.random() * 2 * Math.PI;
-        const radius = Math.random() * moveRange;
-        const newX = Math.cos(angle) * radius;
-        const newY = Math.sin(angle) * radius;
-
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        const minX = -rect.left + 10;
-        const maxX = viewportWidth - rect.left - rect.width - 10;
-        const minY = -rect.top + 10;
-        const maxY = viewportHeight - rect.top - rect.height - 10;
-
-        const boundedX = Math.max(minX, Math.min(maxX, newX));
-        const boundedY = Math.max(minY, Math.min(maxY, newY));
-
-        setButtonPosition({ x: boundedX, y: boundedY });
-        lastMoveTimeRef.current = currentTime;
-      }
-    };
-
-    if (isDesktop) {
-      window.addEventListener("mousemove", handleMouseMove);
-    }
-
-    return () => {
-      if (isDesktop) {
-        window.removeEventListener("mousemove", handleMouseMove);
-      }
-    };
-  }, [isPasswordCorrect, buttonPosition, isDesktop]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
 
     const formdata = new FormData(e.target);
     const data = Object.fromEntries(formdata);
 
     setIsLoading(true);
+    setErrorFields([]); // Reset error fields before submission
+
     try {
       const response = await myaxios.post("/accounts/login/", {
         email: data.email,
         password: data.password,
       });
+      console.log("Login response:", response.data); // Debug log
 
       if (response.data.status === "success") {
         const token = response.data.token;
@@ -190,21 +75,21 @@ const LoginPage = () => {
         } else {
           throw new Error("Context login failed");
         }
-      } else if (response.data.status === "unverified") {
-        errorToast(response.data.message);
-        navigate("/not-verified", { state: { email: data.email } });
       } else {
-        throw new Error(response.data.message || "Invalid Credentials");
+        throw new Error(response.data.message || "Login failed");
       }
     } catch (error) {
-      console.error("Login error ->", error);
-      setErrorFields(["email", "password"]);
-      setIsPasswordCorrect(false);
-      if (error.response?.data?.status === "unverified") {
-        errorToast(error.response.data.message);
+      console.error("Login error:", error.response?.data || error);
+      const errorData = error.response?.data || {};
+      if (errorData.status === "unauthorized") {
+        setErrorFields(["email", "password"]);
+        errorToast("Invalid Credentials");
+      } else if (errorData.status === "unverified") {
+        errorToast(errorData.message || "Please verify your email before logging in.");
         navigate("/not-verified", { state: { email: data.email } });
       } else {
-        errorToast("Failed to log in. Please check your email and password.");
+        setErrorFields(["email", "password"]);
+        errorToast(errorData.message || "Failed to log in. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -224,7 +109,7 @@ const LoginPage = () => {
         }}
       >
         <div
-          className="card p-4 shadow-lg position-relative"
+          className="card p-4 shadow-lg"
           style={{
             maxWidth: "400px",
             width: "90%",
@@ -295,9 +180,8 @@ const LoginPage = () => {
                 />
               </div>
               <button
-                ref={buttonRef}
                 type="submit"
-                className={`btn ${isDesktop && !isPasswordCorrect ? "wobble" : ""}`}
+                className="btn"
                 disabled={isLoading}
                 style={{
                   background:
@@ -307,24 +191,18 @@ const LoginPage = () => {
                   borderRadius: "10px",
                   fontWeight: "500",
                   transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                  position: isDesktop && !isPasswordCorrect ? "absolute" : "relative",
-                  transform:
-                    isDesktop && !isPasswordCorrect
-                      ? `translate(${buttonPosition.x}px, ${buttonPosition.y}px)`
-                      : "none",
-                  zIndex: 1000,
                   display: "block",
                   margin: "0 auto",
                 }}
                 onMouseEnter={(e) => {
-                  if (isPasswordCorrect && !isLoading) {
+                  if (!isLoading) {
                     e.target.style.transform = "scale(1.02)";
                     e.target.style.boxShadow =
                       "0 4px 15px rgba(139, 0, 0, 0.3)";
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (isPasswordCorrect && !isLoading) {
+                  if (!isLoading) {
                     e.target.style.transform = "scale(1)";
                     e.target.style.boxShadow = "none";
                   }
